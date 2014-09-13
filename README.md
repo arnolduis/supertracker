@@ -5,7 +5,9 @@ supertracker
 
 # For testers
 
-```java
+```javascript
 st=require('supertracker');
+st.auth(1); // 1 means admin, 0 means user
+
 ```
 
