@@ -4,6 +4,4 @@ var path = require('path');
 var fs = require('fs');
 var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
 
-
-require(lib+'/supertracker.js').fakju();
-// require(lib+'/supertracker.js').auth(process.argv[2]);
+require(lib+'/supertracker.js').auth(process.argv[2]);
