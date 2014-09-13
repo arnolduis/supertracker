@@ -2,9 +2,9 @@
   "name": "supertracker",
   "version": "0.0.2",
   "description": "A super package for tracking and visualising user activity",
-  "main": "./lib/supertracker.js",
+  "main": "./lib/track/supertracker.js",
   "bin": {
-    "replaceme": "./bin/supertracker"
+    "auth": "./bin/auth"
   },
   "scripts": {
     "test": "echo \"test\""
