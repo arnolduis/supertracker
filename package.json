@@ -1,0 +1,26 @@
+{
+  "name": "supertracker",
+  "version": "0.0.1",
+  "description": "A super package for tracking and visualising user activity",
+  "main": "./lib/supertracker.js",
+  "bin": {
+    "replaceme": "./bin/supertracker"
+  },
+  "scripts": {
+    "test": "echo \"test\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arnolduis/supertracker.git"
+  },
+  "keywords": [
+    "event",
+    "track"
+  ],
+  "author": "arnolduis",
+  "license": "GLP",
+  "bugs": {
+    "url": "https://github.com/arnolduis/supertracker/issues"
+  },
+  "homepage": "https://github.com/arnolduis/supertracker"
+}
