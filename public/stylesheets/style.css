@@ -1,0 +1,21 @@
+body {
+	padding: 50px;
+	font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+	color: #00B7FF;
+}
+
+.content {
+	background-color:#aaaaaa; 
+	border-radius: 10px;
+	margin: 0px;
+	padding: 0px 5px 0px 5px;
+}
+
+.step {
+	border-radius: 5px;
+	background-color:#dddddd; 
+	margin: 5px;
+}
