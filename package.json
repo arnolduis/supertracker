@@ -1,6 +1,6 @@
 {
   "name": "supertracker",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A super package for tracking and visualising user activity",
   "main": "./lib/supertracker.js",
   "bin": {
@@ -13,8 +13,8 @@
     "type": "git",
     "url": "https://github.com/arnolduis/supertracker.git"
   },
-  "dependencies" : { 
-    "mongoose" : ">3.0.0"
+  "dependencies": {
+    "mongoose": ">3.0.0"
   },
   "keywords": [
     "event",
