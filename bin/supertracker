@@ -1,47 +1,31 @@
 #!/usr/bin/env node
+'use strict';
 
+// BASE SETUP
+// ==============================================
+
+var express = require('express');
+var app     = express();
+var port    =   process.env.PORT || 3100;
 var path = require('path');
+var bodyParser = require('body-parser');
 
-var fs = require('fs');
-var lib = path.join(path.dirname(fs.realpathSync(__filename)), '../lib');
+var index = require('../routes/index');
+var track = require('../routes/track');
 
-// /***************** MODULE SETUP *********************/
-// var express = require('express');
-// var app = express();
+// CONFIGURE
+// ==============================================
 
-// var http = require('http');
-// var path = require('path');
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// var routes = require('./routes');
-// var user = require('./routes/user');
-// var eventReceiver = require('./routes/eventReceiver');
-// var stats = require('./routes/stats');
-// var funnels = require('./routes/funnels');
-// var webmail = require('./routes/webmail');
+// ROUTES
+// ==============================================
 
+app.get('/', index);
+app.post('/track', track);
 
+// START THE SERVER
+// ==============================================
 
-// /******************** CONFIGURE *******************/
-// app.set('port', process.env.PORT || 3000);
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// /********************* MIDDLEWARES ***************/
-// app.use(express.bodyParser());
-// // development only
-// // if ('development' == app.get('env')) {
-// // 	app.use(express.errorHandler());
-// // }
-
-// /******************** ROUTES **********************/
-// app.get('/', routes.index);
-// app.get('/users', user.list);
-// app.post('/eventReceiver', eventReceiver.index);
-// app.get('/stats', stats.index);
-// app.get('/funnels', funnels.index);
-// app.get('/webmail', webmail.index);
-
-// http.createServer(app).listen(app.get('port'), function(){
-// 	console.log('Express server listening on port ' + app.get('port'));
-// });
+app.listen(port);
+console.log('Magic happens on port ' + port);
