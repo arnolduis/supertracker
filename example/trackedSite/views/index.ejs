@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title><%= title %></title>
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src='/javascripts/jquery-1.11.1.min.js'></script>
+    <script src='/javascripts/eventTracker.js'></script>
+	<script src='/javascripts/knockout-3.1.0.js'></script>
+
+  <script>
+
+  // Igy kell eventet trackelni
+  eventTracker = eventTracker("userid");
+  $(document).ready(function() {
+    $('.subscr, .button').click(function() {
+        eventTracker.track($(this).attr('id'), 'nincsen', 'dummycomment');
+    });
+  });
+
+  </script>
+</head>
+<body>
+	<h1><%= title %></h1>
+
+	<% include sidemenu.ejs %>
+
+
+	<input class='subscr' id='Subscribe' type="button" value="Subscribe"> <br> <br>
+	<input class='button' id='gomb1' type="button" value="gomb1">
+	<input class='button' id='gomb2' type="button" value="gomb2">
+	<input class='button' id='gomb3' type="button" value="gomb3">
+	<input class='button' id='gomb4' type="button" value="gomb4">
+	<input class='button' id='gomb5' type="button" value="gomb5"> <br> <br>
+	<input class='subscr' id='Unsubscribe' type="button" value="Unsubscribe">
+
+
+	<div id="ajaxmessage"></div>
+
+</body>
+</html>
