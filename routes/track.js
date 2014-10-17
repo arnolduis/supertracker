@@ -2,14 +2,22 @@ var Event = require('../models/event');
 
 module.exports = function(req, res) {
 
-	var buttonpress = new Event(req.body);	
+	var response = [];
 
-	buttonpress.save(function (err) {
+	for (var i = 0 ; i < req.body.length; i++) {
 
-		if (err) console.log(err);
-	});
+		console.log(req.body[i]);
+		console.log(req.body[i].name);
+		console.log(typeof(req.body[i].name));
+		console.log(' ');
+		var event = new Event(req.body);
 
-	res.send( { response: req.body.name} );
+		event.save(function (err) {	if (err) console.log(err);	});		
+
+		// response.push(event.name);
+	}
+
+	// res.send( JSON.stringify(response) );
 };
 
 module.exports.get = function(req,res) {

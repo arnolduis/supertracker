@@ -13,7 +13,8 @@ var index = require('./routes/index');
 // ==============================================
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
 
 // ROUTES
@@ -24,7 +25,8 @@ app.get('/', index);
 // LOGIC
 // ==============================================
 
-st = require("supertracker")(app, "/tracking");
+var stpath = '/tracking';
+var st = require('supertracker')(app, stpath);
 
 // START THE SERVER
 // ==============================================
