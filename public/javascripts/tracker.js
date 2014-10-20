@@ -51,8 +51,6 @@ function supertracker() {
 
     function flush () {
         if (localStorage.eventBuffer) {
-console.log(JSON.stringify(localStorage.eventBuffer));  
-// console.log(JSON.parse(localStorage.eventBuffer)); 
             $.ajax({
                     url: '%path%/track', //ttt
                     type: 'POST',
@@ -77,13 +75,3 @@ console.log(JSON.stringify(localStorage.eventBuffer));
         track: track
     };
 }
-
-// if (typeof require === "function" && typeof require.specified === "function" && require.specified("jquery")) {
-//     define(["jquery"], function () {
-//         return EDMUtils;
-//     });
-// } else {
-//     $(document).ready(function() {
-//         var edmUtils = EDMUtils();
-//     });
-// }

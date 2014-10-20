@@ -2,19 +2,21 @@ var Event = require('../models/event');
 
 module.exports = function(req, res) {
 
+	// Saving to server
+	Event.create(req.body,function(err) {
+		if (err) console.log(err);
+	});
+
+
+	// Creating server response
 	var response = [];
 
 	for (var i = 0 ; i < req.body.length; i++) {
 
-		console.log(req.body[i]);
-		var event = new Event(req.body);
-
-		event.save(function (err) {	if (err) console.log(err);	});		
-
-		// response.push(event.name);
+		response.push(req.body[i].name);
 	}
 
-	// res.send( JSON.stringify(response) );
+	res.send( JSON.stringify(response) );
 };
 
 module.exports.get = function(req,res) {
