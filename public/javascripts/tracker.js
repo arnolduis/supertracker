@@ -1,83 +1,76 @@
 /*
-* Depends on Jquery
+* This file  blabla, one day ill write it....
 *
 */
-var userId = null;
 
-function eventTracker(_userId) {
+function supertracker() {
 
-    var userId = userId || _userId;
+    var bufferSize = %bufferSize%; 
+    var bufferTimeLimit = %bufferTimeLimit%; 
+
+    // var loop = setInterval(flush(), bufferTimeLimit);
+
+    
 
     function track(eventName, eventData, comment) {
 
-        var bufferSize = 1; 
-        // var bufferTimeLimit = 10; 
-        // var bufferTime = 0; 
-
         // Preparing data
         var event = {
-            "user_id": userId,
+            "user_id": "dummyId",
             "name": eventName,
             "data": eventData,
             "date": new Date(),
             "comments": comment
         };
 
-        // Handling localstorage
-        if(typeof(Storage) !== "undefined") {
 
+
+        //Loading localstorage
+        if(typeof(Storage) !== "undefined") {
             var eventBuffer;
 
-            // preparing eventbuffer
             if (localStorage.eventBuffer) {
-
                 eventBuffer = JSON.parse(localStorage.eventBuffer);
                 eventBuffer.push(event);
-
             } else {
-
                 eventBuffer = [event];
             }
+console.log(eventBuffer);  
 
-            // sending
+
             if (eventBuffer.length >= bufferSize) {
-
-                // Sending data
-                $.ajax({
-                        url: '%=path%/track', //xxx
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(eventBuffer)
-                    })
-                .done(function(data) {
-                    console.log('success');
-                    console.log(data);
-                    $("#ajaxmessage").html(data.response);
-                })
-                .fail(function(data) {
-                    console.log("error");
-                    console.log(data);
-                    $("#ajaxmessage").html(data);
-                })
-                .always(function() {
-                    // console.log('Contacts obtained!!');
-                });
-
-
-                // empty localbuffer
-                localStorage.removeItem('eventBuffer');
-
+                flush();
             } else {
                 localStorage.eventBuffer = JSON.stringify(eventBuffer);                
             }
 
+
         } else {
             console.log('Localstorage is not available...');
         }
+    }
 
 
-
-
+    function flush () { 
+        if (localStorage.eventBuffer) {
+            $.ajax({
+                    url: '%path%/track', //ttt
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(localStorage.eventBuffer)                
+                })
+            .done(function(data) {
+                localStorage.removeItem('eventBuffer');
+                clearInterval(loop);
+                loop = setInterval(flush(), bufferTimeLimit);
+                $("#ajaxmessage").html(data);
+            })
+            .fail(function(data) {
+                console.log("error");
+                console.log(data);
+                $("#ajaxmessage").html(data);
+            });
+        }
     }
 
     return {

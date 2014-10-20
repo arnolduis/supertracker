@@ -11,10 +11,10 @@
   <script>
 
   // Igy kell eventet trackelni
-  eventTracker = eventTracker("userid");
+  tracker = supertracker();
   $(document).ready(function() {
     $('.subscr, .button').click(function() {
-        eventTracker.track($(this).attr('id'), 'nincsen', 'dummycomment');
+        tracker.track($(this).attr('id'), 'nincsen', 'dummycomment');
     });
   });
 

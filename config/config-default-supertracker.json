@@ -2,5 +2,9 @@
   "mongodb": {
     "host": "localhost",
     "port": 27017
+  },
+  "buffer": {
+  	"size":"5",
+  	"timeLimit":"5000"
   }
 }

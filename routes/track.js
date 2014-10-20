@@ -7,9 +7,6 @@ module.exports = function(req, res) {
 	for (var i = 0 ; i < req.body.length; i++) {
 
 		console.log(req.body[i]);
-		console.log(req.body[i].name);
-		console.log(typeof(req.body[i].name));
-		console.log(' ');
 		var event = new Event(req.body);
 
 		event.save(function (err) {	if (err) console.log(err);	});		
