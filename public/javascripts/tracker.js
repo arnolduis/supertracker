@@ -50,24 +50,28 @@ function supertracker() {
 
 
     function flush () {
-        if (localStorage.eventBuffer) {
-            $.ajax({
-                    url: '%path%/track', //ttt
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(JSON.parse(localStorage.eventBuffer))                
+        if(typeof(Storage) !== "undefined") {
+            if (localStorage.eventBuffer) {
+                $.ajax({
+                        url: '%path%/track',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(JSON.parse(localStorage.eventBuffer))                
+                    })
+                .done(function(data) {
+                    localStorage.removeItem('eventBuffer');
+                    clearInterval(loop);
+                    loop = setInterval(flush, bufferTimeLimit);
+                    $("#ajaxmessage").html(data);
                 })
-            .done(function(data) {
-                localStorage.removeItem('eventBuffer');
-                clearInterval(loop);
-                loop = setInterval(flush, bufferTimeLimit);
-                $("#ajaxmessage").html(data);
-            })
-            .fail(function(data) {
-                console.log("error");
-                console.log(data);
-                $("#ajaxmessage").html(data);
-            });
+                .fail(function(data) {
+                    console.log("error");
+                    console.log(data);
+                    $("#ajaxmessage").html(data);
+                });
+            }
+        } else {
+            console.log('Localstorage is not available...');
         }
     }
 

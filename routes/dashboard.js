@@ -1,11 +1,7 @@
-var Event = require('../models/event');
+module.exports = function(req, res){
 
-module.exports = function(req, res) {
+	// funnelVM = require('../viewmodels/funnelVM');
 
-		Event.find({}, function (err, events) {
+  	res.render('../node_modules/supertracker/views/dashboard.ejs',{title: 'Dashboard'}); //ttt ez retek eossz igy, kezdj vele valamit...
 
-	  		if (err) console.log(err);
-	  		
-	  		res.send(events);
-	  	});
-};
+ };

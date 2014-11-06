@@ -14,8 +14,20 @@ a {
 	padding: 0px 5px 0px 5px;
 }
 
+.funnel {
+	border-radius: 5px;
+	background-color:#888888; 
+	margin: 5px;
+	padding: 5px;
+}
+
 .step {
 	border-radius: 5px;
 	background-color:#dddddd; 
 	margin: 5px;
+	padding: 5px;	
+}
+
+.funnel h2 {
+	margin: 1px;
 }
