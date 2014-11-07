@@ -38,7 +38,7 @@ $(document).ready(function() {
 
         function save () {
             return {
-                // operation_types: operation_types(),
+                // operation_type: ,
                 event: event(),
                 property: property(),
                 operator: operator(),
@@ -56,14 +56,16 @@ $(document).ready(function() {
             property: property,
             operator: operator,
             value: value,
-
+            //method
             save: save
         };
     }
 
-    function funnelVM () {
+    function funnelVM (_name) {
         var name = ko.observable();
         var steps = ko.observableArray([stepVM()]);
+
+        if (_name) name(_name);
         
         function addStep() {
             steps.push(stepVM());
@@ -87,8 +89,9 @@ $(document).ready(function() {
     }
 
     function dashboardVM() {      
-        var funnels = ko.observableArray();
-        var funnel = ko.observable(funnelVM());
+
+        var funnels = ko.observableArray([funnelVM('Mell'), funnelVM('Pina')]);
+        var funnel = ko.observable();
 
         function addFunnel() {
             console.log('Meg nincs kesz:(');
@@ -96,7 +99,7 @@ $(document).ready(function() {
 
         return {
             funnels: funnels,
-            funnel:funnel,
+            funnel: funnel,
             // methods
             addFunnel: addFunnel
         };

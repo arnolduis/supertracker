@@ -38,9 +38,7 @@
 
     <div class="content">
         <h2>Funnel List</h2>
-        <div data-bind="foreach: funnels">
-            <div data-bind="text: name"></div>
-        </div>
+        <select data-bind="options: funnels, optionsText: 'name', value: funnel"></select>
     </div>
 
     <div class="content">
