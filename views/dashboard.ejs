@@ -13,11 +13,11 @@
     <script type="text/html" id='step-template'>
         <div class = 'step'>
             <h2 data-bind="text:'Step ' + $index()"></h2>
-            <select data-bind="options: events, value: event, visible: true"></select>
-            <select data-bind="options: properties, value: property, visible: true", width="8"></select>
-            <select data-bind="options: available_operators, optionsText: 'name', optionsValue: 'value', value: operator, visible: true"></select>
+            <select data-bind="options: events, value: event"></select>
+            <select data-bind="options: properties, value: property", width="8"></select>
+            <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
             <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
-            <select data-bind="options: operation_types, optionsText: 'name', optionsValue: 'value', value: available_operators, visible: true"></select>
+            <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
         </div>
     </script>
 
@@ -27,16 +27,19 @@
             <!-- ko foreach: $data.steps -->
             <div data-bind="template: { name: 'step-template', data: $data }"></div>
             <!-- /ko -->
-            <button data-bind="click: $data.addStep, visible: true"> Add Step</button>
-            <button data-bind="click: $data.save, visible: true"> Save Funnel</button>
+            <button data-bind="click: $data.addStep"> Add Step</button>
+            <button data-bind="click: $data.save"> Save Funnel</button>
         </div>
     </script>
 
 </head>
 <body >
     <h1><%= title %></h1>
-
+    <label for="userId">User Id:</label>
+    <input data-bind="value: userId, valueUpdate: 'afterkeydown'" id="userId">
+        
     <div class="content">
+
         <h2>Funnel List</h2>
         <select data-bind="options: funnels, optionsText: 'name', value: funnel"></select>
     </div>
@@ -46,6 +49,7 @@
         <div data-bind="template: { name: 'funnel-template', data: funnel }"></div>
     </div>
 
+    <button data-bind="click: test">Test</button>
 
 </body>
 </html>
