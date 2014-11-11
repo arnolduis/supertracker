@@ -1,7 +1,8 @@
 {
   "mongodb": {
     "host": "localhost",
-    "port": 27017
+    "port": 27017,
+    "dbname": "supertracker"
   },
   "buffer": {
   	"size":"5",

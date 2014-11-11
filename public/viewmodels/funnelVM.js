@@ -2,7 +2,7 @@ $(document).ready(function() {
     // Overall viewmodel for this screen, along with initial state
 
     function stepVM (stepJson) {
-        var events =%events%;
+        var events = %events%;
         var properties = ['Happened','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
         var operation_types = [ 
             { name: 'String', operators: [
@@ -36,7 +36,7 @@ $(document).ready(function() {
         var operator       = stepJson ? ko.observable(stepJson.operator)       : ko.observable();
         var value          = stepJson ? ko.observable(stepJson.value)          : ko.observable();
 
-        function save () {
+        function toJson () {
             return {
                 operation_type: operation_type(),
                 event: event(),
@@ -57,7 +57,7 @@ $(document).ready(function() {
             operator: operator,
             value: value,
             //method
-            save: save
+            toJson: toJson
         };
     }
 
@@ -78,15 +78,13 @@ $(document).ready(function() {
             steps.push(stepVM());
         }
 
-        function save () {
-            var savedFunnel = {name: "", steps: []};//ttt itt lehet hogy lehet roviditeni
-            savedFunnel.name = name();
+        function toJson () {
+            var funnelJson = {name: "", steps: []};//ttt itt lehet hogy lehet roviditeni
+            funnelJson.name = name();
             for (var i = 0; i < steps().length; i++) {
-                savedFunnel.steps.push(steps()[i].save());
+                funnelJson.steps.push(steps()[i].toJson());
             }
-            localStorage.savedFunnel = JSON.stringify(savedFunnel);
-
-            return savedFunnel;
+            return  funnelJson;
         }
 
 
@@ -95,15 +93,51 @@ $(document).ready(function() {
             name: name,
             steps: steps,
             addStep: addStep,
-            save: save
+            toJson: toJson
         };
     }
 
     function dashboardVM() {      
 
         var userId = ko.observable("arni");
-        var funnels = ko.observableArray([funnelVM({name: 'Mell', steps:[stepVM()]}), funnelVM({name: 'Pina', steps: [stepVM()]})]);
-        var funnel = ko.observable();
+        var serverFunnels = %funnels%;
+        var funnels = ko.observableArray();
+        if (serverFunnels.length > 0) {
+            for (var i = 0; i < serverFunnels.length; i++) {
+                funnels.push(funnelVM(serverFunnels[i]));
+            }
+        } else {
+            funnels.push(funnelVM());
+        }
+        var funnel = ko.observable(funnelVM(funnels()[0].toJson()));
+        
+        function addFunnel() {
+            funnel(funnelVM());
+        }
+
+        function saveFunnel () {
+            $.ajax({
+                url: '%path%/funnels',
+                type: 'POST',
+                dataType: 'json',
+                data: {userId: userId(), funnel: funnel.toJson()}
+            })
+            .done(function() {
+                if (localStorage.userFunnels) {
+                    var userFunnels = JSON.parse(localStorage.userFunnels);
+                    userFunnels.push(funnel.toJson());
+                    localStorage.userFunnels = JSON.stringify(userFunnels);
+                } else {
+                    localStorage.userFunnels = JSON.stringify([funnel.toJson()]);             
+                }
+            })
+            .fail(function(err) {
+                console.log(err);
+                console.log("error");
+            });
+            return savedFunnel;
+            
+        }
 
         function test () {
             var mystepJson = {
@@ -132,14 +166,6 @@ $(document).ready(function() {
             // myfunnel.save();
             console.log(funnelVM(JSON.parse(localStorage.savedFunnel)).steps()[0].operation_type());
         }
-        
-        function addFunnel() {
-            console.log('Meg nincs kesz:(');
-        }
-
-        function loadFunnel () {
-            // body...
-        }
 
         return {
             funnels: funnels,
@@ -147,6 +173,7 @@ $(document).ready(function() {
             userId: userId,
             // methods
             addFunnel: addFunnel,
+            saveFunnel: saveFunnel,
             test: test
         };
     }
