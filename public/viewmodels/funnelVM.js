@@ -101,6 +101,7 @@ $(document).ready(function() {
 
         var userId = ko.observable("arni");
         var serverFunnels = %funnels%;
+        
         //[funnelVM({name: 'Dummy', steps:[stepVM().toJson()]})]
         var funnels = ko.observableArray();
         var funnelSelected = ko.observable();
