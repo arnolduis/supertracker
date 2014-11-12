@@ -34,7 +34,7 @@ $(document).ready(function() {
         var event          = stepJson ? ko.observable(stepJson.event)          : ko.observable();
         var property       = stepJson ? ko.observable(stepJson.property)       : ko.observable();
         var operator       = stepJson ? ko.observable(stepJson.operator)       : ko.observable();
-        var value          = stepJson ? ko.observable(stepJson.value)          : ko.observable();
+        var value          = stepJson ? ko.observable(stepJson.value)          : ko.observable("");
 
         function toJson () {
             return {
@@ -63,13 +63,13 @@ $(document).ready(function() {
 
     function funnelVM (funnelJson) {
         var name = funnelJson ? ko.observable(funnelJson.name) : ko.observable();
-        var steps = ko.observableArray();
+        var steps = ko.observableArray([]);
         if (funnelJson) {
             for (var i = 0; i < funnelJson.steps.length; i++) {
                 steps.push(stepVM(funnelJson.steps[i]));
             }
         } else {
-            steps.push([stepVM()]);
+            steps.push(stepVM());
         }
 
 
@@ -101,79 +101,101 @@ $(document).ready(function() {
 
         var userId = ko.observable("arni");
         var serverFunnels = %funnels%;
+        //[funnelVM({name: 'Dummy', steps:[stepVM().toJson()]})]
         var funnels = ko.observableArray();
+        var funnelSelected = ko.observable();
+        var funnelEdited = ko.observable();
+        funnelSelected.subscribe(function () {
+            funnelEdited(funnelVM(funnelSelected().toJson()));
+        });
+
         if (serverFunnels.length > 0) {
             for (var i = 0; i < serverFunnels.length; i++) {
                 funnels.push(funnelVM(serverFunnels[i]));
             }
         } else {
-            funnels.push(funnelVM());
+            funnels.push(funnelVM({name: 'Dummy', steps:[stepVM().toJson()]}));
         }
-        var funnel = ko.observable(funnelVM(funnels()[0].toJson()));
         
         function addFunnel() {
             funnel(funnelVM());
         }
 
         function saveFunnel () {
-            $.ajax({
-                url: '%path%/funnels',
-                type: 'POST',
-                dataType: 'json',
-                data: {userId: userId(), funnel: funnel.toJson()}
-            })
-            .done(function() {
-                if (localStorage.userFunnels) {
-                    var userFunnels = JSON.parse(localStorage.userFunnels);
-                    userFunnels.push(funnel.toJson());
-                    localStorage.userFunnels = JSON.stringify(userFunnels);
-                } else {
-                    localStorage.userFunnels = JSON.stringify([funnel.toJson()]);             
-                }
-            })
-            .fail(function(err) {
-                console.log(err);
-                console.log("error");
-            });
-            return savedFunnel;
-            
+            console.log('Saving funnel');
+
+            var funnelToBeSaved = {
+                userId: userId(), 
+                funnel: funnelEdited().toJson()
+            };
+
+
+            console.log(funnelToBeSaved);
+            // $.ajax({
+            //     url: '%path%/funnels',
+            //     type: 'POST',
+            //     dataType: 'json',
+            //     data: JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()})
+            // })
+            // .done(function(res) {
+            //     console.log('Server response: '+ response);
+            //     // if (localStorage.userFunnels) {
+            //     //     var userFunnels = JSON.parse(localStorage.userFunnels);
+            //     //     userFunnels.push(funnel.toJson());
+            //     //     localStorage.userFunnels = JSON.stringify(userFunnels);
+            //     // } else {
+            //     //     localStorage.userFunnels = JSON.stringify([funnel.toJson()]);             
+            //     // }
+            //     // console.log('Funnel Saving is done');
+            // })
+            // .fail(function(err) {
+            //     console.log("error");
+            //     console.log(err.error());
+            // });
+        }
+
+        function deleteFunnel () {
+            // body...
         }
 
         function test () {
-            var mystepJson = {
-                operation_type: { 
-                    name: 'Date',
-                    operators: [{ name: 'was XXX', value: '<' }]
-                },
-                event: 'gomb1',
-                property: 'Happened',
-                operator: '<',
-                value: ''
-            };
-            var mystep = stepVM(mystepJson);
+            // var mystepJson = {
+            //     operation_type: { 
+            //         name: 'Date',
+            //         operators: [{ name: 'was XXX', value: '<' }]
+            //     },
+            //     event: 'gomb1',
+            //     property: 'Happened',
+            //     operator: '<',
+            //     value: ''
+            // };
+            // var mystep = stepVM();
 
             // console.log("Step test:");
-            // console.log(stepVM(mystep.save()).operation_type()); //ttt tesztek a funnel mentesere. 
+            // // console.log(mystep.toJson());
+            // console.log(stepVM().toJson()); //ttt tesztek a funnel mentesere. 
 
-            var myfunnel = funnelVM({
-                name: "Nuni", 
-                steps: [mystepJson,mystepJson]
-            });
+            // var myfunnel = funnelVM({
+            //     name: "Nuni", 
+            //     steps: [mystepJson,mystepJson]
+            // });
 
-            // console.log("Funnel test:");
-            // console.log(funnelVM(myfunnel.save()).steps()[0].operation_type());
+            console.log("Funnel test:");
+            console.log(funnelVM({name: 'Nuni', steps:[stepVM().toJson()]}).toJson());
 
             // myfunnel.save();
-            console.log(funnelVM(JSON.parse(localStorage.savedFunnel)).steps()[0].operation_type());
+            // console.log(funnelVM(JSON.parse(localStorage.savedFunnel)).steps()[0].operation_type());
         }
 
         return {
             funnels: funnels,
-            funnel: funnel,
+            funnelSelected: funnelSelected,
+            funnelEdited: funnelEdited,
             userId: userId,
             // methods
             addFunnel: addFunnel,
             saveFunnel: saveFunnel,
+            deleteFunnel: deleteFunnel,
             test: test
         };
     }

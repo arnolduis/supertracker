@@ -17,6 +17,7 @@
             <select data-bind="options: properties, value: property", width="8"></select>
             <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
             <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
+            <!--qqq Itt miert kell lefuttatni?-->
             <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
         </div>
     </script>
@@ -28,7 +29,6 @@
             <div data-bind="template: { name: 'step-template', data: $data }"></div>
             <!-- /ko -->
             <button data-bind="click: $data.addStep"> Add Step</button>
-            <button data-bind="click: $data.save"> Save Funnel</button>
         </div>
     </script>
 
@@ -41,13 +41,15 @@
     <div class="content">
 
         <h2>Funnel List</h2>
-        <select data-bind="options: funnels, optionsText: 'name', value: funnel"></select>
+        <select data-bind="options: funnels, optionsText: 'name', value: funnelSelected"></select>
         <button data-bind="click: addFunnel">New Funnel</button>
     </div>
 
     <div class="content">
         <h2>Edit Funnel</h2>
-        <div data-bind="template: { name: 'funnel-template', data: funnel }"></div>
+        <div data-bind="template: { name: 'funnel-template', data: funnelEdited }"></div>
+        <button data-bind="click: saveFunnel"> Save Funnel</button>
+        <button data-bind="click: deleteFunnel"> Delete Funnel</button>
     </div>
 
     <button data-bind="click: test">Test</button>
