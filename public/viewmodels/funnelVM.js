@@ -101,7 +101,6 @@ $(document).ready(function() {
 
         var userId = ko.observable("arni");
         var serverFunnels = %funnels%;
-        
         //[funnelVM({name: 'Dummy', steps:[stepVM().toJson()]})]
         var funnels = ko.observableArray();
         var funnelSelected = ko.observable();
@@ -125,34 +124,36 @@ $(document).ready(function() {
         function saveFunnel () {
             console.log('Saving funnel');
 
-            var funnelToBeSaved = {
-                userId: userId(), 
-                funnel: funnelEdited().toJson()
-            };
+            var funnelToBeSent = {userId: userId(), funnel: funnelEdited().toJson()};
 
 
-            console.log(funnelToBeSaved);
-            // $.ajax({
-            //     url: '%path%/funnels',
-            //     type: 'POST',
-            //     dataType: 'json',
-            //     data: JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()})
-            // })
-            // .done(function(res) {
-            //     console.log('Server response: '+ response);
-            //     // if (localStorage.userFunnels) {
-            //     //     var userFunnels = JSON.parse(localStorage.userFunnels);
-            //     //     userFunnels.push(funnel.toJson());
-            //     //     localStorage.userFunnels = JSON.stringify(userFunnels);
-            //     // } else {
-            //     //     localStorage.userFunnels = JSON.stringify([funnel.toJson()]);             
-            //     // }
-            //     // console.log('Funnel Saving is done');
-            // })
-            // .fail(function(err) {
-            //     console.log("error");
-            //     console.log(err.error());
-            // });
+            var funnelToBeSentString = JSON.stringify(funnelToBeSent);
+            console.log(funnelToBeSent);
+            console.log(funnelToBeSentString);
+
+            $.ajax({
+                url: '%path%/funnels',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: funnelToBeSentString
+            })
+            .done(function(res) {
+                console.log('Server response: '+ res.response);
+
+                // if (localStorage.userFunnels) {
+                //     var userFunnels = JSON.parse(localStorage.userFunnels);
+                //     userFunnels.push(funnel.toJson());
+                //     localStorage.userFunnels = JSON.stringify(userFunnels);
+                // } else {
+                //     localStorage.userFunnels = JSON.stringify([funnel.toJson()]);             
+                // }
+                // console.log('Funnel Saving is done');
+            })
+            .fail(function(err) {
+                console.log("error");
+                console.log(err);
+            });
         }
 
         function deleteFunnel () {
