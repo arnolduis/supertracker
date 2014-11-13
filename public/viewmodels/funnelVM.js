@@ -126,12 +126,16 @@ console.log(_userId);
         function saveFunnel () {
             console.log('Saving funnel');
 
-            var funnelToBeSent = {userId: userId(), funnel: funnelEdited().toJson()};
+            var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()});
 
-
-            var funnelToBeSentString = JSON.stringify(funnelToBeSent);
-            console.log(funnelToBeSent);
-            console.log(funnelToBeSentString);
+            if (localStorage.userFunnels) {
+                var userFunnels = JSON.parse(localStorage.userFunnels);
+                userFunnels.push(funnelToBeSentString);
+                localStorage.userFunnels = JSON.stringify(userFunnels);
+            } else {
+                localStorage.userFunnels = JSON.stringify([funnelToBeSentString]);             
+            }
+            console.log('Funnel Saving is done');
 
             $.ajax({
                 url: '%path%/funnels',
@@ -143,14 +147,6 @@ console.log(_userId);
             .done(function(res) {
                 console.log('Server response: '+ res.response);
 
-                // if (localStorage.userFunnels) {
-                //     var userFunnels = JSON.parse(localStorage.userFunnels);
-                //     userFunnels.push(funnel.toJson());
-                //     localStorage.userFunnels = JSON.stringify(userFunnels);
-                // } else {
-                //     localStorage.userFunnels = JSON.stringify([funnel.toJson()]);             
-                // }
-                // console.log('Funnel Saving is done');
             })
             .fail(function(err) {
                 console.log("error");
