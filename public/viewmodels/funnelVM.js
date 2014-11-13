@@ -128,14 +128,14 @@ console.log(_userId);
 
             var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()});
 
-            if (localStorage.userFunnels) {
-                var userFunnels = JSON.parse(localStorage.userFunnels);
-                userFunnels.push(funnelToBeSentString);
-                localStorage.userFunnels = JSON.stringify(userFunnels);
-            } else {
-                localStorage.userFunnels = JSON.stringify([funnelToBeSentString]);             
-            }
-            console.log('Funnel Saving is done');
+            // // A lokalstoragees moka azert, hogy biztonsagosan el lehessen menteni a funnelt.
+            // if (localStorage.userFunnels) {
+            //     var userFunnels = JSON.parse(localStorage.userFunnels);
+            //     userFunnels.push(funnelToBeSentString);
+            //     localStorage.userFunnels = JSON.stringify(userFunnels);
+            // } else {
+            //     localStorage.userFunnels = JSON.stringify([funnelToBeSentString]);             
+            // }
 
             $.ajax({
                 url: '%path%/funnels',
@@ -146,7 +146,18 @@ console.log(_userId);
             })
             .done(function(res) {
                 console.log('Server response: '+ res.response);
-
+                var update = -1;
+                for (var i = 0; i < funnels().length; i++) {
+                    if (funnels()[i].name() == funnelEdited().name()) {
+                        update = i;
+                        return;
+                    }
+                }
+                if (update+1) {
+                    funnels()[update] = funnelVM(funnelEdited().toJson());
+                } else{
+                    funnels.push(funnelVM(funnelEdited().toJson()));
+                }
             })
             .fail(function(err) {
                 console.log("error");
