@@ -1,0 +1,113 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'publish' ]
+2 info using npm@1.4.23
+3 info using node@v0.10.31
+4 verbose publish [ '.' ]
+5 verbose cache add [ '.', null ]
+6 verbose cache add name=undefined spec="." args=[".",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: '.',
+7 verbose parsed url   path: '.',
+7 verbose parsed url   href: '.' }
+8 silly lockFile 3a52ce78- .
+9 verbose lock . C:\Users\Dell\AppData\Roaming\npm-cache\3a52ce78-.lock
+10 verbose tar pack [ 'C:\\Users\\Dell\\AppData\\Roaming\\npm-cache\\supertracker\\0.0.9\\package.tgz',
+10 verbose tar pack   '.' ]
+11 verbose tarball C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package.tgz
+12 verbose folder .
+13 info prepublish supertracker@0.0.9
+14 silly lockFile 1f1177db-tar tar://.
+15 verbose lock tar://. C:\Users\Dell\AppData\Roaming\npm-cache\1f1177db-tar.lock
+16 silly lockFile 6b5ceced-e-supertracker-0-0-9-package-tgz tar://C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package.tgz
+17 verbose lock tar://C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package.tgz C:\Users\Dell\AppData\Roaming\npm-cache\6b5ceced-e-supertracker-0-0-9-package-tgz.lock
+18 silly lockFile 1f1177db-tar tar://.
+19 silly lockFile 1f1177db-tar tar://.
+20 silly lockFile 6b5ceced-e-supertracker-0-0-9-package-tgz tar://C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package.tgz
+21 silly lockFile 6b5ceced-e-supertracker-0-0-9-package-tgz tar://C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package.tgz
+22 silly lockFile 04e5a46b-cache-supertracker-0-0-9-package C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package
+23 verbose lock C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package C:\Users\Dell\AppData\Roaming\npm-cache\04e5a46b-cache-supertracker-0-0-9-package.lock
+24 silly lockFile 04e5a46b-cache-supertracker-0-0-9-package C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package
+25 silly lockFile 04e5a46b-cache-supertracker-0-0-9-package C:\Users\Dell\AppData\Roaming\npm-cache\supertracker\0.0.9\package
+26 silly lockFile 3a52ce78- .
+27 silly lockFile 3a52ce78- .
+28 silly publish { name: 'supertracker',
+28 silly publish   version: '0.0.9',
+28 silly publish   description: 'A super package for tracking and visualising user activity',
+28 silly publish   main: './lib/supertracker.js',
+28 silly publish   bin: { supertracker: './bin/supertracker' },
+28 silly publish   scripts: { test: 'echo "test"' },
+28 silly publish   repository:
+28 silly publish    { type: 'git',
+28 silly publish      url: 'https://github.com/arnolduis/supertracker.git' },
+28 silly publish   dependencies:
+28 silly publish    { mongoose: '>3.0.0',
+28 silly publish      express: '>3.0.0',
+28 silly publish      'body-parser': '*',
+28 silly publish      nconf: '*' },
+28 silly publish   keywords: [ 'event', 'track' ],
+28 silly publish   author: { name: 'arnolduis' },
+28 silly publish   license: 'GLP',
+28 silly publish   bugs: { url: 'https://github.com/arnolduis/supertracker/issues' },
+28 silly publish   homepage: 'https://github.com/arnolduis/supertracker',
+28 silly publish   readme: 'supertracker\n============\n\n\n### <span style="color:red">*Please dont install this, it\'s in a very early stage of developement!!*</span>\n\nsupertracker is an npm package for NodeJS, which came to life with the mission to ease tracking the traffic of your webservice. \nThe Federation needs you!! \n\n## Local and global usage\n\nThe package can be used as a local, or a global package. The local install defines routes to track events on, and to view the apps usage statistics. \n\n### Local usage\n\nThe local package lets you define a route, on which the package features become accessible.\n\n```javascript\n\n/*\n* Initialise the package, passing the app to it, and defining the route for \n* package features. Leaving it blank will make the features accessible on the \n* base route of the app.\n*/  \nst=require(\'supertracker\')(app, "/tracking"); \n\n```\n\n### Global usage\n\nThe global install adds a command "supertracker" in your path. Running the command will fire up a server listening to tracking events, saving them into a database upon receiving.\n\n```javascript\n$ supertracker\n```\n\n### Features\n\n#### track\nReceives ajax messages saving them to database\n\n#### dashboard\nMonitoring and visualizing app usage.\n',
+28 silly publish   readmeFilename: 'README.md',
+28 silly publish   gitHead: '014ba62a238fb97f4e51e1a7717018b0491057e0',
+28 silly publish   _id: 'supertracker@0.0.9',
+28 silly publish   _shasum: '6d3994627dec8c024ae9a216c4f64b929b63012d',
+28 silly publish   _from: '.' }
+29 verbose request where is /supertracker
+30 verbose request registry https://registry.npmjs.org/
+31 verbose request id 3570e54c7658a11b
+32 verbose url raw /supertracker
+33 verbose url resolving [ 'https://registry.npmjs.org/', './supertracker' ]
+34 verbose url resolved https://registry.npmjs.org/supertracker
+35 verbose request where is https://registry.npmjs.org/supertracker
+36 info trying registry request attempt 1 at 16:27:14
+37 http PUT https://registry.npmjs.org/supertracker
+38 http 403 https://registry.npmjs.org/supertracker
+39 verbose headers { date: 'Thu, 13 Nov 2014 15:27:15 GMT',
+39 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+39 verbose headers   'content-type': 'application/json',
+39 verbose headers   'cache-control': 'max-age=60',
+39 verbose headers   'content-length': '3930',
+39 verbose headers   'accept-ranges': 'bytes',
+39 verbose headers   via: '1.1 varnish',
+39 verbose headers   'x-served-by': 'cache-fra1228-FRA',
+39 verbose headers   'x-cache': 'MISS',
+39 verbose headers   'x-cache-hits': '0',
+39 verbose headers   'x-timer': 'S1415892434.464236,VS0,VE996',
+39 verbose headers   'keep-alive': 'timeout=10, max=50',
+39 verbose headers   connection: 'Keep-Alive' }
+40 error publish Failed PUT 403
+41 error Error: forbidden cannot modify pre-existing version: 0.0.9
+41 error old={"name":"supertracker","version":"0.0.9","description":"A super package for tracking and visualising user activity","main":"./lib/supertracker.js","bin":{"supertracker":"./bin/supertracker"},"scripts":{"test":"echo \"test\""},"repository":{"type":"git","url":"https://github.com/arnolduis/supertracker.git"},"dependencies":{"mongoose":">3.0.0","express":">3.0.0","body-parser":"*","nconf":"*"},"keywords":["event","track"],"author":{"name":"arnolduis"},"license":"GLP","bugs":{"url":"https://github.com/arnolduis/supertracker/issues"},"homepage":"https://github.com/arnolduis/supertracker","gitHead":"af376754f0db5a8411e32b1820105a51f5aed5e8","_id":"supertracker@0.0.9","_shasum":"ad1eef52133173c275767aed60efa84a7ca440c7","_from":".","_npmVersion":"1.4.23","_npmUser":{"name":"arnolduis","email":"arnolduis@gmail.com"},"maintainers":[{"name":"arnolduis","email":"arnolduis@gmail.com"}],"dist":{"shasum":"ad1eef52133173c275767aed60efa84a7ca440c7","tarball":"http://registry.npmjs.org/supertracker/-/supertracker-0.0.9.tgz"}}
+41 error new={"name":"supertracker","version":"0.0.9","description":"A super package for tracking and visualising user activity","main":"./lib/supertracker.js","bin":{"supertracker":"./bin/supertracker"},"scripts":{"test":"echo \"test\""},"repository":{"type":"git","url":"https://github.com/arnolduis/supertracker.git"},"dependencies":{"mongoose":">3.0.0","express":">3.0.0","body-parser":"*","nconf":"*"},"keywords":["event","track"],"author":{"name":"arnolduis"},"license":"GLP","bugs":{"url":"https://github.com/arnolduis/supertracker/issues"},"homepage":"https://github.com/arnolduis/supertracker","readme":"supertracker\u000a============\u000a\u000a\u000a### <span style=\"color:red\">*Please dont install this, it's in a very early stage of developement!!*</span>\u000a\u000asupertracker is an npm package for NodeJS, which came to life with the mission to ease tracking the traffic of your webservice. \u000aThe Federation needs you!! \u000a\u000a## Local and global usage\u000a\u000aThe package can be used as a local, or a global package. The local install defines routes to track events on, and to view the apps usage statistics. \u000a\u000a### Local usage\u000a\u000aThe local package lets you define a route, on which the package features become accessible.\u000a\u000a```javascript\u000a\u000a/*\u000a* Initialise the package, passing the app to it, and defining the route for \u000a* package features. Leaving it blank will make the features accessible on the \u000a* base route of the app.\u000a*/  \u000ast=require('supertracker')(app, \"/tracking\"); \u000a\u000a```\u000a\u000a### Global usage\u000a\u000aThe global install adds a command \"supertracker\" in your path. Running the command will fire up a server listening to tracking events, saving them into a database upon receiving.\u000a\u000a```javascript\u000a$ supertracker\u000a```\u000a\u000a### Features\u000a\u000a#### track\u000aReceives ajax messages saving them to database\u000a\u000a#### dashboard\u000aMonitoring and visualizing app usage.\u000a","readmeFilename":"README.md","gitHead":"014ba62a238fb97f4e51e1a7717018b0491057e0","_id":"supertracker@0.0.9","_shasum":"6d3994627dec8c024ae9a216c4f64b929b63012d","_from":".","_npmVersion":"1.4.23","_npmUser":{"name":"arnolduis","email":"arnolduis@gmail.com"},"maintainers":[{"name":"arnolduis","email":"arnolduis@gmail.com"}],"dist":{"shasum":"6d3994627dec8c024ae9a216c4f64b929b63012d","tarball":"http://registry.npmjs.org/supertracker/-/supertracker-0.0.9.tgz"}}: supertracker
+41 error     at RegClient.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:300:14)
+41 error     at Request._callback (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:238:65)
+41 error     at Request.self.callback (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:123:22)
+41 error     at Request.emit (events.js:98:17)
+41 error     at Request.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:893:14)
+41 error     at Request.emit (events.js:117:20)
+41 error     at IncomingMessage.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:844:12)
+41 error     at IncomingMessage.emit (events.js:117:20)
+41 error     at _stream_readable.js:943:16
+41 error     at process._tickCallback (node.js:419:13)
+42 error If you need help, you may report this *entire* log,
+42 error including the npm and node versions, at:
+42 error     <http://github.com/npm/npm/issues>
+43 error System Windows_NT 6.1.7601
+44 error command "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "publish"
+45 error cwd C:\Dropbox\Coding\NodeJS\supertracker
+46 error node -v v0.10.31
+47 error npm -v 1.4.23
+48 verbose exit [ 1, true ]
