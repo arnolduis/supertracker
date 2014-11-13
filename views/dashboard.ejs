@@ -17,8 +17,8 @@
             <select data-bind="options: properties, value: property", width="8"></select>
             <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
             <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
-            <!--qqq Itt miert kell lefuttatni?-->
             <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
+            <button data-bind="click: deleteStep"></button>
         </div>
     </script>
 

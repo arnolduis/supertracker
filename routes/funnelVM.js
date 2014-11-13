@@ -19,7 +19,6 @@ module.exports = function(path) {
 				Funnel.find({userId: 'arni'}, {userId:1, funnel:1, _id:0}, function (err, funnels) {
 			  		if (err) res.send(err);
 
-
 					result = result.replace(/%path%/g, path);
 					result = result.replace(/%events%/g, JSON.stringify(events));
 					result = result.replace(/%funnels%/g, JSON.stringify(funnels));

@@ -98,22 +98,27 @@ $(document).ready(function() {
     }
 
     function dashboardVM(_userId) {      
-console.log(_userId);
+        console.log(_userId);
         var userId = ko.observable(_userId);
         var serverFunnels = %funnels%;
-        //[funnelVM({name: 'Dummy', steps:[stepVM().toJson()]})]
         var funnels = ko.observableArray();
         var funnelSelected = ko.observable();
         var funnelEdited = ko.observable();
         funnelSelected.subscribe(function () {
-            funnelEdited(funnelVM(funnelSelected().toJson()));
+            if (funnelSelected()) {
+                funnelEdited(funnelVM(funnelSelected().toJson())); //ttt itten ez nagyon csuny a deletefunnellel egyutt. Nezd meg, hogy lehet e mashogyh megoldani, ha a selected elemet dropoljuk
+            }
         });
+
 
         // Fill up funnels with serverFunnels or with dummy data
         if (serverFunnels.length > 0) {
             for (var i = 0; i < serverFunnels.length; i++) {
                 funnels.push(funnelVM(serverFunnels[i].funnel));
             }
+            funnels.sort(function(left, right) { 
+                return left.name() == right.name() ? 0 : (left.name() < right.name() ? -1 : 1); 
+            });
         } else {
             funnels.push(funnelVM({name: 'Dummy', steps:[stepVM().toJson()]}));
         }
@@ -146,16 +151,25 @@ console.log(_userId);
             })
             .done(function(res) {
                 console.log('Server response: '+ res.response);
-                var update = -1;
-                for (var i = 0; i < funnels().length; i++) {
-                    if (funnels()[i].name() == funnelEdited().name()) {
-                        update = i;
-                        return;
-                    }
-                }
-                if (update+1) {
+                var update = indexOfFunnel(funnels, funnelEdited);
+                if (update + 1) {
                     funnels()[update] = funnelVM(funnelEdited().toJson());
                 } else{
+                    //ttt itt meg kell csinalni, ha minden elemet torolnek
+                    for (var i = 0; i < funnels().length; i++) {
+                        if (funnels()[i].name() < funnelEdited().name()) {
+                        } else{
+                            var tfunnels = [];
+                            for (var j = 0; j < funnels().length; j++) {
+                                tfunnels.push(funnelVM(funnels()[j].toJson()));
+                            }
+                            var bfunnels = tfunnels.splice(0,i);
+                            bfunnels.push(funnelEdited());
+                            bfunnels = bfunnels.concat(tfunnels.splice(0,tfunnels.length));
+                            funnels(bfunnels);//nnn jaj de finesszes
+                            return;
+                        } 
+                    }
                     funnels.push(funnelVM(funnelEdited().toJson()));
                 }
             })
@@ -166,7 +180,45 @@ console.log(_userId);
         }
 
         function deleteFunnel () {
-            // body...
+            var funnelIndex = indexOfFunnel(funnels, funnelEdited);
+            console.log('%path%/funnels/'+userId()+'/'+funnels()[funnelIndex].name());
+            if (funnelIndex + 1) {
+                $.ajax({
+                    url: '%path%/funnels/'+userId()+'/'+funnels()[funnelIndex].name(),
+                    type: 'DELETE'
+                })
+                .done(function(res) {
+                    console.log("deleteFunnel() success");
+                    console.log(res);
+                    funnels.splice(funnelIndex,1);//qqq itt lehet mast hasznalni?
+
+
+                    if (funnels().length > 0) {
+                        funnelSelected(funnels()[0]);
+                    } else{
+                        funnels.push(funnelVM({name: 'Dummy', steps:[stepVM().toJson()]}));
+                    }
+                })
+                .fail(function(res) {
+                    console.log("deleteFunnel() error");
+                    console.log(res);
+                });
+                
+            } else{
+                // if (funnels().length > 0) {
+                //     funnelSelected() = 
+                // } else{};
+                // console.log('nincs ilyen funnel');
+            }
+        }
+
+        function indexOfFunnel (funnelObsArray, funnelObs) {
+            for (var i = 0; i < funnelObsArray().length; i++) {
+                if (funnelObsArray()[i].name() == funnelObs().name()) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         function test () {
