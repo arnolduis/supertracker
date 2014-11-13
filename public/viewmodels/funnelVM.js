@@ -78,6 +78,12 @@ $(document).ready(function() {
             steps.push(stepVM());
         }
 
+        function removeStep (step) {
+            //ttt nem mukodik
+            console.log('removeStep');
+            steps.remove(step);
+        }
+
         function toJson () {
             var funnelJson = {name: "", steps: []};//ttt itt lehet hogy lehet roviditeni
             funnelJson.name = name();
@@ -93,6 +99,7 @@ $(document).ready(function() {
             name: name,
             steps: steps,
             addStep: addStep,
+            removeStep: removeStep,
             toJson: toJson
         };
     }
