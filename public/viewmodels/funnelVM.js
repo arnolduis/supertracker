@@ -97,9 +97,9 @@ $(document).ready(function() {
         };
     }
 
-    function dashboardVM() {      
-
-        var userId = ko.observable("arni");
+    function dashboardVM(_userId) {      
+console.log(_userId);
+        var userId = ko.observable(_userId);
         var serverFunnels = %funnels%;
         //[funnelVM({name: 'Dummy', steps:[stepVM().toJson()]})]
         var funnels = ko.observableArray();
@@ -109,13 +109,15 @@ $(document).ready(function() {
             funnelEdited(funnelVM(funnelSelected().toJson()));
         });
 
+        // Fill up funnels with serverFunnels or with dummy data
         if (serverFunnels.length > 0) {
             for (var i = 0; i < serverFunnels.length; i++) {
-                funnels.push(funnelVM(serverFunnels[i]));
+                funnels.push(funnelVM(serverFunnels[i].funnel));
             }
         } else {
             funnels.push(funnelVM({name: 'Dummy', steps:[stepVM().toJson()]}));
         }
+        funnelSelected(funnels()[0]);
         
         function addFunnel() {
             funnel(funnelVM());
@@ -202,6 +204,6 @@ $(document).ready(function() {
         };
     }
 
-    ko.applyBindings(new dashboardVM());
+    ko.applyBindings(new dashboardVM("arni"));
 
 });
