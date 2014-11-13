@@ -3,8 +3,11 @@ $(document).ready(function() {
 
     function stepVM (stepJson) {
         var events = %events%;
-        var properties = ['Happened','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
+        var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
         var operation_types = [ 
+            { name: 'Happened', operators: [
+
+            ]},
             { name: 'String', operators: [
                 { name: 'equals'       ,value: '=' },
                 { name: 'not equals'   ,value: '!=' },
