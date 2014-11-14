@@ -1,8 +1,0 @@
-<div id='step_template'>
-    <h2 data-bind="text:'Step ' + $parent.$index()"></h2>
-    <select data-bind="options: events, value: event, visible: true"></select>
-    <select data-bind="options: properties, value: property, visible: true", width="8"></select>
-    <select data-bind="options: available_operators, optionsText: 'name', optionsValue: 'value', value: operator, visible: true"></select>
-    <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
-    <select data-bind="options: operation_type, optionsText: 'name', optionsValue: 'value', value: available_operators, visible: true"></select>
-</div>

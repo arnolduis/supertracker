@@ -1,6 +1,45 @@
 $(document).ready(function() {
     // Overall viewmodel for this screen, along with initial state
 
+
+
+    function chartVM () {
+        // Chart.defaults.global.responsive = true;
+        var funnelCtx = $("#funnelChart").get(0).getContext("2d");
+        var funnelChart = new Chart(funnelCtx);
+        var data = {
+            labels: ["January", "February", "March", "April", "May", "June", "July"],
+            datasets: [
+                {
+                    label: "My First dataset",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: [65, 59, 80, 81, 56, 55, 40]
+                },
+                {
+                    label: "My Second dataset",
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: [28, 48, 40, 19, 86, 27, 90]
+                }
+            ]
+        };
+
+        return {
+            funnelCtx: funnelCtx,
+            funnelChart: funnelChart,
+            data: data
+        };
+    }
+
     function stepVM (stepJson) {
         var events = %events%;
         var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
@@ -120,7 +159,6 @@ $(document).ready(function() {
             }
         });
 
-
         // Fill up funnels with serverFunnels or with dummy data
         if (serverFunnels.length > 0) {
             for (var i = 0; i < serverFunnels.length; i++) {
@@ -133,6 +171,9 @@ $(document).ready(function() {
             funnels.push(funnelVM({name: 'Dummy', steps:[stepVM().toJson()]}));
         }
         funnelSelected(funnels()[0]);
+
+        var funnelChart = chartVM();
+        funnelChart.funnelChart.Line(funnelChart.data);
         
         function addFunnel() {
             funnel(funnelVM());
@@ -222,6 +263,25 @@ $(document).ready(function() {
             }
         }
 
+        function applyFunnel () {
+            var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()});
+
+            $.ajax({
+                url: '%path%/funnels/apply',
+                type: 'POST',
+                dataType: 'json',
+                data: funnelToBeSentString
+            })
+            .done(function() {
+
+                console.log("success");
+            })
+            .fail(function() {
+                console.log("error");
+            });
+            
+        }
+
         function indexOfFunnel (funnelObsArray, funnelObs) {
             for (var i = 0; i < funnelObsArray().length; i++) {
                 if (funnelObsArray()[i].name() == funnelObs().name()) {
@@ -273,6 +333,6 @@ $(document).ready(function() {
         };
     }
 
-    ko.applyBindings(new dashboardVM("arni"));
+    ko.applyBindings(dashboardVM('%userId%'));
 
 });

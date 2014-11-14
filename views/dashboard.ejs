@@ -6,9 +6,10 @@
 	<link rel='stylesheet' href='/stylesheets/style.css' />
 
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
-    <script src="/javascripts/knockout-3.1.0.js"></script>
 
     <script src="/tracking/viewmodels/funnelVM"></script>
+    <script src="/tracking/javascripts/knockout-3.1.0.js"></script>
+    <script src="/tracking/javascripts/Chart.min.js"></script>
 
     <script type="text/html" id='step-template'>
         <div class = 'step'>
@@ -50,7 +51,10 @@
         <div data-bind="template: { name: 'funnel-template', data: funnelEdited }"></div>
         <button data-bind="click: saveFunnel"> Save Funnel</button>
         <button data-bind="click: deleteFunnel"> Delete Funnel</button>
+        <button data-bind="click: applyFunnel"> Apply Funnel</button>
     </div>
+
+    <canvas id="funnelChart" width="680" height="300"></canvas>
 
     <button data-bind="click: test">Test</button>
 

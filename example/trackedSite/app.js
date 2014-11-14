@@ -16,6 +16,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json({strict:false}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
+ 
+// Serve req.user for the supertracker
+app.use(function (req, res, next) {
+	req.user = {
+		userId: 'arni'
+	};
+	next();
+});
 
 // ROUTES
 // ==============================================

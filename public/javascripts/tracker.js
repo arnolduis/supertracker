@@ -7,10 +7,43 @@ function supertracker() {
 
     var bufferSize = %bufferSize%; 
     var bufferTimeLimit = %bufferTimeLimit%; 
+    // userData
+    var userId;
+    var windowX;
+    var windowY;
+    var screenX;
+    var screenY;
+    var country;
+    var region;
+    var city;
+    var initialReferrer;
 
     var loop = setInterval(flush, bufferTimeLimit);
 
-    
+    function init (_userId) {
+        userId = _userId;
+
+        windowY = $(window).height();   // returns height of browser viewport
+        windowX = $(window).width();   // returns width of browser viewport
+        screenX = screen.width;
+        screenY = screen.height;
+
+        // $.getScript('http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js', function () {
+        //     // ttt errorkezeles
+        //     geoip2.country(function (resCountry) {
+        //         console.log(resCountry);
+        //     });
+        // });
+        
+        $.getScript('http://j.maxmind.com/app/geoip.js', function () {
+            // ttt errorkezeles
+            country = geoip_country_name();
+            region = geoip_region_name();
+            city = geoip_city();
+        });
+
+        initialReferrer = document.referrer;
+    }    
 
     function track(eventName, eventData, comment) {
 
@@ -48,7 +81,6 @@ function supertracker() {
         }
     }
 
-
     function flush () {
         if(typeof(Storage) !== "undefined") {
             if (localStorage.eventBuffer) {
@@ -76,6 +108,7 @@ function supertracker() {
     }
 
     return {
-        track: track
+        track: track,
+        init: init
     };
 }

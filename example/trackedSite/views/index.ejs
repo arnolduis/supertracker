@@ -4,25 +4,24 @@
 	<meta charset="UTF-8">
 	<title><%= title %></title>
 	<link rel='stylesheet' href='/stylesheets/style.css' />
-    <script src='/javascripts/jquery-1.11.1.min.js'></script>
-    <script src='/tracking/tracker'></script>
+	<script src='/javascripts/jquery-1.11.1.min.js'></script>
 	<script src='/javascripts/knockout-3.1.0.js'></script>
 
-  <script>
+	<script src='/tracking/tracker'></script>
 
-  // Igy kell eventet trackelni
-  tracker = supertracker();
-  $(document).ready(function() {
-    $('.subscr, .button').click(function() {
-        tracker.track($(this).attr('id'), 'nincsen', 'dummycomment');
-    });
-  });
-
-  </script>
+	<script>
+		// Igy kell eventet trackelni
+		tracker = supertracker();
+		tracker.init('arni');
+		$(document).ready(function() {
+			$('.subscr, .button').click(function() {
+				tracker.track($(this).attr('id'), 'nincsen', 'dummycomment');
+			});
+		});
+	</script>
 </head>
 <body>
 	<h1><%= title %></h1>
-
 	<% include sidemenu.ejs %>
 
 
