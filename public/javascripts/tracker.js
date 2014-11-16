@@ -9,14 +9,15 @@ function supertracker() {
     var bufferTimeLimit = %bufferTimeLimit%; 
     // userData
     var userId;
-    var windowX;
-    var windowY;
-    var screenX;
-    var screenY;
-    var country;
-    var region;
-    var city;
-    var initialReferrer;
+    var windowX, windowY, screenX, screenY;
+    var country, region, city;
+    var reverref, initialReferrer;
+
+    var onsiteChecking = setInterval(function () {
+        var date = new Date();
+        date.setTime(+ date + (days * 300000)); //5 * 60 * 1000
+           document.cookie = "supertrackerOn=; expires=" + date.toGMTString() + ";";
+    }, 270000);
 
     var loop = setInterval(flush, bufferTimeLimit);
 

@@ -7,7 +7,7 @@ module.exports = function(path) {
 		var fs = require('fs');
 
 		fs.readFile('node_modules/supertracker/public/viewmodels/funnelVM.js', 'utf8', function (err,result) {
-			if (err) return console.log(err);
+			if (err) console.log(err);
 
 			Event.distinct('name', function (err, events) {//nnn talan asyncel kellene megoldani a callback hellt
 			  	if (err) res.send(err);

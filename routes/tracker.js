@@ -9,7 +9,6 @@ module.exports = function(path,bufferSize,bufferTimeLimit) {
 		req.user.os =r.os.toString();
 		req.user.device =r.device.toString();
 
-		console.log(req.user);
 		
 		fs.readFile('node_modules/supertracker/public/javascripts/tracker.js', 'utf8', function (err,result) {
 			if (err) {

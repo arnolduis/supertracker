@@ -1,7 +1,9 @@
-fs = require('fs');
-module.exports.stylesheets = function (req, res) {
-	res.sendFile('./node_modules/supertracker/public/javascripts/' + req.params[0],{root: '.'}); //ttt ezzel keseobb kezdj valamit
-};
-module.exports.javascripts = function (req, res) {
-	res.sendFile('./node_modules/supertracker/public/javascripts/' + req.params[0],{root: '.'}); //ttt ezzel keseobb kezdj valamit
+var path = require('path');
+module.exports = function (req, res) {
+	for(var i = 1; i < req.url.length; i++){//qqq jo, hogy igy parsolom?
+		if (req.url[i] == '/') {
+			res.sendFile(path.join(__dirname, '../public') + req.url.slice(i, req.url.length));
+			return;
+		}
+	}
 };
