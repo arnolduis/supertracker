@@ -14,6 +14,7 @@ function supertracker() {
 
 
     function init (_userId) {
+        $.ajaxSetup({ cache: true});
         if (sessionStorage.supertrackerSessionId) {
             sessionId = sessionStorage.supertrackerSessionId;
          } else {
@@ -26,12 +27,13 @@ function supertracker() {
             screenX = screen.width;
             screenY = screen.height;
             
-            $.getScript('http://j.maxmind.com/app/geoip.js', function () {
+            $.getScript('//js.maxmind.com/js/geoip.js', function () {
                 // ttt errorkezeles
                 country = geoip_country_name();
                 region = geoip_region_name();
                 city = geoip_city();
             });
+            console.log("tracler.js:");
 
             initialReferrer = document.referrer;
 
