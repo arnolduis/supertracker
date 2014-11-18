@@ -18,7 +18,8 @@
     "express": ">3.0.0",
     "body-parser": "*",
     "nconf": "*",
-    "ua-parser": "*"
+    "ua-parser": "*",
+    "referer-parser": "*"
   },
   "keywords": [
     "event",
