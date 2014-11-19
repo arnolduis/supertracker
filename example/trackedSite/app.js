@@ -7,7 +7,6 @@ var port    =   process.env.PORT || 3000;
 var path = require('path');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
 
 // CONFIGURE
 // ==============================================
@@ -27,8 +26,11 @@ app.use(function (req, res, next) {
 
 // ROUTES
 // ==============================================
+var index = require('./routes/index');
+var secondPage = require('./routes/secondPage');
 
 app.get('/', index);
+app.get('/secondPage', secondPage);
 
 // LOGIC
 // ==============================================

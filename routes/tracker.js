@@ -9,6 +9,7 @@ module.exports = function(path,bufferSize,bufferTimeLimit) {
 			}
 
 			result = result.replace(/%path%/g, path);
+			result = result.replace(/%userId%/g, req.user.userId);
 			result = result.replace(/%bufferSize%/g, bufferSize);
 			result = result.replace(/%bufferTimeLimit%/g, bufferTimeLimit);
 

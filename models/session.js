@@ -2,20 +2,21 @@ var mongoose = require('mongoose');
 
 var sessionSchema = {
 	// Session data
-	sessionId: { type: String, required: true },//ttt
-	userId: { type: String, required: true },
-	// Screen
-    windowX: { type: String}, 
-    windowY: { type: String}, 
-    screenX: { type: String}, 
-    screenY: { type: String},
-    // Geography
-    country: { type: String}, 
-    region: { type: String}, 
-    city: { type: String},
-    // User Agent
+	userId: { type:String, required: true },
+	screen: {
+		windowX: Number, 
+		windowY: Number, 
+		screenX: Number, 
+		screenY: Number,		
+	},
+    location: {
+    	ipAddress: String,
+    	country: String, 
+    	region: String, 
+    	city: String,
+    },
     userAgent: {
-    	userAgentHeader: { type: String},
+    	userAgentHeader: String,
     	ua: {
         	full: String,
         	version: String,
@@ -32,12 +33,11 @@ var sessionSchema = {
         	minor: String,
         	patch: String    	
         },
-    	device: { type: String}
+    	device: String
     },
-    // Referrer
     referer: {
-    	refererHeader: { type: String},
-    	known: String,
+    	refererHeader: String,
+    	known: Boolean,
     	referer: String,
     	medium: String,
     	search_parameter: String,
@@ -46,5 +46,4 @@ var sessionSchema = {
     }
     
 };
-
 module.exports = mongoose.model('Session', sessionSchema);

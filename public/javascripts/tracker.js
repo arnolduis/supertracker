@@ -8,73 +8,76 @@ function supertracker() {
     var bufferSize = %bufferSize%; 
     var bufferTimeLimit = %bufferTimeLimit%; 
     // Session wide event data
-    var sessionId;
-    // Uniq event data
+    var sessionId, userId;
+    var flushingLoop;
     var referrer;
 
 
-    function init (_userId) {
+    function init () {
+        userId  = '%userId%';
+        referrer = document.referrer;
+
         if (sessionStorage.supertrackerSessionId) {
             sessionId = sessionStorage.supertrackerSessionId;
+            console.log('Sessionstorage on');
          } else {
-            var windowX, windowY, screenX, screenY;
-            var country, region, city;
-            var initialReferrer;
+            console.log('Sessionstorage off');
+            var session = {userId: userId, screen: {}, location: {}};
+            // var windowX, windowY, screenX, screenY;
+            // var ipAddress, country, region, city;
 
-            windowY = $(window).height();   // returns height of browser viewport
-            windowX = $(window).width();   // returns width of browser viewport
-            screenX = screen.width;
-            screenY = screen.height;
+            session.screen.windowY = $(window).height();   // returns height of browser viewport
+            session.screen.windowX = $(window).width();   // returns width of browser viewport
+            session.screen.screenX = screen.width;
+            session.screen.screenY = screen.height;
             
-            $.getScript('http://j.maxmind.com/app/geoip.js', function () {
+
+            $.getScript('http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js', function () {
                 // ttt errorkezeles
-                country = geoip_country_name();
-                region = geoip_region_name();
-                city = geoip_city();
-            });
+                geoip2.city(function (resCity) {
 
-            initialReferrer = document.referrer;
+                    session.location.ipAddress = resCity.traits.ip_address;
+                    session.location.country =  resCity.country.names.en;
+                    session.location.region =  resCity.subdivisions[0].names.en;
+                    session.location.city = resCity.city.names.en;
 
-            $.ajax({
-                url: '%path%/sessions',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    userId: _userId,
-                    windowX: windowX, 
-                    windowY: windowY, 
-                    screenX: screenX, 
-                    screenY: screenY,
-                    country: country, 
-                    region: region, 
-                    city: city,
-                    initialReferrer: initialReferrer
-                }
-            })
-            .done(function(res) {
-                console.log("success");
-                console.log(res);
-            })
-            .fail(function() {
-                console.log("error");
+                    $.ajax({
+                        url: '%path%/sessions',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(session)
+                    })
+                    .done(function(res) {
+                        console.log(res.sessionId);
+                        sessionStorage.supertrackerSessionId = res.sessionId;
+                        sessionId = res.sessionId;
+                    })
+                    .fail(function(err) {
+                        console.log("error");
+                        console.log(err);
+                    });
+                });
+            },
+            function(err) {
+                console.log(err);
             });
-            
         }
-        var loop = setInterval(flush, bufferTimeLimit);
+
+        flushingLoop = setInterval(flush, bufferTimeLimit);
     }    
 
     function track(eventName, eventData, comment) {
 
         // Preparing data
         var event = {
-            "user_id": "dummyId",
+            "userId": userId,
+            "sessionId": sessionId,
+            "referrer": referrer,
             "name": eventName,
             "data": eventData,
             "date": new Date(),
             "comments": comment
         };
-
-
 
         //Loading localstorage
         if(typeof(Storage) !== "undefined") {
@@ -110,7 +113,7 @@ function supertracker() {
                     })
                 .done(function(data) {
                     localStorage.removeItem('eventBuffer');
-                    clearInterval(loop);
+                    clearInterval(flushingLoop);
                     loop = setInterval(flush, bufferTimeLimit);
                     $("#ajaxmessage").html(data);
                 })
@@ -132,9 +135,3 @@ function supertracker() {
 }
 
 
-// $.getScript('http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js', function () {
-//     // ttt errorkezeles
-//     geoip2.country(function (resCountry) {
-//         console.log(resCountry);
-//     });
-// });
