@@ -20,6 +20,7 @@ function supertracker() {
         referrer = document.referrer;
         date = new Date();
 
+
         if (sessionStorage.supertrackerSessionId) {
             sessionId = sessionStorage.supertrackerSessionId;
             console.log('Sessionstorage on');
@@ -34,7 +35,7 @@ function supertracker() {
             session.screen.screenX = screen.width;
             session.screen.screenY = screen.height;
             
-
+            $.ajaxSetup({ cache: true });
             $.getScript('http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js', function () {
                 // ttt errorkezeles
                 geoip2.city(function (resCity) {
