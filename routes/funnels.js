@@ -19,3 +19,9 @@ module.exports.delete = function(req, res) {
 		res.send('Funnel '+req.params.funnelName+' deleted.');
 	} );
 };
+
+module.exports.apply = function (req, res) {
+	console.log(req.body);
+	console.log(req.body.funnel.steps[0]);
+	res.send({response: 'HelloBello'});
+};

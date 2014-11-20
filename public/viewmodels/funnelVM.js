@@ -269,11 +269,11 @@ $(document).ready(function() {
             $.ajax({
                 url: '%path%/funnels/apply',
                 type: 'POST',
-                dataType: 'json',
+                contentType: 'application/json',
                 data: funnelToBeSentString
             })
-            .done(function() {
-
+            .done(function(res) {
+                console.log(res);
                 console.log("success");
             })
             .fail(function() {
@@ -324,6 +324,7 @@ $(document).ready(function() {
             funnels: funnels,
             funnelSelected: funnelSelected,
             funnelEdited: funnelEdited,
+            applyFunnel: applyFunnel,
             userId: userId,
             // methods
             addFunnel: addFunnel,

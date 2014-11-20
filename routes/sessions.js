@@ -30,8 +30,8 @@ module.exports.post = ( function(req, res) {
 		device: u.device.family
     };
 
-	req.body.referer = {
-    	refererHeader: req.headers.referer,
+	req.body.referrer = {
+    	referrerHeader: req.headers.referer,
     	known: r.known,
     	referer: r.referer,
     	medium: r.medium,

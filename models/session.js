@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 
 var sessionSchema = {
-	// Session data
 	userId: { type:String, required: true },
+    date: { type: Date, default: Date.now },
 	screen: {
 		windowX: Number, 
 		windowY: Number, 
@@ -35,8 +35,8 @@ var sessionSchema = {
         },
     	device: String
     },
-    referer: {
-    	refererHeader: String,
+    referrer: {
+    	referrerHeader: String,
     	known: Boolean,
     	referer: String,
     	medium: String,

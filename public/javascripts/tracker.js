@@ -1,4 +1,5 @@
-/*
+/* /public/javascripts/tracker.js
+* 
 * This file  blabla, one day ill write it....
 *
 */
@@ -11,11 +12,13 @@ function supertracker() {
     var sessionId, userId;
     var flushingLoop;
     var referrer;
+    var date;
 
 
     function init () {
         userId  = '%userId%';
         referrer = document.referrer;
+        date = new Date();
 
         if (sessionStorage.supertrackerSessionId) {
             sessionId = sessionStorage.supertrackerSessionId;
