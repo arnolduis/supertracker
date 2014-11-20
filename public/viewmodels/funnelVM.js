@@ -148,6 +148,13 @@ $(document).ready(function() {
 
     function dashboardVM(_userId) {      
         console.log(_userId);
+
+        var calOne = ko.observable();
+        var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
+
+
+
+
         var userId = ko.observable(_userId);
         var serverFunnels = %funnels%;
         var funnels = ko.observableArray();
@@ -326,6 +333,7 @@ $(document).ready(function() {
             funnelEdited: funnelEdited,
             applyFunnel: applyFunnel,
             userId: userId,
+            calOne: calOne,
             // methods
             addFunnel: addFunnel,
             saveFunnel: saveFunnel,

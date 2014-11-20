@@ -25,7 +25,7 @@ function supertracker() {
             console.log('Sessionstorage on');
          } else {
             console.log('Sessionstorage off');
-            var session = {userId: userId, screen: {}, location: {}};
+            var session = {userId: userId, date: date, screen: {}, location: {}};
             // var windowX, windowY, screenX, screenY;
             // var ipAddress, country, region, city;
 

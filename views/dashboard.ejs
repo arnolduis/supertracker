@@ -6,10 +6,13 @@
 	<link rel='stylesheet' href='/stylesheets/style.css' />
 
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
+    <link rel="stylesheet" type="text/css" href="/tracking/stylesheets/dhtmlxcalendar.css"/>
+    <script src="/tracking/javascripts/dhtmlxcalendar.js"></script>
 
     <script src="/tracking/viewmodels/funnelVM"></script>
     <script src="/tracking/javascripts/knockout-3.1.0.js"></script>
     <script src="/tracking/javascripts/Chart.min.js"></script>
+
 
     <script type="text/html" id='step-template'>
         <div class = 'step'>
@@ -54,7 +57,12 @@
         <button data-bind="click: applyFunnel"> Apply Funnel</button>
     </div>
 
-    <canvas id="funnelChart" width="680" height="300"></canvas>
+    <div class="funnelChart">
+        <input id="calendar" data-bind="value: calOne">
+        <input type="text" id="calendar2"><br>
+        <p data-bind="text: calOne"></p><br>
+        <canvas id="funnelChart" width="680" height="300"></canvas>
+    </div>
 
     <button data-bind="click: test">Test</button>
 
