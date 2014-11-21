@@ -22,6 +22,9 @@ module.exports.delete = function(req, res) {
 
 module.exports.apply = function (req, res) {
 	console.log(req.body);
-	console.log(req.body.funnel.steps[0]);
 	res.send({response: 'HelloBello'});
+
+	for (var i = 0; i < req.body.funnel.steps.length; i++) {
+		console.log(req.body.funnel.steps[i]);
+	}
 };
