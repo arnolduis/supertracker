@@ -42,7 +42,7 @@ module.exports.post = ( function(req, res) {
 
 	var session = new Session(req.body);
 	session.save(function (err) {
-		if(err) res.send("Couldnt save session");
+		if(err) return res.send({err: "Couldnt save session"});
 		res.send({sessionId: session._id});
 	});
 });
