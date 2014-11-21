@@ -1,4 +1,5 @@
 var Funnel = require('../models/funnel');
+var Event = require('../models/event');
 
 module.exports.post = function(req, res) {
 
@@ -21,10 +22,16 @@ module.exports.delete = function(req, res) {
 };
 
 module.exports.apply = function (req, res) {
-	console.log(req.body);
-	res.send({response: 'HelloBello'});
 
 	for (var i = 0; i < req.body.funnel.steps.length; i++) {
-		console.log(req.body.funnel.steps[i]);
+		switch(req.body.funnel.steps[i].operation_type.name){
+			case 'Happened':
+			// Event.find({})
+
+				break;
+			default:
+				break;
+		}
 	}
+	res.send({response: 'HelloBello'});
 };
