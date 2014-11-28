@@ -8,30 +8,20 @@ $(document).ready(function() {
         var funnelCtx = $("#funnelChart").get(0).getContext("2d");
         var funnelChart = new Chart(funnelCtx);
         var data = {
-            labels: ["January", "February", "March", "April", "May", "June", "July"],
+            labels: ["Dummy"],
             datasets: [
                 {
-                    label: "My First dataset",
-                    fillColor: "rgba(220,220,220,0.2)",
-                    strokeColor: "rgba(220,220,220,1)",
-                    pointColor: "rgba(220,220,220,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(220,220,220,1)",
-                    data: [65, 59, 80, 81, 56, 55, 40]
-                },
-                {
-                    label: "My Second dataset",
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: [28, 48, 40, 19, 86, 27, 90]
+                    label: "Funneel",
+                    fillColor: "rgba(220,220,220,0.5)",
+                    strokeColor: "rgba(220,220,220,0.8)",
+                    highlightFill: "rgba(220,220,220,0.75)",
+                    highlightStroke: "rgba(220,220,220,1)",
+                    data: [1]
                 }
             ]
         };
+        funnelChart.Bar(data);
+
 
         return {
             funnelCtx: funnelCtx,
@@ -147,12 +137,19 @@ $(document).ready(function() {
     }
 
     function dashboardVM(_userId) {      
-        console.log(_userId);
+        var funnelDate1;
+        var funnelDate2;
+        var myCalendar1 = new dhtmlXCalendarObject(["calendar1"]);
+        var myCalendar2 = new dhtmlXCalendarObject(["calendar2"]);
 
-        var calOne = ko.observable();
-        var myCalendar = new dhtmlXCalendarObject(["calendar","calendar2"]);
-
-
+        myCalendar1.attachEvent("onClick",function(date){
+            console.log(myCalendar1.getDate());
+            funnelDate1 = myCalendar1.getDate();
+        });
+        myCalendar2.attachEvent("onClick",function(date){
+            console.log(myCalendar2.getDate());
+            funnelDate2 = myCalendar2.getDate();
+        });
 
 
         var userId = ko.observable(_userId);
@@ -180,7 +177,6 @@ $(document).ready(function() {
         funnelSelected(funnels()[0]);
 
         var funnelChart = chartVM();
-        funnelChart.funnelChart.Line(funnelChart.data);
         
         function addFunnel() {
             funnel(funnelVM());
@@ -271,8 +267,14 @@ $(document).ready(function() {
         }
 
         function applyFunnel () {
-            var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()});
+            var funnelEditedJSON = funnelEdited().toJson();
 
+            console.log(funnelDate1);
+            funnelEditedJSON.from = funnelDate1;
+            funnelEditedJSON.to = funnelDate2;
+
+            var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEditedJSON});
+            console.log(funnelEditedJSON);
             $.ajax({
                 url: '%path%/funnels/apply',
                 type: 'POST',
@@ -280,8 +282,23 @@ $(document).ready(function() {
                 data: funnelToBeSentString
             })
             .done(function(res) {
-                console.log(res);
                 console.log("success");
+                funnelChart.data.labels = [];
+                for (var i = 0; i < res.length; i++) {
+                    funnelChart.data.labels.push(funnelEditedJSON.steps[i].event);
+                }
+                funnelChart.data.datasets[0].data = res;
+
+                //ttt update function undefined
+                $('#funnelChart').replaceWith('<canvas id="funnelChart" width="680" height="300"></canvas>');
+         
+
+
+
+                 // Draw the chart
+                funnelChart.ctx = $('#funnelChart').get(0).getContext("2d");
+                funnelChart.funnelChart = new Chart(funnelChart.ctx);
+                funnelChart.funnelChart.Bar(funnelChart.data);    
             })
             .fail(function() {
                 console.log("error");
@@ -333,7 +350,6 @@ $(document).ready(function() {
             funnelEdited: funnelEdited,
             applyFunnel: applyFunnel,
             userId: userId,
-            calOne: calOne,
             // methods
             addFunnel: addFunnel,
             saveFunnel: saveFunnel,

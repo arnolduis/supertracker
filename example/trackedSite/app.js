@@ -24,7 +24,7 @@ nconf.argv()
 // Serve req.user for the supertracker
 app.use(function (req, res, next) {
 	req.user = {
-		userId: 'cecil'
+		userId: 'arni'
 	};
 	next();
 });

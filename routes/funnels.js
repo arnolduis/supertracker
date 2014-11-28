@@ -22,16 +22,46 @@ module.exports.delete = function(req, res) {
 };
 
 module.exports.apply = function (req, res) {
-
+	var events = [];
+	// , date: {$gt: req.body.funnel.from, $lt: req.body.funnel.to}
+	console.log(req.body.funnel.from);
 	for (var i = 0; i < req.body.funnel.steps.length; i++) {
-		switch(req.body.funnel.steps[i].operation_type.name){
-			case 'Happened':
-			// Event.find({})
-
-				break;
-			default:
-				break;
-		}
+		events.push(req.body.funnel.steps[i].event);
 	}
-	res.send({response: 'HelloBello'});
+	var o = {};
+
+	o.map = function() {
+	    emit(1,this.name);
+	};
+
+	o.reduce = function(key, values) {
+	    var funnel = {steps: []};
+	    for (var i = 0; i < events.length; i++) {
+	        funnel.steps[i] = 0;
+	    }
+
+	    for (var j = 0; j < values.length; j++) {
+	        var k = 0;
+	        while( (j+k) < values.length && values[j+k] == events[k]) {
+	            funnel.steps[k]++;
+	            k++;
+	        }
+	    }
+	    return funnel;
+	};
+
+    o.scope = {events: events};
+    o.query = { name: {$in: events}};
+    o.sort = {sessionId:1, date:1 };
+    o.out = "funnelResult";
+	
+
+	Event.mapReduce(o, function (err, model, stats) {
+	  model.find().exec(function (err, docs) {
+	  	console.log(err);
+	    console.log(docs);
+	    res.send(docs[0].value.steps);
+	  });
+	});
+
 };
