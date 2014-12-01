@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title><%= title %></title>
-	<link rel='stylesheet' href='/stylesheets/style.css' />
+	<link rel='stylesheet' href='<%= stpath %>/stylesheets/style.css' />
 
     <script src='/javascripts/jquery-1.11.1.min.js'></script>
     <link rel="stylesheet" type="text/css" href="<%= stpath %>/stylesheets/dhtmlxcalendar.css"/>
@@ -38,30 +38,31 @@
 
 </head>
 <body >
-    <h1><%= title %></h1>
-    <div><a href="/">Back</a></div><br>
-    <label for="userId">User Id:</label>
-    <input data-bind="value: userId, valueUpdate: 'afterkeydown'" id="userId">
+    <div class="content">
+        <h1><%= title %></h1>
+        <div><a href="/">Back</a></div><br>
+        <label for="userId">User Id:</label>
+        <input data-bind="value: userId, valueUpdate: 'afterkeydown'" id="userId"><br><br>
         
+        <div id="funnelPicker">
+            <h2>Funnel List</h2>
+            <select data-bind="options: funnels, optionsText: 'name', value: funnelSelected"></select>
+            <button data-bind="click: addFunnel">New Funnel</button>
+        </div>
 
-    <div class="content">
-        <h2>Funnel List</h2>
-        <select data-bind="options: funnels, optionsText: 'name', value: funnelSelected"></select>
-        <button data-bind="click: addFunnel">New Funnel</button>
-    </div>
+        <div id="funnelEditor">
+            <h2>Edit Funnel</h2>
+            <div data-bind="template: { name: 'funnel-template', data: funnelEdited }"></div>
+            <button data-bind="click: saveFunnel"> Save Funnel</button>
+            <button data-bind="click: deleteFunnel"> Delete Funnel</button>
+            <button data-bind="click: applyFunnel"> Apply Funnel</button>
+        </div>
 
-    <div class="content">
-        <h2>Edit Funnel</h2>
-        <div data-bind="template: { name: 'funnel-template', data: funnelEdited }"></div>
-        <button data-bind="click: saveFunnel"> Save Funnel</button>
-        <button data-bind="click: deleteFunnel"> Delete Funnel</button>
-        <button data-bind="click: applyFunnel"> Apply Funnel</button>
-    </div>
-
-    <div class="funnelChart">
-        <input id="calendar1">
-        <input id="calendar2"><br>
-        <canvas id="funnelChart" width="680" height="300"></canvas>
+        <div id="funnelChart">
+            <input id="calendar1">
+            <input id="calendar2"><br>
+            <canvas id="funnelCanvas" width="680" height="300"></canvas>
+        </div>
     </div>
 
     <button data-bind="click: test">Test</button>

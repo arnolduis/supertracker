@@ -5,14 +5,14 @@ $(document).ready(function() {
 
     function chartVM () {
         // Chart.defaults.global.responsive = true;
-        var funnelCtx = $("#funnelChart").get(0).getContext("2d");
+        var funnelCtx = $("#funnelCanvas").get(0).getContext("2d");
         var funnelChart = new Chart(funnelCtx);
         var data = {
             labels: ["Dummy"],
             datasets: [
                 {
                     label: "Funneel",
-                    fillColor: "rgba(220,220,220,0.5)",
+                    fillColor: "rgba(0,0,220,0.7)",
                     strokeColor: "rgba(220,220,220,0.8)",
                     highlightFill: "rgba(220,220,220,0.75)",
                     highlightStroke: "rgba(220,220,220,1)",
@@ -290,13 +290,13 @@ $(document).ready(function() {
                 funnelChart.data.datasets[0].data = res;
 
                 //ttt update function undefined
-                $('#funnelChart').replaceWith('<canvas id="funnelChart" width="680" height="300"></canvas>');
+                $('#funnelCanvas').replaceWith('<canvas id="funnelCanvas" width="680" height="300"></canvas>');
          
 
 
 
                  // Draw the chart
-                funnelChart.ctx = $('#funnelChart').get(0).getContext("2d");
+                funnelChart.ctx = $('#funnelCanvas').get(0).getContext("2d");
                 funnelChart.funnelChart = new Chart(funnelChart.ctx);
                 funnelChart.funnelChart.Bar(funnelChart.data);    
             })
