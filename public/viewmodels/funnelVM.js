@@ -5,8 +5,6 @@ $(document).ready(function() {
 
     function chartVM () {
         // Chart.defaults.global.responsive = true;
-        var funnelCtx = $("#funnelCanvas").get(0).getContext("2d");
-        var funnelChart = new Chart(funnelCtx);
         var data = {
             labels: ["Dummy"],
             datasets: [
@@ -20,8 +18,8 @@ $(document).ready(function() {
                 }
             ]
         };
-        funnelChart.Bar(data);
-
+        var funnelCtx = $("#funnelCanvas").get(0).getContext("2d");
+        var funnelChart = new Chart(funnelCtx).Bar(data);
 
         return {
             funnelCtx: funnelCtx,
@@ -283,6 +281,7 @@ $(document).ready(function() {
             })
             .done(function(res) {
                 console.log("success");
+                console.log(res);
                 funnelChart.data.labels = [];
                 for (var i = 0; i < res.length; i++) {
                     funnelChart.data.labels.push(funnelEditedJSON.steps[i].event);
@@ -291,8 +290,6 @@ $(document).ready(function() {
 
                 //ttt update function undefined
                 $('#funnelCanvas').replaceWith('<canvas id="funnelCanvas" width="680" height="300"></canvas>');
-         
-
 
 
                  // Draw the chart

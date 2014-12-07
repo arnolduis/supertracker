@@ -24,22 +24,22 @@ module.exports.delete = function(req, res) {
 module.exports.apply = function (req, res) {
 	var events = [];
 	// , date: {$gt: req.body.funnel.from, $lt: req.body.funnel.to}
-	console.log(req.body.funnel.from);
+	console.log(req.body.funnel);
 	for (var i = 0; i < req.body.funnel.steps.length; i++) {
 		events.push(req.body.funnel.steps[i].event);
 	}
 	var o = {};
 
+	//ttt reszletezd a doksiban a gondolatmenetet
 	o.map = function() {
 	    emit(1,this.name);
 	};
-
+	//ttt sessionkeveredes
 	o.reduce = function(key, values) {
 	    var funnel = {steps: []};
 	    for (var i = 0; i < events.length; i++) {
 	        funnel.steps[i] = 0;
 	    }
-
 	    for (var j = 0; j < values.length; j++) {
 	        var k = 0;
 	        while( (j+k) < values.length && values[j+k] == events[k]) {
@@ -47,6 +47,7 @@ module.exports.apply = function (req, res) {
 	            k++;
 	        }
 	    }
+
 	    return funnel;
 	};
 
