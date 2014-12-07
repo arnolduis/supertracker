@@ -3,14 +3,14 @@ html, body {
 }
 body {
     font-family: sans-serif;
-    color: #666;
+    /*color: #666;*/
 }
 
 .content {
 	margin: auto;
 	/*padding: 10px;*/
 	max-width: 90%;
-    background: #efefef;
+    /*background: #efefef;*/
 }
 
 .content h1 {
@@ -57,4 +57,16 @@ body {
 
 .step h2 {
 	text-align: left;
+}
+
+.step .removeStep {
+    font-weight: bold;
+    color: #627b86;
+    background: #efefef;
+    border: 0px;
+}
+
+button {
+    color: #627b86;
+    border: 0px;
 }
