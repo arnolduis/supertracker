@@ -15,6 +15,7 @@ body {
 
 .content h1 {
     margin-top: 0;
+    margin-bottom: 0;
     text-align: center;
     margin: auto;
     /*padding: 5px;*/
@@ -26,23 +27,23 @@ body {
 .widget {
     position: relative;
     margin: 10px;
+    margin-bottom: 20px;
     background: #efefef;
     border: 2px solid #a6b1b6;
 
+-webkit-box-shadow: 3px 3px 5px -1px rgba(0,0,0,0.75);
+-moz-box-shadow: 3px 3px 5px -1px rgba(0,0,0,0.75);
+box-shadow: 3px 3px 5px -1px rgba(0,0,0,0.75);
 
-    /*padding: 12px;*/
-    /*margin-bottom: 30px;*/
-    /*-webkit-box-sizing: border-box;*/
-    /*-moz-box-sizing: border-box;*/
-    /*box-sizing: border-box;*/
 }
 
 .widget h2 {
+    margin-bottom: 0;
     margin-top: 0;
     text-align: center;
     color: #627b86;
     background: #a6b1b6;
-    line-height: 1.5em;
+    /*line-height: 1.5em;*/
 }
 
 .steps {
@@ -60,6 +61,7 @@ body {
 }
 
 .step .removeStep {
+	float: right;
     font-weight: bold;
     color: #627b86;
     background: #efefef;
