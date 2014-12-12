@@ -1,3 +1,4 @@
+/*#efefef,#d0dde3,#a6b1b6,#627b86*/
 html,
 body
 {
@@ -6,7 +7,7 @@ body
 body
 {
     font-family: sans-serif;
-    /*color: #666;*/
+    color: #627b86;
 }
 
 .content
@@ -76,15 +77,25 @@ body
     text-align: left;
 }
 
-.step .removeStep
+.removeStep
 {
     font-weight: bold;
 
     float: right;
 
+    margin: 2px 2px;
+
     color: #627b86;
-    border: 0;
-    background: #efefef;
+
+    border: 0 solid #000;
+    -webkit-border-radius: 30px 30px 30px 30px;
+       -moz-border-radius: 30px 30px 30px 30px;
+            border-radius: 30px 30px 30px 30px;
+    background-color: #a6b1b6;
+}
+
+button, select, input {
+    max-width: 170px; 
 }
 
 button
@@ -101,9 +112,11 @@ button
     display: block;
 
     margin: 10px auto 20px auto;
+    padding: 3px 10px;
 
     border: 0 solid #000;
     -webkit-border-radius: 30px 30px 30px 30px;
        -moz-border-radius: 30px 30px 30px 30px;
             border-radius: 30px 30px 30px 30px;
+    background-color: #a6b1b6;
 }

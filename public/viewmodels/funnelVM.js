@@ -137,17 +137,38 @@ $(document).ready(function() {
     function dashboardVM(_userId) {      
         var funnelDate1;
         var funnelDate2;
-        var myCalendar1 = new dhtmlXCalendarObject(["calendar1"]);
-        var myCalendar2 = new dhtmlXCalendarObject(["calendar2"]);
 
-        myCalendar1.attachEvent("onClick",function(date){
-            console.log(myCalendar1.getDate());
-            funnelDate1 = myCalendar1.getDate();
-        });
-        myCalendar2.attachEvent("onClick",function(date){
-            console.log(myCalendar2.getDate());
-            funnelDate2 = myCalendar2.getDate();
-        });
+
+
+
+        var myCalendar;
+        myCalendar = new dhtmlXCalendarObject(["date_from","date_to"]);
+        myCalendar.setDate("2013-03-10");
+        myCalendar.hideTime();
+        // init values
+        var t = new Date();
+        byId("date_from").value = "2013-03-05";
+        byId("date_to").value = "2013-03-15";
+        
+        function setSens(id, k) {
+            // update range
+            if (k == "min") {
+                myCalendar.setSensitiveRange(byId(id).value, null);
+            } else {
+                myCalendar.setSensitiveRange(null, byId(id).value);
+            }
+        }
+        function byId(id) {
+            return document.getElementById(id);
+        }
+
+        // myCalendar.attachEvent("onClick",function(date){
+        //     console.log(myCalendar.getDate());
+        //     funnelDate1 = myCalendar.getDate();
+        // });
+
+
+
 
 
         var userId = ko.observable(_userId);
@@ -173,6 +194,9 @@ $(document).ready(function() {
             funnels.push(funnelVM({name: 'Dummy', steps:[stepVM().toJson()]}));
         }
         funnelSelected(funnels()[0]);
+
+
+
 
         var funnelChart = chartVM();
         
@@ -351,6 +375,8 @@ $(document).ready(function() {
             addFunnel: addFunnel,
             saveFunnel: saveFunnel,
             deleteFunnel: deleteFunnel,
+            setSens: setSens,
+            byId: byId,
             test: test
         };
     }
