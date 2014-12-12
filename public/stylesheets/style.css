@@ -1,74 +1,109 @@
-html, body {
+html,
+body
+{
     height: 100%;
 }
-body {
+body
+{
     font-family: sans-serif;
     /*color: #666;*/
 }
 
-.content {
-	margin: auto;
-	/*padding: 10px;*/
-	max-width: 90%;
+.content
+{
+    /*padding: 10px;*/
+    max-width: 90%;
+    margin: auto;
     /*background: #efefef;*/
 }
 
-.content h1 {
+.content h1
+{
+    line-height: 1.5em;
+
+    margin: auto;
     margin-top: 0;
     margin-bottom: 0;
+
     text-align: center;
-    margin: auto;
     /*padding: 5px;*/
+
     color: #627b86;
-    line-height: 1.5em;
     background: #d0dde3;
 }
 
-.widget {
+.widget
+{
     position: relative;
+
     margin: 10px;
     margin-bottom: 20px;
-    background: #efefef;
+
     border: 2px solid #a6b1b6;
-
--webkit-box-shadow: 3px 3px 5px -1px rgba(0,0,0,0.75);
--moz-box-shadow: 3px 3px 5px -1px rgba(0,0,0,0.75);
-box-shadow: 3px 3px 5px -1px rgba(0,0,0,0.75);
-
+    background: #efefef;
+    -webkit-box-shadow: 3px 3px 5px -1px rgba(0,0,0,.75);
+       -moz-box-shadow: 3px 3px 5px -1px rgba(0,0,0,.75);
+            box-shadow: 3px 3px 5px -1px rgba(0,0,0,.75);
 }
 
-.widget h2 {
-    margin-bottom: 0;
+.widget h2
+{
     margin-top: 0;
+    margin-bottom: 0;
+
     text-align: center;
+
     color: #627b86;
     background: #a6b1b6;
     /*line-height: 1.5em;*/
 }
 
-.steps {
-	margin: 10px;
+.steps
+{
+    margin: 10px;
 }
 
-.step {
-	/*border-radius: 10px;*/
+.step
+{
+    margin: 0 10px 0 10px;
+    /*border-radius: 10px;*/
+
     border: 2px solid #a6b1b6;
-	margin: 0px 10px 0px 10px;
 }
 
-.step h2 {
-	text-align: left;
+.step h2
+{
+    text-align: left;
 }
 
-.step .removeStep {
-	float: right;
+.step .removeStep
+{
     font-weight: bold;
+
+    float: right;
+
     color: #627b86;
+    border: 0;
     background: #efefef;
-    border: 0px;
 }
 
-button {
+button
+{
     color: #627b86;
-    border: 0px;
+    border: 0;
+}
+
+#buttonAddStep
+{
+    font-size: 30px;
+    font-weight: bold;
+
+    display: block;
+
+    margin: 10px auto 20px auto;
+
+    border: 0 solid #000;
+    -webkit-border-radius: 30px 30px 30px 30px;
+       -moz-border-radius: 30px 30px 30px 30px;
+            border-radius: 30px 30px 30px 30px;
 }
