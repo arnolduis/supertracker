@@ -135,20 +135,23 @@ $(document).ready(function() {
     }
 
     function dashboardVM(_userId) {      
-        var funnelDate1;
-        var funnelDate2;
+        var funnelFrom;
+        var funnelTo;
 
 
 
 
         var myCalendar;
+        var t = new Date();
+        console.log(t.format('yyyy-mm-dd'));
+        // var tstr = t.getUTCFullYear()+"-"+t.getUTCMonth()+"-01";
+        var tstr = t.format('yyyy-mm-dd');
         myCalendar = new dhtmlXCalendarObject(["date_from","date_to"]);
-        myCalendar.setDate("2013-03-10");
+        myCalendar.setDate(tstr);
         myCalendar.hideTime();
         // init values
-        var t = new Date();
-        byId("date_from").value = "2013-03-05";
-        byId("date_to").value = "2013-03-15";
+        byId("date_from").value = tstr;
+        byId("date_to").value = tstr;
         
         function setSens(id, k) {
             // update range
@@ -161,11 +164,6 @@ $(document).ready(function() {
         function byId(id) {
             return document.getElementById(id);
         }
-
-        // myCalendar.attachEvent("onClick",function(date){
-        //     console.log(myCalendar.getDate());
-        //     funnelDate1 = myCalendar.getDate();
-        // });
 
 
 
@@ -289,11 +287,13 @@ $(document).ready(function() {
         }
 
         function applyFunnel () {
+            
             var funnelEditedJSON = funnelEdited().toJson();
 
-            console.log(funnelDate1);
-            funnelEditedJSON.from = funnelDate1;
-            funnelEditedJSON.to = funnelDate2;
+            console.log("DateFrom> "+$("#date_from").val());
+            console.log("DateTo  > "+$("#date_from").val());
+            funnelEditedJSON.from = $("#date_from").val();
+            funnelEditedJSON.to = $("#date_to").val();
 
             var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEditedJSON});
             console.log(funnelEditedJSON);

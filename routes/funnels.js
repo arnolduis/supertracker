@@ -23,6 +23,7 @@ module.exports.delete = function(req, res) {
 
 module.exports.apply = function (req, res) {
 	var events = [];
+	console.log("routes/funnel.js:26> "+req.body.funnel.from);
 	// , date: {$gt: req.body.funnel.from, $lt: req.body.funnel.to}
 	console.log(req.body.funnel);
 	for (var i = 0; i < req.body.funnel.steps.length; i++) {
