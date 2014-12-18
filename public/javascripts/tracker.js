@@ -110,7 +110,7 @@ function supertracker() {
         if(typeof(Storage) !== "undefined") {
             if (localStorage.eventBuffer) {
                 $.ajax({
-                        url: '%path%/track',
+                        url: '%path%/events',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify(JSON.parse(localStorage.eventBuffer))                
