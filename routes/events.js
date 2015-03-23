@@ -2,6 +2,7 @@ var Event = require('../models/event');
 
 module.exports = function(app, stpath) {
 
+	// get list of all events
 	app.get(stpath+"/events",  function(req, res) {
 			Event.find({}, function (err, events) {
 		  		if (err) console.log(err);	  		
@@ -9,6 +10,7 @@ module.exports = function(app, stpath) {
 		  	});
 	});
 
+	// put event to db
 	app.post(stpath+"/events", function(req, res){
 		// Saving to server
 		Event.create(req.body,function(err) {
@@ -29,6 +31,7 @@ module.exports = function(app, stpath) {
 		});
 	});
 
+	// get event names for picking
 	app.get(stpath+"/events/getNames", function (req, res) {
 		var names;
 		Event.find().distinct('name', function (err, names) {

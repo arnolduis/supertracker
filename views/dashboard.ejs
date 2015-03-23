@@ -42,11 +42,13 @@
 </head>
 <body >
 <div class="steps">
+
+    <div><a href="/">Back</a></div><br>
+    <label for="userId">Observer Id:</label>
+    <input data-bind="value: userId, valueUpdate: 'afterkeydown'" id="userId"><br><br>
+
     <div class="content">
         <p><h1>Funnel Analysis</h1></p>
-        <div><a href="/">Back</a></div><br>
-        <label for="userId">User Id:</label>
-        <input data-bind="value: userId, valueUpdate: 'afterkeydown'" id="userId"><br><br>
         
         <div class="widget" id="funnelPicker">
             <h2>Funnel List</h2>
@@ -64,11 +66,28 @@
 
         <div class="widget" id="funnelChart">
             <h2>Chart</h2>
-            <span class="label">From</span> <input type="text" id="date_from" data-bind="click: setSens('date_to', 'max');" readonly="true">
-            <span class="label">Till</span> <input type="text" id="date_to" data-bind="click: setSens('date_from', 'min');" readonly="true">
+            <span class="label">From</span> <input type="text" id="funnel_date_from" data-bind="click: setSens('funnel_date_to', 'max');" readonly="true">
+            <span class="label">Till</span> <input type="text" id="funnel_date_to" data-bind="click: setSens('funnel_date_from', 'min');" readonly="true">
 
             <div class="canvas-container">
                 <canvas id="funnelCanvas" width="680" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="content">
+        <p><h1>Cohort Analysis</h1></p>
+
+
+        <div class="widget" id="cohortChart">
+            <h2>Cohort Chart</h2>
+            <span class="label">From</span> <input type="text" id="cohort_date_from" data-bind="click: setSensCohort('cohort_date_to', 'max');" readonly="true">
+            <span class="label">Till</span> <input type="text" id="cohort_date_to" data-bind="click: setSensCohort('cohort_date_from', 'min');" readonly="true">
+            <button data-bind="click: applyCohort">Apply</button>
+
+            <div class="canvas-container">
+                <canvas id="cohortCanvas" width="680" height="300"></canvas>
             </div>
         </div>
     </div>

@@ -3,6 +3,7 @@ var Event = require('../models/event');
 
 module.exports = function(app, stpath) {
 
+	// upsert funnel
 	app.post(stpath+"/funnels", function(req, res) {
 
 		console.log('routes/funnels.post');
@@ -14,6 +15,9 @@ module.exports = function(app, stpath) {
 		});	
 	});
 
+	/* 
+	 *  Delete funnel
+	 */
 	app.delete(stpath+"/funnels/:userId/:funnelName", function(req, res) {
 		console.log('userId: '+req.params.userId);
 		console.log('funnelName: '+req.params.funnelName);
@@ -23,6 +27,9 @@ module.exports = function(app, stpath) {
 		} );
 	});
 
+	/*
+	 * Applyfunnel
+	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
 		var events = [];
 		console.log("routes/funnel.js:26> "+req.body.funnel.from);

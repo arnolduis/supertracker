@@ -13,7 +13,6 @@ module.exports = function(app, stpath) {
 			  	if (err) res.send(err);
 				Funnel.find({userId: req.user.userId}, {userId:1, funnel:1, _id:0}, function (err, funnels) {
 			  		if (err) res.send(err);
-console.log(result);
 
 					result = result.replace(/%path%/g, stpath);
 					result = result.replace(/%userId%/g, req.user.userId);

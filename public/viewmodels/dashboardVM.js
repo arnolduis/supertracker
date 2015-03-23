@@ -134,42 +134,40 @@ $(document).ready(function() {
         };
     }
 
-    function dashboardVM(_userId) {      
-        var funnelFrom;
-        var funnelTo;
+    function cohortVM() {
 
+        return {
 
+        };
+    }
 
+    function dashboardVM(_observerId) {   
 
-        var myCalendar;
-        var t = new Date();
-        console.log(t.format('yyyy-mm-dd'));
-        // var tstr = t.getUTCFullYear()+"-"+t.getUTCMonth()+"-01";
-        var tstr = t.format('yyyy-mm-dd');
-        myCalendar = new dhtmlXCalendarObject(["date_from","date_to"]);
-        myCalendar.setDate(tstr);
-        myCalendar.hideTime();
-        // init values
-        byId("date_from").value = tstr;
-        byId("date_to").value = tstr;
+        var tstr = new Date().format('yyyy-mm-dd');
+        var observerId = _observerId;
+        
+        /*
+         * FUNNEL ANALYSIS
+         */
+
+        // Calendar
+        var funnelCalendar;
+        funnelCalendar = new dhtmlXCalendarObject(["funnel_date_from","funnel_date_to"]);
+        funnelCalendar.setDate(tstr);
+        funnelCalendar.hideTime();
+        $("#funnel_date_from").val(tstr);
+        $("#funnel_date_to").val(tstr);
         
         function setSens(id, k) {
             // update range
             if (k == "min") {
-                myCalendar.setSensitiveRange(byId(id).value, null);
+                funnelCalendar.setSensitiveRange($("#funnel_date_from").val(), null);
             } else {
-                myCalendar.setSensitiveRange(null, byId(id).value);
+                funnelCalendar.setSensitiveRange(null, $("#funnel_date_to").val());
             }
         }
-        function byId(id) {
-            return document.getElementById(id);
-        }
 
-
-
-
-
-        var userId = ko.observable(_userId);
+        // Funnels
         var serverFunnels = %funnels%;
         var funnels = ko.observableArray();
         var funnelSelected = ko.observable();
@@ -206,15 +204,6 @@ $(document).ready(function() {
             console.log('Saving funnel');
 
             var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()});
-
-            // // A lokalstoragees moka azert, hogy biztonsagosan el lehessen menteni a funnelt.
-            // if (localStorage.userFunnels) {
-            //     var userFunnels = JSON.parse(localStorage.userFunnels);
-            //     userFunnels.push(funnelToBeSentString);
-            //     localStorage.userFunnels = JSON.stringify(userFunnels);
-            // } else {
-            //     localStorage.userFunnels = JSON.stringify([funnelToBeSentString]);             
-            // }
 
             $.ajax({
                 url: '%path%/funnels',
@@ -336,6 +325,66 @@ $(document).ready(function() {
             return -1;
         }
 
+
+        /*
+         * COHORT ANALYSIS
+         */
+
+        // Calendar
+        var cohortCalendar;
+        cohortCalendar = new dhtmlXCalendarObject(["cohort_date_from","cohort_date_to"]);
+        cohortCalendar.setDate(tstr);
+        cohortCalendar.hideTime();
+        $("#cohort_date_from").val(tstr);
+        $("#cohort_date_to").val(tstr);
+        
+        function setSensCohort(id, k) {
+            console.log('nuni');
+            // update range
+            if (k == "min") {
+                cohortCalendar.setSensitiveRange($("#cohort_date_from").val(), null);
+            } else {
+                cohortCalendar.setSensitiveRange(null, $("#cohort_date_to").val());
+            }
+        }
+
+        function applyCohort() {
+            var data = {};
+            data.cohort_from = $("#cohort_date_from").val();
+            data.cohort_to   = $("#cohort_date_to").val();
+            data.cohortEvent = "Subscribe";
+            data.returnEvent = "Return";
+
+
+            $.ajax({
+                url: '%path%/cohort/apply',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data)
+            })
+            .done(function(res) {
+                console.log("success");
+                console.log(res);
+                
+     
+            })
+            .fail(function() {
+                console.log("error");
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
         function test () {
             // var mystepJson = {
             //     operation_type: { 
@@ -376,7 +425,9 @@ $(document).ready(function() {
             saveFunnel: saveFunnel,
             deleteFunnel: deleteFunnel,
             setSens: setSens,
-            byId: byId,
+            // Cohort
+            applyCohort: applyCohort,
+            setSensCohort: setSensCohort,
             test: test
         };
     }
