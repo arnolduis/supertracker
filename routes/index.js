@@ -4,13 +4,13 @@ var fs = require('fs'),
 var path = require('path');
 
  
-var requireFiles = function (directory, app, stpath, bufferSize, bufferTimeLimit) {
+var requireFiles = function (directory, app, stpath, bufferSize, bufferTimeLimit, db) {
   fs.readdirSync(directory).forEach(function (fileName) {
     // Recurse if directory
     var target = path.join(directory, fileName);
 
     if(fs.lstatSync(target).isDirectory()) {
-      requireFiles(target, app, stpath, bufferSize, bufferTimeLimit);
+      requireFiles(target, app, stpath, bufferSize, bufferTimeLimit, db);
     } else {
  
       // Skip this file
@@ -20,11 +20,11 @@ var requireFiles = function (directory, app, stpath, bufferSize, bufferTimeLimit
       if(validFileTypes.indexOf(fileName.split('.').pop()) === -1) return;
  
       // Require the file.
-      require(target)(app, stpath, bufferSize, bufferTimeLimit);
+      require(target)(app, stpath, bufferSize, bufferTimeLimit, db );
     }
   });
 };
  
-module.exports = function (app, stpath, bufferSize, bufferTimeLimit) {
-  requireFiles(__dirname, app, stpath, bufferSize, bufferTimeLimit);
+module.exports = function (app, stpath, bufferSize, bufferTimeLimit, db) {
+  requireFiles(__dirname, app, stpath, bufferSize, bufferTimeLimit, db);
 };

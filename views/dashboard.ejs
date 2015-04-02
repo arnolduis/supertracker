@@ -61,7 +61,7 @@
             <div data-bind="template: { name: 'funnel-template', data: funnelEdited }"></div>
             <button data-bind="click: saveFunnel">Save</button>
             <button data-bind="click: deleteFunnel">Delete</button>
-            <button data-bind="click: applyFunnel">Apply</button>
+            <button data-bind="click: applyFunnel">Show</button>
         </div>
 
         <div class="widget" id="funnelChart">
@@ -77,22 +77,50 @@
 
 
     <div class="content">
-        <p><h1>Cohort Analysis</h1></p>
+        <p><h1>Retention Analysis</h1></p>
 
 
         <div class="widget" id="cohortChart">
-            <h2>Cohort Chart</h2>
+            <h2>Retention Chart</h2>
             <span class="label">From</span> <input type="text" id="cohort_date_from" data-bind="click: setSensCohort('cohort_date_to', 'max');" readonly="true">
             <span class="label">Till</span> <input type="text" id="cohort_date_to" data-bind="click: setSensCohort('cohort_date_from', 'min');" readonly="true">
-            <button data-bind="click: applyCohort">Apply</button>
+            <span class="label">Rows</span> <input type="text" id="cohRows" data-bind="value: cohRows">
+            <span class="label">Cols</span> <input type="text" id="cohCols" data-bind="value: cohCols">
+            <button data-bind="click: applyCohort">Show</button>
 
-            <div class="canvas-container">
-                <canvas id="cohortCanvas" width="680" height="300"></canvas>
-            </div>
+
+            <table class="cohortTable">
+                <tbody data-bind="foreach: retentionMX">
+                    <tr data-bind="foreach: $data">
+                        <td data-bind="text: $data"></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
+
     </div>
 
-    <button data-bind="click: test">Test</button>
+    <div class="content">
+        <p><h1>Segmentation Analysis</h1></p>
+
+
+        <div class="widget" id="segChart">
+            <h2>Segmentation Chart</h2>
+
+            <select data-bind="options: events, value: segEvent"></select>
+
+
+            <button data-bind="click: applySegQuery">Show</button>
+
+
+            <div class="canvas-container">
+                <canvas id="segCanvas" width="680" height="300"></canvas>
+            </div>
+        </div>
+
+
+    </div>
 
 </body>
 </html>

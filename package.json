@@ -19,7 +19,8 @@
     "body-parser": "*",
     "nconf": "*",
     "ua-parser": "*",
-    "referer-parser": "*"
+    "referer-parser": "*",
+    "mongo-fast-join": "*"
   },
   "keywords": [
     "event",

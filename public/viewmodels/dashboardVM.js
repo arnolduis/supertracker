@@ -146,9 +146,7 @@ $(document).ready(function() {
         var tstr = new Date().format('yyyy-mm-dd');
         var observerId = _observerId;
         
-        /*
-         * FUNNEL ANALYSIS
-         */
+        /******************************** FUNNEL ANALYSIS  **********************************/
 
         // Calendar
         var funnelCalendar;
@@ -326,17 +324,28 @@ $(document).ready(function() {
         }
 
 
-        /*
-         * COHORT ANALYSIS
-         */
+        /******************************** COHORT ANALYSIS  **********************************/
+        var cohRows = ko.observable(2);
+        var cohCols = ko.observable(5);
+        var retentionMX = ko.observableArray(); 
+
+        // initialize
+        var tmp = [];
+        for (var i = 0; i < cohRows(); i++) {
+            tmp.push([]);
+            for (var j = 0; j < cohCols(); j++) {
+                tmp[i][j] = "Nan%";
+            }
+        }
+        retentionMX(tmp);
 
         // Calendar
-        var cohortCalendar;
-        cohortCalendar = new dhtmlXCalendarObject(["cohort_date_from","cohort_date_to"]);
+        var cohortCalendar = new dhtmlXCalendarObject(["cohort_date_from","cohort_date_to"]);
+        cohortCalendar.setWeekStartDay(1);
         cohortCalendar.setDate(tstr);
         cohortCalendar.hideTime();
-        $("#cohort_date_from").val(tstr);
-        $("#cohort_date_to").val(tstr);
+        $("#cohort_date_from").val("2014-01-01");
+        $("#cohort_date_to").val("2014-01-02");
         
         function setSensCohort(id, k) {
             console.log('nuni');
@@ -350,6 +359,8 @@ $(document).ready(function() {
 
         function applyCohort() {
             var data = {};
+            data.cols = cohCols();
+            data.rows = cohRows();
             data.cohort_from = $("#cohort_date_from").val();
             data.cohort_to   = $("#cohort_date_to").val();
             data.cohortEvent = "Subscribe";
@@ -357,15 +368,19 @@ $(document).ready(function() {
 
 
             $.ajax({
-                url: '%path%/cohort/apply',
+                url: '%path%/cohort/getRetentionMatrix',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data)
             })
             .done(function(res) {
                 console.log("success");
-                console.log(res);
-                
+                for (var i = 0; i < res.length; i++) {
+                    for (var j = 1; j < res[i].length; j++) {
+                        res[i][j] = Math.round(res[i][j] / res[i][0] * 100) + "%";
+                    }
+                }
+                retentionMX(res);
      
             })
             .fail(function() {
@@ -375,44 +390,71 @@ $(document).ready(function() {
 
 
 
+        /*********************************************  SEGMENTATION ANALYSIS  ****************************************/
+        var events = %events%;
+        var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
+        // var segData = ko.observableArray([]);
 
+        var segEvent = ko.observable();
+        var segCond =  {
+            "$or": [{
+                    "sessionId": "lolo"
+                }, {
+                    "sessionId": "lolo"
+            }]
+        };
+        var segGrpBy = ko.observable();
 
+        // Segmentation Chart
+        var segData = {
+            labels: ['','','','','','','',],
+            datasets: [
+                {
+                    label: "My First dataset",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: [65, 59, 80, 81, 56, 55, 40]
+                },
+                {
+                    label: "My Second dataset",
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: [28, 48, 40, 19, 86, 27, 90]
+                }
+            ]
+        };
+        var segCtx = document.getElementById("segCanvas").getContext("2d");
+        var segChart = new Chart(segCtx).Line(segData);
 
-
-
-
-
-
-
-
-        function test () {
-            // var mystepJson = {
-            //     operation_type: { 
-            //         name: 'Date',
-            //         operators: [{ name: 'was XXX', value: '<' }]
-            //     },
-            //     event: 'gomb1',
-            //     property: 'Happened',
-            //     operator: '<',
-            //     value: ''
-            // };
-            // var mystep = stepVM();
-
-            // console.log("Step test:");
-            // // console.log(mystep.toJson());
-            // console.log(stepVM().toJson()); //ttt tesztek a funnel mentesere. 
-
-            // var myfunnel = funnelVM({
-            //     name: "Nuni", 
-            //     steps: [mystepJson,mystepJson]
-            // });
-
-            console.log("Funnel test:");
-            console.log(funnelVM({name: 'Nuni', steps:[stepVM().toJson()]}).toJson());
-
-            // myfunnel.save();
-            // console.log(funnelVM(JSON.parse(localStorage.savedFunnel)).steps()[0].operation_type());
+        function applySegQuery() {
+console.log(segEvent());
+            $.ajax({
+                url: '%path%/segmentation/apply',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    event: segEvent(),
+                    condition: segCond
+                })
+            })
+            .done(function(res) {
+                console.log("success");
+console.log(res);
+            
+            })
+            .fail(function() {
+                console.log("error");
+            });
         }
+
 
         return {
             funnels: funnels,
@@ -426,9 +468,15 @@ $(document).ready(function() {
             deleteFunnel: deleteFunnel,
             setSens: setSens,
             // Cohort
+            retentionMX: retentionMX,
+            cohRows: cohRows,
+            cohCols: cohCols,
             applyCohort: applyCohort,
             setSensCohort: setSensCohort,
-            test: test
+            // Segmentation
+            events: events, //ttt valamit at kell itt gondolni
+            segEvent: segEvent,
+            applySegQuery: applySegQuery
         };
     }
 
