@@ -47,6 +47,9 @@
     <label for="userId">Observer Id:</label>
     <input data-bind="value: userId, valueUpdate: 'afterkeydown'" id="userId"><br><br>
 
+
+    <!-- FUNNEL ANALYSIS PANEL -->
+
     <div class="content">
         <p><h1>Funnel Analysis</h1></p>
         
@@ -76,6 +79,8 @@
     </div>
 
 
+    <!-- RETENTION ANALYSIS PANEL -->
+
     <div class="content">
         <p><h1>Retention Analysis</h1></p>
 
@@ -84,8 +89,10 @@
             <h2>Retention Chart</h2>
             <span class="label">From</span> <input type="text" id="cohort_date_from" data-bind="click: setSensCohort('cohort_date_to', 'max');" readonly="true">
             <span class="label">Till</span> <input type="text" id="cohort_date_to" data-bind="click: setSensCohort('cohort_date_from', 'min');" readonly="true">
+            <div></div>
             <span class="label">Rows</span> <input type="text" id="cohRows" data-bind="value: cohRows">
             <span class="label">Cols</span> <input type="text" id="cohCols" data-bind="value: cohCols">
+            <div></div>
             <button data-bind="click: applyCohort">Show</button>
 
 
@@ -97,9 +104,10 @@
                 </tbody>
             </table>
         </div>
-
-
     </div>
+
+
+    <!-- COHORT ANALYSIS PANEL -->
 
     <div class="content">
         <p><h1>Segmentation Analysis</h1></p>
@@ -108,7 +116,11 @@
         <div class="widget" id="segChart">
             <h2>Segmentation Chart</h2>
 
+            <span class="label">From</span> <input type="text" id="segFrom">
+            <select data-bind="options: intervals, value: segTimeInt"></select>
+            <div></div>
             <select data-bind="options: events, value: segEvent"></select>
+            <select data-bind="options: properties, value: segGrpBy"></select>
 
 
             <button data-bind="click: applySegQuery">Show</button>

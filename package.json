@@ -20,7 +20,8 @@
     "nconf": "*",
     "ua-parser": "*",
     "referer-parser": "*",
-    "mongo-fast-join": "*"
+    "mongo-fast-join": "*",
+    "strftime": "*" 
   },
   "keywords": [
     "event",

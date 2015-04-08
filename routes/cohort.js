@@ -4,42 +4,6 @@ var async = require('async');
 module.exports = function(app, stpath) {
 
 
-	app.post(stpath + "/cohort/apply", function(req, res){
-		var retentionDates = [];
-		var cohortArray = [];
-		var cohortFrom = new Date(req.body.cohort_from + "T00:00:00Z");
-        var cohortTo   = new Date(req.body.cohort_to + "T00:00:00Z");
-        var cohortEvent = req.body.cohortEvent;
-        var cols = req.body.cols;
-        var rows = req.body.rows;
-        var returnEvent = req.body.returnEvent;
-        var testIntervalInDays = daysBetween(cohortFrom, cohortTo);
-
-
-        // for (var j = 0; j < rows; j++) {
-	       //  for (var i = 0; i <= cols; i++) {
-	       //  	retentionDates.push({ 
-	       //  		i: i,
-	       //  		j: j,
-	       //  		from: plusXDay(cohortFrom, (j+i) * testIntervalInDays).toISOString(), 
-	       //  		to: plusXDay(cohortTo, (j+i) * testIntervalInDays).toISOString()
-	       //  	});
-	       //  }
-        // }
-
-        for (var i = 0; i <= cols; i++) {
-        	retentionDates.push({ 
-        		i: i,
-        		from: plusXDay(cohortFrom, (i) * testIntervalInDays).toISOString(), 
-        		to: plusXDay(cohortTo, (i) * testIntervalInDays).toISOString()
-        	});
-        }
-
-        cohortAnalyse(res, cohortArray, cohortEvent, returnEvent, retentionDates);
-
-
-	});
-
 	app.post(stpath + "/cohort/getRetentionMatrix", function(req, res){
 		var cohortFrom = new Date(req.body.cohort_from + "T00:00:00Z");
         var cohortTo   = new Date(req.body.cohort_to + "T00:00:00Z");

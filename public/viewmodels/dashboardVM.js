@@ -348,7 +348,6 @@ $(document).ready(function() {
         $("#cohort_date_to").val("2014-01-02");
         
         function setSensCohort(id, k) {
-            console.log('nuni');
             // update range
             if (k == "min") {
                 cohortCalendar.setSensitiveRange($("#cohort_date_from").val(), null);
@@ -393,66 +392,138 @@ $(document).ready(function() {
         /*********************************************  SEGMENTATION ANALYSIS  ****************************************/
         var events = %events%;
         var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
-        // var segData = ko.observableArray([]);
+        var intervals = ['30 days','24 weeks','12 months'];
 
-        var segEvent = ko.observable();
-        var segCond =  {
-            "$or": [{
-                    "sessionId": "lolo"
-                }, {
-                    "sessionId": "lolo"
-            }]
-        };
-        var segGrpBy = ko.observable();
+        var segFrom = null; //ttt custom binding
+        var segTimeInt = ko.observable(); // hour, day, week month
+        var segEvent = ko.observable(); // one event
+        var segGrpBy = ko.observable(); // one property
+        var segData = {}; // filling up the chart
 
-        // Segmentation Chart
-        var segData = {
-            labels: ['','','','','','','',],
-            datasets: [
-                {
-                    label: "My First dataset",
-                    fillColor: "rgba(220,220,220,0.2)",
-                    strokeColor: "rgba(220,220,220,1)",
-                    pointColor: "rgba(220,220,220,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(220,220,220,1)",
-                    data: [65, 59, 80, 81, 56, 55, 40]
-                },
-                {
-                    label: "My Second dataset",
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: [28, 48, 40, 19, 86, 27, 90]
-                }
-            ]
-        };
-        var segCtx = document.getElementById("segCanvas").getContext("2d");
-        var segChart = new Chart(segCtx).Line(segData);
+        // var segCond =  {
+        //     "$or": [{
+        //             "sessionId": "lolo"
+        //         }, {
+        //             "sessionId": "lolo"
+        //     }]
+        // };
 
+
+
+        // Calendar
+        var segCalendar = new dhtmlXCalendarObject("segFrom");
+        $("#segFrom").val("2014-01-01");
+
+
+        // Chart
         function applySegQuery() {
-console.log(segEvent());
+            segFrom = new Date($('#segFrom').val() + 'T00:00:00Z');
+            var xLabels = [];
+            
+            switch (segTimeInt()) {
+                case '30 days':
+                    segTo = plusXDay(segFrom, 30);
+                    for (var i = 0; i < 30; i++) {
+                        xLabels[i] = plusXDay(segFrom, i).format('mm-dd') ;
+                    }
+                    break; 
+                case '24 weeks':
+                    segTo = plusXDay(segFrom, 168);
+                    for (var i = 0; i < 24; i++) {
+                        xLabels[i] = plusXDay(segFrom, i * 7).format('mm-dd') ;
+                    }
+
+                    // while(iDate.gerDay() == 0) {
+                    //     iDate.setDate(iDate.getDate() - 1);
+                    // }
+                    break; 
+                case '12 months':
+                    segTo = plusXMonth(segFrom, 12);
+                    for (var i = 0; i < 12; i++) {
+                        xLabels[i] = plusXMonth(segFrom, i * 1).format('mm-dd') ;
+                    }
+                    break; 
+                default: 
+                    segTo = plusXDay(segFrom, 30);
+                    for (var i = 0; i < 30; i++) {
+                        xLabels[i] = plusXDay(segFrom, i).format('mm-dd') ;
+                    }
+            }
+
+
+            var data = {
+                segFrom: segFrom,
+                segTimeInt: segTimeInt(),
+                segEvent: segEvent(),
+                segGrpBy: segGrpBy(),
+
+            };
+
             $.ajax({
                 url: '%path%/segmentation/apply',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({
-                    event: segEvent(),
-                    condition: segCond
-                })
+                data: JSON.stringify(data)
             })
             .done(function(res) {
                 console.log("success");
-console.log(res);
-            
+
+                var segData = fillsegData(res, xLabels);
+console.log(res);            
+
+                $('#segCanvas').replaceWith('<canvas id="segCanvas" width="680" height="300"></canvas>');
+                var segCtx = document.getElementById("segCanvas").getContext("2d");
+                var segChart = new Chart(segCtx).Line(segData, {  multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>" }); 
+
+
             })
             .fail(function() {
                 console.log("error");
             });
+        }
+
+        function fillsegData (res, xLabels) {
+            var segData = {
+                labels: xLabels,
+                datasets: []
+            };
+
+
+            for (var i = 0; i < res.length; i++) {
+                var datasetSchema = {
+                    label: '',
+                    fillColor: ",0.2)",
+                    strokeColor: ",1)",
+                    pointColor: ",1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: ",1)",
+                    data: []
+                };
+                var color = "rgba(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255);
+
+                datasetSchema.label = res[i].grpBy;
+                datasetSchema.fillColor = color + datasetSchema.fillColor;
+                datasetSchema.strokeColor = color + datasetSchema.strokeColor;
+                datasetSchema.pointColor = color + datasetSchema.pointColor;
+                datasetSchema.pointHighlightStroke = color + datasetSchema.pointHighlightStroke;
+                datasetSchema.data = res[i].data;
+                segData.datasets.push(datasetSchema);
+            }
+console.log(segData);
+            return segData;
+        }
+
+        function plusXDay(date, x){
+            var newday = new Date(date.toISOString());
+            newday.setDate(date.getDate() + x);
+            return newday;
+        }
+
+        function plusXMonth(date, x){
+            var newday = new Date(date.toISOString());
+            newday.setMonth(date.getMonth() + x);
+            return newday;
         }
 
 
@@ -476,6 +547,10 @@ console.log(res);
             // Segmentation
             events: events, //ttt valamit at kell itt gondolni
             segEvent: segEvent,
+            segGrpBy: segGrpBy,
+            segTimeInt: segTimeInt,
+            properties: properties,
+            intervals: intervals,
             applySegQuery: applySegQuery
         };
     }
