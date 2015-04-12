@@ -1,6 +1,12 @@
 var Session = require('../models/session');
 
-module.exports = function (app, stpath) {
+module.exports = function (app, options) {
+	var stpath          = options.stpath;
+	var bufferSize      = options.bufferSize;
+	var bufferTimeLimit = options.bufferTimeLimit;
+	var db              = options.db;
+	var mwAuth			= options.mwAuth;
+
 	app.post(stpath+"/sessions", function(req, res) {
 
 
@@ -44,6 +50,7 @@ module.exports = function (app, stpath) {
 		var session = new Session(req.body);
 		session.save(function (err) {
 			if(err) return res.send({err: "Couldnt save session"});
+console.log(session);
 			res.send({sessionId: session._id});
 		});
 	});

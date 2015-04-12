@@ -1,10 +1,17 @@
 var Event = require('../models/event');
 var async = require('async');
 
-module.exports = function(app, stpath) {
+module.exports = function(app, options) {
 
+	var stpath          = options.stpath;
+	var bufferSize      = options.bufferSize;
+	var bufferTimeLimit = options.bufferTimeLimit;
+	var db              = options.db;
+	var mwAuth			= options.mwAuth;
 
-	app.post(stpath + "/cohort/getRetentionMatrix", function(req, res){
+	app.post(stpath + "/cohort/getRetentionMatrix", mwAuth, getRetentionMatrix);
+
+	function getRetentionMatrix (req, res){
 		var cohortFrom = new Date(req.body.cohort_from + "T00:00:00Z");
         var cohortTo   = new Date(req.body.cohort_to + "T00:00:00Z");
         var cohortEvent = req.body.cohortEvent;
@@ -39,7 +46,7 @@ module.exports = function(app, stpath) {
 		retentionAnalyse(res, retentionMatrix, cohortEvent, returnEvent, cohortDates, retentionDates);
 
 
-	});
+	}
 
 	function retentionAnalyse(res, retentionMatrix, cohortEvent, returnEvent, cohortDates, retentionDates) {
 

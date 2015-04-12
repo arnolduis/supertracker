@@ -5,12 +5,19 @@ var MJ = require('mongo-fast-join');
 var mongoJoin = new MJ();
 var strftime = require('strftime');
 
-module.exports = function(app, stpath, bufferSize, bufferTimeLimit, db) {
+module.exports = function(app, options) {
 
+    var stpath          = options.stpath;
+    var bufferSize      = options.bufferSize;
+    var bufferTimeLimit = options.bufferTimeLimit;
+    var db              = options.db;
+    var mwAuth          = options.mwAuth;
     
 
-    app.post(stpath + "/segmentation/apply", function(req, res){
-console.log(req.body);
+    app.post(stpath + "/segmentation/apply", mwAuth, applySegmentation); 
+
+
+    function applySegmentation(req, res){
 
         var segFrom = new Date(req.body.segFrom);
         var segTimeInt = req.body.segTimeInt;
@@ -21,7 +28,11 @@ console.log(req.body);
 
         var group1 = {};
 
+        if (segGrpBy === '') {
+            res.send('ures a segGrpBy');
+        }
 
+console.log(req.body);
         // Prepare variables
         switch (segTimeInt) {
             case '30 days':
@@ -51,6 +62,7 @@ console.log(req.body);
                     period: { $month: "$date" },
                     grpBy: prop_mongo[segGrpBy].field
                 };
+console.log('group1:');
 console.log(group1);
                 responseLength = 12;
                 break; 
@@ -99,123 +111,130 @@ console.log(group1);
         })  
         .exec(function (err, items) {
                 if (err) return console.log(err);
-// console.log(items);
+// console.log(items); // ttt nem kapom meg a gomb 5 sessionoket
             db.collection('joinedEventSession').drop();
             db.collection('joinedEventSession').insert(items, function (err) {
+                db.collection('joinedEventSession').aggregate(
+                    [
+                    {
+                        $group : {
+                            _id: group1, // defined in the above switch
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $sort: { '_id.year': 1, '_id.period': 1}
+                    },
+                    {
+                        $group: {
+                            _id: {
+                                grpBy: '$_id.grpBy'
+                            },
+                            data: {
+                                $push: {
+                                    year: '$_id.year',
+                                    period: '$_id.period',
+                                    count: '$count'
+                                } 
+                            }
+                        }
+                    },
+                    {
+                      $project: {
+                          _id: 0,
+                          grpBy: '$_id.grpBy',
+                          data: '$data'
+                      }
+                  }
+                  ],
+                  function (err, items) {
+
+
+                    if (err) 
+                        return console.log(err);
+
+                    var response = []; // {grpBy: 'opera', data:[1,2,3...]}
+                    for (var i = 0; i < items.length; i++) { // browserenkent
+
+console.log(items[i]);
+
+                        // building up hash
+                        var hash = {};
+                        for (var j = 0; j < items[i].data.length; j++) {
+                            if (!hash[items[i].data[j].year])
+                                hash[items[i].data[j].year] = {};
+                            hash[items[i].data[j].year][items[i].data[j].period] = items[i].data[j].count;
+                        }
+
+
+// console.log(hash);
+                        var responseData = []; // [1,2,3 0,0,0,0...]
+                        var iDate = new Date(+segFrom);
+
+                        switch (segTimeInt) {
+                            case '30 days':
+                                // response feltoltese
+                                for (var j = 0; j < responseLength; j++) { 
+                                    responseData[j] = 0;
+                                    if (hash[iDate.getFullYear()]) {
+                                        if (hash[iDate.getFullYear()][dayOfYear(iDate)]) {
+                                            responseData[j] = hash[iDate.getFullYear()][dayOfYear(iDate)];
+                                        }
+                                    }
+                                    iDate.setDate(iDate.getDate() + 1);
+                                }
+                                var responseItem = {grpBy: items[i].grpBy, data: responseData};
+                                response.push(responseItem);
+                                break;
+
+                            case '24 weeks':
+                                
+                                // response feltoltese
+                                for (var j = 0; j < responseLength; j++) { 
+                                    responseData[j] = 0;
+                                    if (hash[iDate.getFullYear()]) {
+                                        if (hash[iDate.getFullYear()][Number(strftime('%U', iDate))]) {
+                                            responseData[j] = hash[iDate.getFullYear()][Number(strftime('%U', iDate))];
+                                        }
+                                    }
+                                    iDate.setDate(iDate.getDate() + 7);
+                                }
+                                var responseItem = {grpBy: items[i].grpBy, data: responseData};
+                                response.push(responseItem);
+                                break; 
+
+                            case '12 months':
+                                for (var j = 0; j < responseLength; j++) { 
+// console.log('items[' + i +']');
+// console.log(items[i]);
+                                    responseData[j] = 0;
+                                    if (hash[iDate.getFullYear()]) {
+                                        if (hash[iDate.getFullYear()][iDate.getMonth()]) {
+                                            responseData[j] = hash[iDate.getFullYear()][iDate.getMonth()];
+                                        }
+                                    }
+                                    iDate.setMonth(iDate.getMonth() + 1);
+                                }
+                                var responseItem = {grpBy: items[i].grpBy, data: responseData};
+                                response.push(responseItem);
+                                break; 
+
+                            default: 
+                        }
+                    }
+console.log('Response:');
+console.log(JSON.stringify(response));
+                    res.send(response);
+                });
+                
             });
         });
+    }
 
 
+    ///////////////////////////////////////////
+    //          UTILITY FUNCTIONS            
 
-        db.collection('joinedEventSession').aggregate(
-            [
-            {
-                $group : {
-                    _id: group1, // defined in the above switch
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $sort: { '_id.year': 1, '_id.period': 1} 
-            },
-            {
-                $group: {
-                    _id: {
-                        grpBy: '$_id.grpBy'
-                    },
-                    data: {
-                        $push: {
-                            year: '$_id.year',
-                            period: '$_id.period',
-                            count: '$count'
-                        } 
-                    }
-                }
-            },
-            {
-              $project: {
-                  _id: 0,
-                  grpBy: '$_id.grpBy',
-                  data: '$data'
-              }
-          }
-          ],
-          function (err, items) {
-
-
-            if (err) 
-                return console.log(err);
-
-            var response = []; // {browser: 'opera', data:[1,2,3...]}
-            for (var i = 0; i < items.length; i++) { // browserenkent
-
-                // building up hash
-                var hash = {};
-                for (var j = 0; j < items[i].data.length; j++) {
-                    if (!hash[items[i].data[j].year])
-                        hash[items[i].data[j].year] = {};
-                    hash[items[i].data[j].year][items[i].data[j].period] = items[i].data[j].count;
-                }
-
-
-console.log(hash);
-                var responseData = []; // [1,2,3 0,0,0,0...]
-                var iDate = new Date(+segFrom);
-
-                switch (segTimeInt) {
-                    case '30 days':
-                        // response feltoltese
-                        for (var j = 0; j < responseLength; j++) { 
-                            responseData[j] = 0;
-                            if (hash[iDate.getFullYear()]) {
-                                if (hash[iDate.getFullYear()][dayOfYear(iDate)]) {
-                                    responseData[j] = hash[iDate.getFullYear()][dayOfYear(iDate)];
-                                }
-                            }
-                            iDate.setDate(iDate.getDate() + 1);
-                        }
-                        var responseItem = {grpBy: items[i].grpBy, data: responseData};
-                        response.push(responseItem);
-                        break;
-
-                    case '24 weeks':
-                        
-                        // response feltoltese
-                        for (var j = 0; j < responseLength; j++) { 
-                            responseData[j] = 0;
-                            if (hash[iDate.getFullYear()]) {
-                                if (hash[iDate.getFullYear()][Number(strftime('%U', iDate))]) {
-                                    responseData[j] = hash[iDate.getFullYear()][Number(strftime('%U', iDate))];
-                                }
-                            }
-                            iDate.setDate(iDate.getDate() + 7);
-                        }
-                        var responseItem = {grpBy: items[i].grpBy, data: responseData};
-                        response.push(responseItem);
-                        break; 
-
-                    case '12 months':
-                        for (var j = 0; j < responseLength; j++) { 
-                            responseData[j] = 0;
-console.log(obj);
-                            if (hash[iDate.getFullYear()]) {
-                                if (hash[iDate.getFullYear()][iDate.getMonth()]) {
-                                    responseData[j] = hash[iDate.getFullYear()][iDate.getMonth()];
-                                }
-                            }
-                            iDate.setMonth(iDate.getMonth() + 1);
-                        }
-                        var responseItem = {grpBy: items[i].grpBy, data: responseData};
-                        response.push(responseItem);
-                        break; 
-
-                    default: 
-                }
-            }
-console.log(JSON.stringify(response));
-            res.send(response);
-        });
-    });
 
     function plusXDay(date, x){
         var newday = new Date(date.toISOString());
@@ -250,15 +269,15 @@ console.log(JSON.stringify(response));
 
     var prop_mongo = {
         '': null,
-        'Browser': { tag: 'browser', 'field': '$session.userAgent.ua.full'},
-        'City': { tag: 'city', 'field': '$session.location.city'},
-        'Country': { tag: 'country', 'field': '$session.location.country'},
-        'Initial Referrer': null,
-        'Initial referring domain': null,
-        'Operating System': null,
-        'Referrer': null,
-        'Region': null,
-        'Screen Height': null,
-        'Screen Width': null
+        'Browser'                  : { tag: 'browser', 'field': '$session.userAgent.ua.full'}, //ttt
+        'City'                     : { tag: 'city', 'field': '$session.location.city'},
+        'Country'                  : { tag: 'country', 'field': '$session.location.country'},
+        'Initial Referrer'         : { tag: 'ireferer', 'field': '$session.referrer.referer'}, //ttt
+        'Initial referring domain' : { tag: 'irefererdomain', 'field': '$session.referrer.country'}, //ttt
+        'Operating System'         : { tag: 'os', 'field': '$session.userAgent.os.family'},
+        'Referrer'                 : { tag: 'referrer', 'field': '$referrer'},
+        'Region'                   : { tag: 'screenY', 'field': '$session.location.region'},
+        'Screen Height'            : { tag: 'screenX', 'field': '$session.screen.screenX'},
+        'Screen Width'             : { tag: 'country', 'field': '$session.screen.screenY'}
     };
 };

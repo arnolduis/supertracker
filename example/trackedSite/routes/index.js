@@ -8,8 +8,7 @@ nconf.argv()
 
 /* GET home page. */
 router.get('/', function(req, res) {
-	console.log(req.app.stpath);
-  res.render('index', { title: 'Tracked site', userId: req.user.userId, stpath: nconf.get('stpath') });
+  res.render('index', { title: 'Tracked site', userId: req.supertracker.userId, stpath: nconf.get('stpath') });
 });
 
 module.exports = router;

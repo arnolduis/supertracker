@@ -21,9 +21,9 @@ nconf.argv()
 	 .env()
 	 .file('user','config-user-supertracker.json');
  
-// Serve req.user for the supertracker
+// Serve fake req.user, and authentication middleware for the supertracker
 app.use(function (req, res, next) {
-	req.user = {
+	req.supertracker = { // ezt majd illik atirni
 		userId: 'arni'
 	};
 	next();
@@ -40,8 +40,17 @@ app.get('/secondPage', secondPage);
 // LOGIC
 // ==============================================
 
+
 var stpath = nconf.get('stpath');
-var st = require('supertracker')(app, stpath);
+var mwAuth = function (req, res, next) {
+	if (req.supertracker.userId === 'arni') {
+		next();
+	}else {
+		res.send("Sorry, you can't acces the Supertrackers dashboard with this account. ");			
+	}
+};
+
+var st = require('supertracker')(app, stpath, mwAuth);
 
 // START THE SERVER
 // ==============================================

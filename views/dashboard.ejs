@@ -45,7 +45,7 @@
 
     <div><a href="/">Back</a></div><br>
     <label for="userId">Observer Id:</label>
-    <input data-bind="value: userId, valueUpdate: 'afterkeydown'" id="userId"><br><br>
+    <span id="userId" data-bind="text: userId"></span><br><br>
 
 
     <!-- FUNNEL ANALYSIS PANEL -->
@@ -116,13 +116,12 @@
         <div class="widget" id="segChart">
             <h2>Segmentation Chart</h2>
 
-            <span class="label">From</span> <input type="text" id="segFrom">
+            <span class="label">From</span> <input type="text" id="segFrom">    
             <select data-bind="options: intervals, value: segTimeInt"></select>
             <div></div>
             <select data-bind="options: events, value: segEvent"></select>
             <select data-bind="options: properties, value: segGrpBy"></select>
-
-
+            <div></div>
             <button data-bind="click: applySegQuery">Show</button>
 
 

@@ -1,7 +1,13 @@
 var Funnel = require('../models/funnel');
 var Event = require('../models/event');
 
-module.exports = function(app, stpath) {
+module.exports = function(app, options) {
+
+	var stpath          = options.stpath;
+	var bufferSize      = options.bufferSize;
+	var bufferTimeLimit = options.bufferTimeLimit;
+	var db              = options.db;
+	var mwAuth			= options.mwAuth;
 
 	// upsert funnel
 	app.post(stpath+"/funnels", function(req, res) {

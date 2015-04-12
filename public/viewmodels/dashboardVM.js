@@ -141,12 +141,24 @@ $(document).ready(function() {
         };
     }
 
-    function dashboardVM(_observerId) {   
+    function dashboardVM(_userId) {   
 
         var tstr = new Date().format('yyyy-mm-dd');
-        var observerId = _observerId;
+        var userId = _userId;
         
-        /******************************** FUNNEL ANALYSIS  **********************************/
+
+
+
+
+
+
+                                    //////////////////////////////////////////////////////////////////////////////////////
+                                    /******************************** FUNNEL ANALYSIS  **********************************/
+
+
+
+
+
 
         // Calendar
         var funnelCalendar;
@@ -193,6 +205,9 @@ $(document).ready(function() {
 
 
         var funnelChart = chartVM();
+
+
+        applyFunnel();
         
         function addFunnel() {
             funnel(funnelVM());
@@ -201,7 +216,7 @@ $(document).ready(function() {
         function saveFunnel () {
             console.log('Saving funnel');
 
-            var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEdited().toJson()});
+            var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEdited().toJson()});
 
             $.ajax({
                 url: '%path%/funnels',
@@ -242,10 +257,10 @@ $(document).ready(function() {
 
         function deleteFunnel () {
             var funnelIndex = indexOfFunnel(funnels, funnelEdited);
-            console.log('%path%/funnels/'+userId()+'/'+funnels()[funnelIndex].name());
+            console.log('%path%/funnels/'+userId+'/'+funnels()[funnelIndex].name());
             if (funnelIndex + 1) {
                 $.ajax({
-                    url: '%path%/funnels/'+userId()+'/'+funnels()[funnelIndex].name(),
+                    url: '%path%/funnels/'+userId+'/'+funnels()[funnelIndex].name(),
                     type: 'DELETE'
                 })
                 .done(function(res) {
@@ -277,12 +292,12 @@ $(document).ready(function() {
             
             var funnelEditedJSON = funnelEdited().toJson();
 
-            console.log("DateFrom> "+$("#date_from").val());
-            console.log("DateTo  > "+$("#date_from").val());
-            funnelEditedJSON.from = $("#date_from").val();
-            funnelEditedJSON.to = $("#date_to").val();
+            console.log("DateFrom> "+$("#funnel_date_from").val());
+            console.log("DateTo  > "+$("#funnel_date_to").val());
+            funnelEditedJSON.from = $("#funnel_date_from").val();
+            funnelEditedJSON.to = $("#funnel_date_to").val();
 
-            var funnelToBeSentString = JSON.stringify({userId: userId(), funnel: funnelEditedJSON});
+            var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEditedJSON});
             console.log(funnelEditedJSON);
             $.ajax({
                 url: '%path%/funnels/apply',
@@ -324,19 +339,31 @@ $(document).ready(function() {
         }
 
 
-        /******************************** COHORT ANALYSIS  **********************************/
-        var cohRows = ko.observable(2);
-        var cohCols = ko.observable(5);
+
+
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /****************************************** COHORT ANALYSIS  *********************************************/
+
+
+
+
+
+
+
+        var cohRows = ko.observable(5);
+        var cohCols = ko.observable(12);
         var retentionMX = ko.observableArray(); 
 
         // initialize
         var tmp = [];
-        for (var i = 0; i < cohRows(); i++) {
-            tmp.push([]);
-            for (var j = 0; j < cohCols(); j++) {
-                tmp[i][j] = "Nan%";
-            }
-        }
+        // for (var i = 0; i < cohRows(); i++) {
+        //     tmp.push([]);
+        //     for (var j = 0; j < cohCols(); j++) {
+        //         tmp[i][j] = "Nuni";
+        //     }
+        // }
         retentionMX(tmp);
 
         // Calendar
@@ -347,6 +374,10 @@ $(document).ready(function() {
         $("#cohort_date_from").val("2014-01-01");
         $("#cohort_date_to").val("2014-01-02");
         
+        // Initial value
+        applyCohort();
+
+
         function setSensCohort(id, k) {
             // update range
             if (k == "min") {
@@ -389,7 +420,18 @@ $(document).ready(function() {
 
 
 
-        /*********************************************  SEGMENTATION ANALYSIS  ****************************************/
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /*********************************************  SEGMENTATION ANALYSIS  ******************************************/
+
+
+
+
+
+
+
+
         var events = %events%;
         var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
         var intervals = ['30 days','24 weeks','12 months'];
@@ -447,9 +489,8 @@ $(document).ready(function() {
                     segTo = plusXDay(segFrom, 30);
                     for (var i = 0; i < 30; i++) {
                         xLabels[i] = plusXDay(segFrom, i).format('mm-dd') ;
-                    }
+                }
             }
-
 
             var data = {
                 segFrom: segFrom,
@@ -468,19 +509,36 @@ $(document).ready(function() {
             .done(function(res) {
                 console.log("success");
 
-                var segData = fillsegData(res, xLabels);
-console.log(res);            
-
                 $('#segCanvas').replaceWith('<canvas id="segCanvas" width="680" height="300"></canvas>');
                 var segCtx = document.getElementById("segCanvas").getContext("2d");
-                var segChart = new Chart(segCtx).Line(segData, {  multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>" }); 
-
-
+                var segOptions = {
+                    multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>",
+                    legendTemplate : '<ul>' /
+                                      +'<% for (var i=0; i<datasets.length; i++) { %>'  /
+                                        +'<li>' /
+                                        +'<span style=\"background-color:<%=datasets[i].lineColor%>\"></span>'  /
+                                        +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'    /
+                                      +'</li>'  /
+                                    +'<% } %>'  /
+                                  +'</ul>'  
+                    };
+                if (res.length === 0) {
+                    segCtx.font="40px Georgia"; //ttt
+                    segCtx.fillText("Fosi az adat, maki!",10,50);
+                    var  segData = {
+                        labels: xLabels,
+                        datasets: []
+                    };
+                } else {
+                    var segData = fillsegData(res, xLabels);
+                    var segChart = new Chart(segCtx).Line(segData, segOptions); 
+                }
             })
             .fail(function() {
                 console.log("error");
             });
         }
+
 
         function fillsegData (res, xLabels) {
             var segData = {
@@ -510,9 +568,23 @@ console.log(res);
                 datasetSchema.data = res[i].data;
                 segData.datasets.push(datasetSchema);
             }
-console.log(segData);
+// console.log(segData);
             return segData;
         }
+
+
+
+
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /******************************************  UTILITY FUNCTIONS  ***********************************************/
+
+
+
+
+
+
 
         function plusXDay(date, x){
             var newday = new Date(date.toISOString());
