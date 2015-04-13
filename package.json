@@ -19,6 +19,7 @@
     "body-parser": "*",
     "nconf": "*",
     "ua-parser": "*",
+    "async": "*",
     "referer-parser": "*",
     "mongo-fast-join": "*",
     "strftime": "*" 

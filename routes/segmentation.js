@@ -26,72 +26,29 @@ module.exports = function(app, options) {
         var segGrpBy = req.body.segGrpBy;
         var responseLength = null;
 
-        var group1 = {};
 
-        if (segGrpBy === '') {
-            res.send('ures a segGrpBy');
-        }
-
-console.log(req.body);
-        // Prepare variables
         switch (segTimeInt) {
             case '30 days':
                 segTo = plusXDay(segFrom, 30);
-                group1 = {
-                    year: { $year: '$date' },
-                    period: { $dayOfYear: "$date" },
-                    grpBy: prop_mongo[segGrpBy].field
-                };
                 responseLength = 30;
                 break; 
 
             case '24 weeks':
                 segTo = plusXDay(segFrom, 168);
-                group1 = {
-                    year: { $year: '$date' },
-                    period: { $week: "$date" },
-                    grpBy: prop_mongo[segGrpBy].field
-                };
                 responseLength = 24;
                 break; 
 
             case '12 months':
                 segTo = plusXMonth(segFrom, 12);
-                group1 = {
-                    year: { $year: '$date' },
-                    period: { $month: "$date" },
-                    grpBy: prop_mongo[segGrpBy].field
-                };
-console.log('group1:');
-console.log(group1);
                 responseLength = 12;
                 break; 
 
             default: 
                 segTo = plusXDay(segFrom, 30);
-                group1 = {
-                    year: { $year: '$date' },
-                    period: { $dayOfYear: "$date" },
-                    grpBy: prop_mongo[segGrpBy].field
-                };
                 responseLength = 30;
-        }
+        }  
 
 
-// console.log('');
-// console.log('');
-// console.log(segEvent);
-// console.log('');
-// console.log(segFrom);   
-// console.log(segFrom.toISOString());
-// console.log(strftime('%U',segFrom));
-// console.log(segTo);
-// console.log(segTo.toISOString());
-// console.log('');
-// console.log(group1);
-// console.log('');
-// console.log('');
-  
         mongoJoin.query(
             db.collection("events"),
                 {
@@ -111,52 +68,114 @@ console.log(group1);
         })  
         .exec(function (err, items) {
                 if (err) return console.log(err);
-// console.log(items); // ttt nem kapom meg a gomb 5 sessionoket
+            // ttt nem kapom meg a gomb 5 sessionoket
             db.collection('joinedEventSession').drop();
             db.collection('joinedEventSession').insert(items, function (err) {
-                db.collection('joinedEventSession').aggregate(
-                    [
-                    {
-                        $group : {
-                            _id: group1, // defined in the above switch
+
+
+                // building the grouping condition
+                var group1 = {
+                            _id: {}, 
                             count: { $sum: 1 }
-                        }
-                    },
-                    {
-                        $sort: { '_id.year': 1, '_id.period': 1}
-                    },
-                    {
-                        $group: {
-                            _id: {
-                                grpBy: '$_id.grpBy'
-                            },
-                            data: {
-                                $push: {
-                                    year: '$_id.year',
-                                    period: '$_id.period',
-                                    count: '$count'
-                                } 
+                        };
+
+
+                // Prepare group1 periods,
+                switch (segTimeInt) {
+                    case '30 days':
+                        group1._id.year    = { $year: '$date' };
+                        group1._id.period  = { $dayOfYear: "$date" };
+                        break; 
+
+                    case '24 weeks':
+                        group1._id.year = { $year: '$date' };
+                        group1._id.period = { $week: "$date" };
+                        break; 
+
+                    case '12 months':
+                        group1._id.year = { $year: '$date' };
+                        group1._id.period = { $month: "$date" };
+                        break; 
+
+                    default: 
+                        group1._id.year = { $year: '$date' };
+                        group1._id.period = { $dayOfYear: "$date" };
+                }   
+
+                //  Prepare final aggregation, and add grpby
+                var aggregation = [];
+
+                if (segGrpBy.length > 0) {
+                    group1._id.grpBy = prop_mongo[segGrpBy].field;
+                    aggregation = [
+                        {
+                            $group : group1
+                        },
+                        {
+                            $sort: { '_id.year': 1, '_id.period': 1}
+                        },
+                        {
+                            $group: {
+                                _id: {
+                                    grpBy: '$_id.grpBy'
+                                },
+                                data: {
+                                    $push: {
+                                        year: '$_id.year',
+                                        period: '$_id.period',
+                                        count: '$count'
+                                    } 
+                                }
+                            }
+                        },
+                        {
+                          $project: {
+                              _id: 0,
+                              grpBy: '$_id.grpBy',
+                              data: '$data'
+                          }
+                      }
+                      ];
+                }
+                else {
+                    aggregation = [
+                        {
+                            $group : group1
+                        },
+                        {
+                            $sort: { '_id.year': 1, '_id.period': 1}
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                data: {
+                                    $push: {
+                                        year: '$_id.year',
+                                        period: '$_id.period',
+                                        count: '$count'
+                                    } 
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                grpBy: { $literal: 'count'},
+                                data: '$data'
                             }
                         }
-                    },
-                    {
-                      $project: {
-                          _id: 0,
-                          grpBy: '$_id.grpBy',
-                          data: '$data'
-                      }
-                  }
-                  ],
-                  function (err, items) {
+                      ];
+                }
 
-
+console.log(JSON.stringify(aggregation));
+                // Applying the aggregation
+                db.collection('joinedEventSession').aggregate( aggregation, function (err, items) {
                     if (err) 
                         return console.log(err);
 
+console.log(JSON.stringify(items));
                     var response = []; // {grpBy: 'opera', data:[1,2,3...]}
                     for (var i = 0; i < items.length; i++) { // browserenkent
-
-console.log(items[i]);
 
                         // building up hash
                         var hash = {};
@@ -167,7 +186,6 @@ console.log(items[i]);
                         }
 
 
-// console.log(hash);
                         var responseData = []; // [1,2,3 0,0,0,0...]
                         var iDate = new Date(+segFrom);
 
@@ -205,8 +223,6 @@ console.log(items[i]);
 
                             case '12 months':
                                 for (var j = 0; j < responseLength; j++) { 
-// console.log('items[' + i +']');
-// console.log(items[i]);
                                     responseData[j] = 0;
                                     if (hash[iDate.getFullYear()]) {
                                         if (hash[iDate.getFullYear()][iDate.getMonth()]) {
@@ -222,8 +238,6 @@ console.log(items[i]);
                             default: 
                         }
                     }
-console.log('Response:');
-console.log(JSON.stringify(response));
                     res.send(response);
                 });
                 

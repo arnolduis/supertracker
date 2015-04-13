@@ -119,8 +119,9 @@
             <span class="label">From</span> <input type="text" id="segFrom">    
             <select data-bind="options: intervals, value: segTimeInt"></select>
             <div></div>
-            <select data-bind="options: events, value: segEvent"></select>
-            <select data-bind="options: properties, value: segGrpBy"></select>
+            <span class="label">Event: </span> <select data-bind="options: events, value: segEvent"></select>
+            <div></div>
+            <span class="label">By: </span>    <select data-bind="options: properties, value: segGrpBy"></select>
             <div></div>
             <button data-bind="click: applySegQuery">Show</button>
 

@@ -531,6 +531,7 @@ $(document).ready(function() {
                     };
                 } else {
                     var segData = fillsegData(res, xLabels);
+console.log(segData);
                     var segChart = new Chart(segCtx).Line(segData, segOptions); 
                 }
             })
