@@ -39,6 +39,27 @@
         </div>
     </script>
 
+    <script type="text/html" id='conditionStepTemplate'>
+        <div class = 'step'>
+            <select data-bind="options: properties, value: property", width="8"></select>
+            <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
+            <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
+            <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
+            <button data-bind="click: $parents[1].removeStep" class="removeStep">x</button>
+        </div>
+    </script>
+
+    <script type="text/html" id='conditionTemplate'>
+        <div class="funnel">
+            <div class="steps">
+                <!-- ko foreach: $data.steps -->
+                <div data-bind="template: { name: 'conditionStepTemplate', data: $data }"></div>
+                <!-- /ko -->
+            </div>
+            <button id="buttonAddStep" data-bind="click: $data.addStep">+</button>
+        </div>
+    </script>
+
 </head>
 <body >
 <div class="steps">
@@ -122,7 +143,10 @@
             <span class="label">Event: </span> <select data-bind="options: events, value: segEvent"></select>
             <div></div>
             <span class="label">By: </span>    <select data-bind="options: properties, value: segGrpBy"></select>
-            <div></div>
+            <div>Where</div>
+
+            <div data-bind="template: { name: 'segCondTemplate', data: segCondition }"></div>
+
             <button data-bind="click: applySegQuery">Show</button>
 
 

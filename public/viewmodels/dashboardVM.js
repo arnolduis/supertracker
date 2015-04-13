@@ -134,10 +134,101 @@ $(document).ready(function() {
         };
     }
 
-    function cohortVM() {
+    
+    function condStepVM (condStepJson) {
+        var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
+        var operation_types = [
+            { name: 'String', operators: [
+                { name: 'equals'       ,value: '=' },
+                { name: 'not equals'   ,value: '!=' },
+                { name: 'contains'     ,value: 'in' },
+                { name: 'not contains' ,value: '!in' },
+                { name: 'is set'       ,value: 'is setXXX' },
+                { name: 'not set'      ,value: 'not setXXX' }
+            ]},
+            { name: 'Number', operators: [
+                { name: 'in between'    ,value: 'in between XXX' },
+                { name: 'less than'     ,value: '<' },
+                { name: 'equal to'      ,value: '=' },
+                { name: 'greater than'  ,value: '>' }
+            ]},
+            { name: 'True/False', operators: [
+                { name: 'is'            ,value: '=' }
+            ]},
+            { name: 'Date', operators: [
+                { name: 'was XXX'       ,value: '<' }// tobb lepeses valasztas
+            ]}, 
+                { name: 'List', operators: [
+                    { name: 'contains'      ,value: 'containtX' }
+                ]}
+        ];
+
+        var operation_type = condStepJson ? ko.observable(condStepJson.operation_type) : ko.observable(operation_types[0]); // default needed becouse of the order of elements
+        var property       = condStepJson ? ko.observable(condStepJson.property)       : ko.observable();
+        var operator       = condStepJson ? ko.observable(condStepJson.operator)       : ko.observable();
+        var value          = condStepJson ? ko.observable(condStepJson.value)          : ko.observable("");
+
+        function toJson () {
+            return {
+                operation_type: operation_type(),
+                property: property(),
+                operator: operator(),
+                value: value()
+            };
+        }
 
         return {
+            properties: properties,
+            operation_type: operation_type,
+            operation_types: operation_types,
+            
+            property: property,
+            operator: operator,
+            value: value,
+            //method
+            toJson: toJson
+        };
+    }
 
+    function conditionVM (conditionJson) {
+        var steps = ko.observableArray([]);
+        if (conditionJson) {
+            for (var i = 0; i < conditionJson.steps.length; i++) {
+                steps.push(stepVM(conditionJson.steps[i]));
+            }
+        } else {
+            steps.push(stepVM());
+        }
+
+
+
+        function addStep() {
+            steps.push(stepVM());
+        }
+
+        function removeStep (step) {
+            //ttt nem mukodik
+            console.log('removeStep');
+            steps.remove(step);
+        }
+
+        function toJson () {
+            var conditionJson = {name: "", steps: []};//ttt itt lehet hogy lehet roviditeni
+            conditionJson.name = name();
+            for (var i = 0; i < steps().length; i++) {
+                conditionJson.steps.push(steps()[i].toJson());
+            }
+            return  conditionJson;
+        }
+
+
+
+        return {
+            name: name,
+            steps: steps,
+            addStep: addStep,
+            removeStep: removeStep,
+            toJson: toJson
         };
     }
 
@@ -435,6 +526,7 @@ $(document).ready(function() {
         var events = %events%;
         var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
         var intervals = ['30 days','24 weeks','12 months'];
+        var segCondition = ko.observable({});
 
         var segFrom = null; //ttt custom binding
         var segTimeInt = ko.observable(); // hour, day, week month
@@ -531,7 +623,6 @@ $(document).ready(function() {
                     };
                 } else {
                     var segData = fillsegData(res, xLabels);
-console.log(segData);
                     var segChart = new Chart(segCtx).Line(segData, segOptions); 
                 }
             })
@@ -569,7 +660,6 @@ console.log(segData);
                 datasetSchema.data = res[i].data;
                 segData.datasets.push(datasetSchema);
             }
-// console.log(segData);
             return segData;
         }
 
@@ -624,7 +714,8 @@ console.log(segData);
             segTimeInt: segTimeInt,
             properties: properties,
             intervals: intervals,
-            applySegQuery: applySegQuery
+            applySegQuery: applySegQuery,
+            segCondition: segCondition
         };
     }
 
