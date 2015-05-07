@@ -37,25 +37,18 @@ module.exports = function(app, options) {
 	 * Applyfunnel
 	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
+		/// ddd reszletezd a gondolatmenetet
 		var events = [];
-		console.log("routes/funnel.js:26> "+req.body.funnel.from);
-		// , date: {$gt: req.body.funnel.from, $lt: req.body.funnel.to}
-		console.log(req.body.funnel);
+		var funnel = {steps: []};
+		var debug = {steps:[]};
 		for (var i = 0; i < req.body.funnel.steps.length; i++) {
 			events.push(req.body.funnel.steps[i].event);
+		    funnel.steps[i] = 0;
 		}
-		var o = {};
-
-		//ttt reszletezd a doksiban a gondolatmenetet
-		o.map = function() {
-		    emit(1,this.name);
+		var map = function(){
+		    emit(this.sessionId,this.name);
 		};
-		//ttt sessionkeveredes
-		o.reduce = function(key, values) {
-		    var funnel = {steps: []};
-		    for (var i = 0; i < events.length; i++) {
-		        funnel.steps[i] = 0;
-		    }
+		var reduce = function(key, values) {
 		    for (var j = 0; j < values.length; j++) {
 		        var k = 0;
 		        while( (j+k) < values.length && values[j+k] == events[k]) {
@@ -66,18 +59,35 @@ module.exports = function(app, options) {
 
 		    return funnel;
 		};
-
-	    o.scope = {events: events};
-	    o.query = { name: {$in: events}};
-	    o.sort = {sessionId:1, date:1 };
-	    o.out = "funnelResult";
+		var finalize = function(key, redValues) {
+		    if(typeof redValues === 'string'){
+		        funnel.steps[0]++;
+		    }
+		    return funnel;
+		};
+		var options = {
+		        scope: {events: events, funnel:funnel, debug: debug},
+		        query: { name: {$in: events}},
+		        sort: {sessionId:1, date:1 },
+		        finalize: finalize,
+		        out: "funnelResult",
+		            
+		};
 		
 
-		Event.mapReduce(o, function (err, model, stats) {
+		Event.mapReduce({
+			map      : map,
+			reduce   : reduce,
+			scope    : options.scope,
+			query    : options.query,
+			sort     : options.sort,
+			finalize : options.finalize,	
+			out      : options.out
+		}, function (err, model, stats) {
 		  model.find().exec(function (err, docs) {
-		  	console.log(err);
-		    console.log(docs);
-		    res.send(docs[0].value.steps);
+		  	if (err) return console.log(err);
+// console.log(JSON.stringify(docs));	
+		    res.send(docs[docs.length-1].value.steps);
 		  });
 		});
 

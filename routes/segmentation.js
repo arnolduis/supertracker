@@ -18,6 +18,7 @@ module.exports = function(app, options) {
 
 
     function applySegmentation(req, res){
+        var t1 = (new Date()).getTime();
 
         var segFrom = new Date(req.body.segFrom);
         var segTimeInt = req.body.segTimeInt;
@@ -72,8 +73,7 @@ module.exports = function(app, options) {
             db.collection('joinedEventSession').drop();
             db.collection('joinedEventSession').insert(items, function (err) {
 
-
-                // building the grouping condition
+                // Building the grouping condition
                 var group1 = {
                             _id: {}, 
                             count: { $sum: 1 }
@@ -167,13 +167,13 @@ module.exports = function(app, options) {
                       ];
                 }
 
-console.log(JSON.stringify(aggregation));
+// console.log(JSON.stringify(aggregation));
                 // Applying the aggregation
                 db.collection('joinedEventSession').aggregate( aggregation, function (err, items) {
                     if (err) 
                         return console.log(err);
 
-console.log(JSON.stringify(items));
+// console.log(JSON.stringify(items));
                     var response = []; // {grpBy: 'opera', data:[1,2,3...]}
                     for (var i = 0; i < items.length; i++) { // browserenkent
 
@@ -238,6 +238,9 @@ console.log(JSON.stringify(items));
                             default: 
                         }
                     }
+// console.log(response);
+                    var t2 = (new Date()).getTime();
+                    console.log('>>> Elapsed time: ' + (t2-t1)/1000 + 'ms');
                     res.send(response);
                 });
                 
@@ -283,7 +286,7 @@ console.log(JSON.stringify(items));
 
     var prop_mongo = {
         '': null,
-        'Browser'                  : { tag: 'browser', 'field': '$session.userAgent.ua.full'}, //ttt
+        'Browser'                  : { tag: 'browser', 'field': '$session.userAgent.ua.family'}, //ttt
         'City'                     : { tag: 'city', 'field': '$session.location.city'},
         'Country'                  : { tag: 'country', 'field': '$session.location.country'},
         'Initial Referrer'         : { tag: 'ireferer', 'field': '$session.referrer.referer'}, //ttt

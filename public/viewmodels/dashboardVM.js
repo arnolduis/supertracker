@@ -463,7 +463,7 @@ $(document).ready(function() {
         cohortCalendar.setDate(tstr);
         cohortCalendar.hideTime();
         $("#cohort_date_from").val("2014-01-01");
-        $("#cohort_date_to").val("2014-01-02");
+        $("#cohort_date_to").val("2014-01-08");
         
         // Initial value
         applyCohort();
@@ -485,7 +485,7 @@ $(document).ready(function() {
             data.cohort_from = $("#cohort_date_from").val();
             data.cohort_to   = $("#cohort_date_to").val();
             data.cohortEvent = "Subscribe";
-            data.returnEvent = "Return";
+            data.returnEvent = "sessionStart";
 
 
             $.ajax({

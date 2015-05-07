@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
 
 var sessionSchema = {
-	userId: { type:String, required: true },
+	userId: { type:Schema.ObjectId, required: true },
     date: { type: Date, default: Date.now },
 	screen: {
 		windowX: Number, 
