@@ -1,4 +1,5 @@
 var Event = require('../models/event');
+var cors = require('cors');
 
 module.exports = function(app, options) {
 
@@ -7,9 +8,10 @@ module.exports = function(app, options) {
 	var bufferTimeLimit = options.bufferTimeLimit;
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
+	var corsOptions     = options.corsOptions;
 
-	app.get(stpath+"/events", getEvents); // get list of all events
-	app.post(stpath+"/events", postEvents); // put event to db
+	app.get(stpath+"/events", cors(corsOptions), getEvents); // get list of all events
+	app.post(stpath+"/events", cors(corsOptions), postEvents); // put event to db
 	app.get(stpath+"/events/getNames", getNames); // get event names for picking
 
 	function getEvents(req, res) {

@@ -2,49 +2,36 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var sessionSchema = {
-	userId: { type:Schema.ObjectId, required: true },
-    date: { type: Date, default: Date.now },
-	screen: {
-		windowX: Number, 
-		windowY: Number, 
-		screenX: Number, 
-		screenY: Number,		
-	},
-    location: {
-    	ipAddress: String,
-    	country: String, 
-    	region: String, 
-    	city: String,
-    },
-    userAgent: {
-    	userAgentHeader: String,
-    	ua: {
-        	full: String,
-        	version: String,
-        	family: String,
-        	major: String,
-        	minor: String,
-        	patch: String
-        },
-        os: {
-        	full: String,
-        	version: String,
-        	family: String,
-        	major: String,
-        	minor: String,
-        	patch: String    	
-        },
-    	device: String
-    },
-    referrer: {
-    	referrerHeader: String,
-    	known: Boolean,
-    	referer: String,
-    	medium: String,
-    	search_parameter: String,
-    	search_term: String,
-    	uri: String
-    }
-    
+	track_id: { type:Schema.Types.Mixed, required: true }, //ttt Mixed amig nem allitom be jol 
+	date: { type: Date, default: Date.now },
+	screen_indowX: Number,
+	screen_windowY: Number,
+	screen_screenX: Number,
+	screen_screenY: Number,
+	location_ipAddress: String,
+	location_country: String,
+	location_region: String,
+	location_city: String,
+	ua_header: String,
+	browser_full: String,
+	browser_version: String,
+	browser_family: String,
+	browser_major: String,
+	browser_minor: String,
+	browser_patch: String,
+	os_full: String,
+	os_version: String,
+	os_family: String,
+	os_major: String,
+	os_minor: String,
+	os_patch: String,	
+	device: String,
+	referrer_header: String,
+	referrer_known: Boolean,
+	referrer_referer: String,
+	referrer_medium: String,
+	referrer_search_parameter: String,
+	referrer_search_term: String,
+	referrer_uri: String
 };
 module.exports = mongoose.model('Session', sessionSchema);

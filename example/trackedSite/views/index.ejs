@@ -17,6 +17,9 @@
 			$('.subscr, .button').click(function() {
 				tracker.track($(this).attr('id'), 'nincsen', 'dummycomment');
 			});
+			$('.subscr').click(function() {
+				tracker.createUser(Math.random().toString(), 'api');
+			});
 		});
 	</script>
 </head>

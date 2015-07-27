@@ -6,6 +6,7 @@ module.exports = function(app, options) {
 	var bufferTimeLimit = options.bufferTimeLimit;
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
+	var cors			= options.cors;
 
 	app.get(stpath, mwAuth, renderDashboard);
 

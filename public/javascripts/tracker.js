@@ -9,42 +9,55 @@ function supertracker() {
     var bufferSize = %bufferSize%; 
     var bufferTimeLimit = %bufferTimeLimit%; 
     // Session wide event data
-    var sessionId, userId;
+    var sessionId, userId, trackId;
     var flushingLoop;
     var referrer;
     var date;
 
 
     function init () {
-        userId  = '%userId%';
+        // userId  = '%userId%';
         referrer = document.referrer;
         date = new Date();
 
+        $.ajaxSetup({ cache: true });
 
-        if (sessionStorage.supertrackerSessionId) {
-            sessionId = sessionStorage.supertrackerSessionId;
-            console.log('Sessionstorage on');
-         } else {
-            console.log('Sessionstorage off');
-            var session = {userId: userId, date: date, screen: {}, location: {}};
-            // var windowX, windowY, screenX, screenY;
-            // var ipAddress, country, region, city;
+        $.when(
+            $.getScript( "%path%/javascripts/md5.min.js" ),
+            $.getScript( "http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js" )
+        ).done(function(){
 
-            session.screen.windowY = $(window).height();   // returns height of browser viewport
-            session.screen.windowX = $(window).width();   // returns width of browser viewport
-            session.screen.screenX = screen.width;
-            session.screen.screenY = screen.height;
-            
-            $.ajaxSetup({ cache: true });
-            $.getScript('http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js', function () {
-                // ttt errorkezeles
-                geoip2.city(function (resCity) {
+            geoip2.city(function (resCity) {
 
-                    session.location.ipAddress = resCity.traits.ip_address;
-                    session.location.country =  resCity.country.names.en;
-                    session.location.region =  resCity.subdivisions[0].names.en;
-                    session.location.city = resCity.city.names.en;
+                if (!localStorage.supertrackerTrackId) {
+                    trackId = md5(date + resCity.city.names.en + Math.random());
+                    localStorage.supertrackerTrackId = trackId;
+                } else {
+                    trackId = localStorage.supertrackerTrackId;
+                }
 
+
+                if (sessionStorage.supertrackerSessionId) {
+                    sessionId = sessionStorage.supertrackerSessionId;
+                    console.log('Sessionstorage on');
+                 } else {
+                    console.log('Sessionstorage off');
+                    var session = {};
+                    session.track_id = trackId;
+                    session.date = date;
+                    session.screen_windowY = $(window).height();   // returns height of browser viewport
+                    session.screen_windowX = $(window).width();   // returns width of browser viewport
+                    session.screen_screenX = screen.width;
+                    session.screen_screenY = screen.height;
+
+                    
+                        // ttt errorkezeles
+
+                    session.location_ipAddress = resCity.traits.ip_address;
+                    session.location_country =  resCity.country.names.en;
+                    session.location_region =  resCity.subdivisions[0].names.en;
+                    session.location_city = resCity.city.names.en;
+                    
                     $.ajax({
                         url: '%path%/sessions',
                         type: 'POST',
@@ -52,7 +65,7 @@ function supertracker() {
                         data: JSON.stringify(session)
                     })
                     .done(function(res) {
-                        console.log(res.sessionId);
+                        console.log(res);
                         sessionStorage.supertrackerSessionId = res.sessionId;
                         sessionId = res.sessionId;
                     })
@@ -60,12 +73,10 @@ function supertracker() {
                         console.log("error");
                         console.log(err);
                     });
-                });
-            },
-            function(err) {
-                console.log(err);
+                }
             });
-        }
+        });
+
 
         flushingLoop = setInterval(flush, bufferTimeLimit);
     }    
@@ -74,8 +85,8 @@ function supertracker() {
 
         // Preparing data
         var event = {
-            "userId": userId,
-            "sessionId": sessionId,
+            "track_id": trackId,
+            "session_id": sessionId,
             "referrer": referrer,
             "name": eventName,
             "data": eventData,
@@ -132,9 +143,28 @@ function supertracker() {
         }
     }
 
+    function createUser(extUserId, extFlag) { //ttt flushing mechanism
+        var user = {
+            "track_id": trackId,
+            "external_user_id": extUserId,
+            "external_flag": extFlag
+        };
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '%path%/users');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var userInfo = JSON.parse(xhr.responseText);
+                // console.log(userInfo);
+            }
+        };
+        xhr.send(JSON.stringify(user));
+    }
+
     return {
         track: track,
-        init: init
+        init: init,
+        createUser: createUser
     };
 }
 

@@ -63,7 +63,7 @@ module.exports = function(app, options) {
         )
         .join({
             joinCollection: db.collection('sessions'),
-            leftKeys: ['sessionId'],
+            leftKeys: ['session_id'],
             rightKeys: ['_id'],
             newKey: 'session'
         })  
