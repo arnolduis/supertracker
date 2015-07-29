@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var sessionSchema = {
-	track_id: { type:Schema.Types.Mixed, required: true }, //ttt Mixed amig nem allitom be jol 
+	track_id: { type:String, required: true }, //ttt Mixed amig nem allitom be jol 
 	date: { type: Date, default: Date.now },
 	screen_indowX: Number,
 	screen_windowY: Number,

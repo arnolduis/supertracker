@@ -20,22 +20,19 @@ function supertracker() {
 		referrer = document.referrer;
 		date = new Date();
 
-		$.ajaxSetup({ cache: true });
+		if (!localStorage.supertrackerTrackId) {
+			trackId = uuid();
+			localStorage.supertrackerTrackId = trackId;
+		} else {
+			trackId = localStorage.supertrackerTrackId;
+		}
 
+		$.ajaxSetup({ cache: true });
 		$.when(
-			$.getScript( "%path%/javascripts/md5.min.js" ),
 			$.getScript( "http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js" )
 		).done(function(){
 
 			geoip2.city(function (resCity) {
-
-				if (!localStorage.supertrackerTrackId) {
-					trackId = md5(date + resCity.city.names.en + Math.random());
-					localStorage.supertrackerTrackId = trackId;
-				} else {
-					trackId = localStorage.supertrackerTrackId;
-				}
-
 
 				if (sessionStorage.supertrackerSessionId) {
 					sessionId = sessionStorage.supertrackerSessionId;
@@ -143,7 +140,7 @@ function supertracker() {
 		}
 	}
 
-	function createUser(extUserId, extFlag) { //ttt flushing mechanism
+	function identify(extUserId, extFlag) { //ttt flushing mechanism
 		var user = {
 			"track_id": trackId,
 			"external_user_id": extUserId,
@@ -209,9 +206,9 @@ function supertracker() {
 	}
 
 	return {
-		track: track,
 		init: init,
-		createUser: createUser
+		track: track,
+		identify: identify
 	};
 }
 
