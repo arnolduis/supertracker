@@ -14,15 +14,16 @@
     "url": "https://github.com/arnolduis/supertracker.git"
   },
   "dependencies": {
-    "mongoose": ">3.0.0",
-    "express": ">3.0.0",
+    "async": "*",
     "body-parser": "*",
+    "cors": "~2.7.1",
+    "express": ">3.0.0",
+    "mongoose": ">3.0.0",
+    "mongo-fast-join": "*",
     "nconf": "*",
     "ua-parser": "*",
-    "async": "*",
     "referer-parser": "*",
-    "mongo-fast-join": "*",
-    "strftime": "*" 
+    "strftime": "*"
   },
   "keywords": [
     "event",

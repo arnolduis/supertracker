@@ -41,12 +41,13 @@ module.exports = function(app, options) {
 		var events = [];
 		var funnel = {steps: []};
 		var debug = {steps:[]};
+console.log(res.body);
 		for (var i = 0; i < req.body.funnel.steps.length; i++) {
 			events.push(req.body.funnel.steps[i].event);
 		    funnel.steps[i] = 0;
 		}
 		var map = function(){
-		    emit(this.sessionId,this.name);
+		    emit(this.session_id,this.name);
 		};
 		var reduce = function(key, values) {
 		    for (var j = 0; j < values.length; j++) {
@@ -68,7 +69,7 @@ module.exports = function(app, options) {
 		var options = {
 		        scope: {events: events, funnel:funnel, debug: debug},
 		        query: { name: {$in: events}},
-		        sort: {sessionId:1, date:1 },
+		        sort: {session_id:1, date:1 },
 		        finalize: finalize,
 		        out: "funnelResult",
 		            
@@ -84,6 +85,9 @@ module.exports = function(app, options) {
 			finalize : options.finalize,	
 			out      : options.out
 		}, function (err, model, stats) {
+			if (err) {
+				return console.log(err);
+			}
 		  model.find().exec(function (err, docs) {
 		  	if (err) return console.log(err);
 // console.log(JSON.stringify(docs));	

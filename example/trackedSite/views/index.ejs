@@ -7,15 +7,19 @@
 	<script src='/javascripts/jquery-1.11.1.min.js'></script>
 	<script src='/javascripts/knockout-3.1.0.js'></script>
 
-	<script src='<%= stpath %>/tracker'></script>
+	<!--script src='<%= stpath %>/tracker'></script-->
+	<script src='<%= stpath %>/trackingWrapper'></script>
 
 	<script>
 		// Igy kell eventet trackelni
-		var tracker = supertracker();
+		var tracker = trackingWrapper();
 		tracker.init();
 		$(document).ready(function() {
 			$('.subscr, .button').click(function() {
 				tracker.track($(this).attr('id'), 'nincsen', 'dummycomment');
+			});
+			$('.subscr').click(function() {
+				tracker.identify("arni_id", 'api');
 			});
 		});
 	</script>
