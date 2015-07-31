@@ -7,9 +7,5 @@
   "buffer": {
   	"size":"5",
   	"timeLimit":"5000"
-  },
-  "cors": {
-  	"whitelist": ["http://edmdesigner.com"],
-  	"methods": ["GET", "POST"]
   }
 }
