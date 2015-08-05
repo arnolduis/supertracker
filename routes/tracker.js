@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require("path");
 
 module.exports = function(app, options) {
 
@@ -11,9 +12,10 @@ module.exports = function(app, options) {
 
 	app.get(stpath+"/tracker", function (req,res) {
 
-		fs.readFile('node_modules/supertracker/public/javascripts/tracker.js', 'utf8', function (err,result) {
+		fs.readFile(path.join(__dirname,'../public/javascripts/tracker.js'), 'utf8', function (err,result) {
 			if (err) {
-				return console.log(err);
+				console.log(err);
+				res.send(err);
 			}
 
 			result = result.replace(/%path%/g, stpath);

@@ -20,34 +20,41 @@ function supertracker() {
 		referrer = document.referrer;
 		date = new Date();
 
-        trackId = getCookie(supertrackerTrackId);
-        console.log("trackId:");
-        console.log(trackId);
+        trackId = getCookie("supertrackerTrackId");
 
-		if (!localStorage.supertrackerTrackId) {
-			trackId = uuid();
-			document.cookie = "supertrackerTrackId="+trackId+";domain=.edmdesigner.com";
+        // Getting the current domain
+        var arrDomain = document.domain.split(".");
+        var domain = null;
+        if (arrDomain.length === 1){
+        	domain = null;
+        } else {
+        	domain = "." + arrDomain[arrDomain.length] + "." + arrDomain[arrDomain.length - 1];
+        }
+console.log("ST: domain: " + domain);
+
+		if (trackId) {
+			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
 		} else {
-			trackId = localStorage.supertrackerTrackId;
+			trackId = uuid();
+			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
 		}
+console.log("ST: trackId:" + trackId);
 
-		$.ajaxSetup({ cache: true });
-		$.when(
-			$.getScript( "http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js" )
-		).done(function(){
+		getScript("http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js", function(){
 
-			geoip2.city(function (resCity) {
 
-				if (sessionStorage.supertrackerSessionId) {
-					sessionId = sessionStorage.supertrackerSessionId;
-					console.log('Sessionstorage on');
-				 } else {
+			if (sessionStorage.supertrackerSessionId) {
+				sessionId = sessionStorage.supertrackerSessionId;
+				console.log('Sessionstorage on');
+			 } else {
+				geoip2.city(function (resCity) {
+					
 					console.log('Sessionstorage off');
 					var session = {};
 					session.track_id = trackId;
 					session.date = date;
-					session.screen_windowY = $(window).height();   // returns height of browser viewport
-					session.screen_windowX = $(window).width();   // returns width of browser viewport
+					session.screen_windowX = window.innerWidth;   // returns width of browser viewport
+					session.screen_windowY = window.innerHeight;   // returns height of browser viewport
 					session.screen_screenX = screen.width;
 					session.screen_screenY = screen.height;
 
@@ -58,29 +65,33 @@ function supertracker() {
 					session.location_country =  resCity.country.names.en;
 					session.location_region =  resCity.subdivisions[0].names.en;
 					session.location_city = resCity.city.names.en;
-					
-					$.ajax({
-						url: '%path%/sessions',
-						type: 'POST',
-						contentType: 'application/json',
-						data: JSON.stringify(session)
-					})
-					.done(function(res) {
-						console.log(res);
-						sessionStorage.supertrackerSessionId = res.sessionId;
-						sessionId = res.sessionId;
-					})
-					.fail(function(err) {
-						console.log("error");
-						console.log(err);
-					});
-				}
-			});
+
+
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', '%path%/sessions');
+					xhr.setRequestHeader('Content-Type', 'application/json');
+					xhr.onload = function() {
+					    if (xhr.status === 200) {
+					        var res = JSON.parse(xhr.responseText);
+console.log("ST: sessions_response:");
+console.log(res);
+							sessionStorage.supertrackerSessionId = res.sessionId;
+							sessionId = res.sessionId;
+
+					        if (res.errorMessage) {
+					        	alert(res.errorMessage);
+					        }
+					    } else {
+					    	console.log("session_post_error");
+					    }
+					};
+					xhr.send(JSON.stringify(session));
+
+				});
+			}
+			flushingLoop = setInterval(flush, bufferTimeLimit);
 		});
-
-
-		flushingLoop = setInterval(flush, bufferTimeLimit);
-	}    
+	}
 
 	function track(eventName, eventData, comment) {
 
@@ -121,23 +132,26 @@ function supertracker() {
 	function flush () {
 		if(typeof(Storage) !== "undefined") {
 			if (localStorage.eventBuffer) {
-				$.ajax({
-						url: '%path%/events',
-						type: 'POST',
-						contentType: 'application/json',
-						data: JSON.stringify(JSON.parse(localStorage.eventBuffer))                
-					})
-				.done(function(data) {
-					localStorage.removeItem('eventBuffer');
-					clearInterval(flushingLoop);
-					loop = setInterval(flush, bufferTimeLimit);
-					$("#ajaxmessage").html(data);
-				})
-				.fail(function(data) {
-					console.log("error");
-					console.log(data);
-					$("#ajaxmessage").html(data);
-				});
+
+				var xhr = new XMLHttpRequest();
+				xhr.open('POST', '%path%/events');
+				xhr.setRequestHeader('Content-Type', 'application/json');
+				xhr.onload = function() {
+				    if (xhr.status === 200) {
+				        var res = JSON.parse(xhr.responseText);
+	console.log(res);
+						localStorage.removeItem('eventBuffer');
+						clearInterval(flushingLoop);
+						flushingLoop = setInterval(flush, bufferTimeLimit);
+
+				        if (res.errorMessage) {
+				        	alert(res.errorMessage);
+						}
+				    } else {
+				    	console.log("event_flush_error");
+				    }
+				};
+				xhr.send(JSON.stringify(JSON.parse(localStorage.eventBuffer)));
 			}
 		} else {
 			console.log('Localstorage is not available...');
@@ -214,7 +228,11 @@ function supertracker() {
 	    d.setTime(d.getTime() + (exdays*24*60*60*1000));
 	    var expires = "expires="+d.toUTCString();
 	    var domain = "domain=" + cdomain;
-	    document.cookie = cname + "=" + cvalue + "; " + expires + "; " + domain;
+	    var strCookie = cname + "=" + cvalue + "; " + expires + "; ";
+	    if (cdomain) {
+	    	strCookie = strCookie + domain;
+	    }
+	    document.cookie = strCookie;
 	}
 
 	function getCookie(cname) {
@@ -226,6 +244,24 @@ function supertracker() {
 	        if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
 	    }
 	    return "";
+	}
+
+	function getScript(source, callback) {
+	    var script = document.createElement('script');
+	    var prior = document.getElementsByTagName('script')[0];
+	    script.async = 1;
+	    prior.parentNode.insertBefore(script, prior);
+
+	    script.onload = script.onreadystatechange = function( _, isAbort ) {
+	        if(isAbort || !script.readyState || /loaded|complete/.test(script.readyState) ) {
+	            script.onload = script.onreadystatechange = null;
+	            script = undefined;
+
+	            if(!isAbort) { if(callback) callback(); }
+	        }
+	    };
+
+	    script.src = source;
 	}
 
 	return {

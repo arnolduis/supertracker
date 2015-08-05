@@ -33,5 +33,4 @@ module.exports = function(app, options) {
 			res.send( JSON.stringify(req.body) );
 		});
 	}
-
 };

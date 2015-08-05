@@ -1,6 +1,5 @@
 var Session = require('../models/session');
 var cors = require("cors");
-
 module.exports = function (app, options) {
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;
