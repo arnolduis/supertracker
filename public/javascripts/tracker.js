@@ -99,9 +99,9 @@ console.log(res);
 		var event = {
 			"track_id": trackId,
 			"session_id": sessionId,
-			"referrer": referrer,
 			"name": eventName,
-			"data": eventData,
+			"referrer": referrer,
+			"properties": eventData,
 			"date": new Date(),
 			"comments": comment
 		};

@@ -2,7 +2,8 @@ var cors = require('cors');
 var ObjectId = require("mongoose").Types.ObjectId;
 
 module.exports = function(app, options) {
-var Event = options.db.model("Event");
+var Event = options.db.model("Event", require("../models/event"));
+// var Event = options.db.model("Event");
 
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;
@@ -26,12 +27,14 @@ var Event = options.db.model("Event");
 console.log(req.body);
 console.log(ObjectId());
 		// Saving to server
-		Event.create(req.body,function(err) {
+		Event.create(req.body,function(err, doc) {
 			if (err) {
 				console.log(err);
 				res.send('Server error, couldn\'t save events to server!');
 				return;
 			}
+
+console.log(doc);
 
 			// Creating server response
 			var response = [];
