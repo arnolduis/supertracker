@@ -1,5 +1,3 @@
-// var Event = require('../models/event');
-var Session = require('../models/session');
 var async = require('async');
 var MJ = require('mongo-fast-join');
 var mongoJoin = new MJ();
@@ -7,6 +5,7 @@ var strftime = require('strftime');
 
 module.exports = function(app, options) {
 var Event = options.db.model("Event");
+var Session = options.db.model("Session");
 
     var stpath          = options.stpath;
     var bufferSize      = options.bufferSize;

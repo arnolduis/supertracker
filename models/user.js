@@ -7,4 +7,4 @@ var userSchema = {
 	external_flag: String
 };
 
-module.exports = mongoose.model('User', userSchema);
+mongoose.model('User', userSchema);

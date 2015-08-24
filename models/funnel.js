@@ -20,4 +20,4 @@ var funnelSchema = {
 	}
 };
 
-module.exports = mongoose.model('Funnel', funnelSchema);
+mongoose.model('Funnel', funnelSchema);

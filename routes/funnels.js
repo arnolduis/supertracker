@@ -1,7 +1,6 @@
-var Funnel = require('../models/funnel');
-// var Event = require('../models/event');
 
 module.exports = function(app, options) {
+var Funnel = options.db.model("Funnel");
 var Event = options.db.model("Event");
 
 	var stpath          = options.stpath;

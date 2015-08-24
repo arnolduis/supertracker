@@ -1,7 +1,7 @@
 var cors = require('cors');
+var ObjectId = require("mongoose").Types.ObjectId;
 
 module.exports = function(app, options) {
-// var Event = options.db.model("Event", require('../models/event'));
 var Event = options.db.model("Event");
 
 	var stpath          = options.stpath;
@@ -23,7 +23,8 @@ var Event = options.db.model("Event");
 	}
 
 	function postEvents(req, res){
-	console.log(req.body);
+console.log(req.body);
+console.log(ObjectId());
 		// Saving to server
 		Event.create(req.body,function(err) {
 			if (err) {

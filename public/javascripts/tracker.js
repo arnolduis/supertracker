@@ -105,6 +105,7 @@ console.log(res);
 			"date": new Date(),
 			"comments": comment
 		};
+console.log(event);
 
 		//Loading localstorage
 		if(typeof(Storage) !== "undefined") {

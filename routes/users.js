@@ -1,8 +1,7 @@
-var User = require('../models/user');
 var cors = require('cors');
 
-
 module.exports = function(app, options) {
+	var User = options.db.model("User");
 
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;

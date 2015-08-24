@@ -34,4 +34,4 @@ var sessionSchema = {
 	referrer_search_term: String,
 	referrer_uri: String
 };
-module.exports = mongoose.model('Session', sessionSchema);
+mongoose.model('Session', sessionSchema);
