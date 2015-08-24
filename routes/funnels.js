@@ -1,7 +1,8 @@
 var Funnel = require('../models/funnel');
-var Event = require('../models/event');
+// var Event = require('../models/event');
 
 module.exports = function(app, options) {
+var Event = options.db.model("Event");
 
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;

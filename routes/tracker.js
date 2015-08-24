@@ -9,6 +9,7 @@ module.exports = function(app, options) {
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
 
+console.log("XXX", stpath);
 
 	app.get(stpath+"/tracker", function (req,res) {
 

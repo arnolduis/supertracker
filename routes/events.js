@@ -1,7 +1,8 @@
-var Event = require('../models/event');
 var cors = require('cors');
 
 module.exports = function(app, options) {
+// var Event = options.db.model("Event", require('../models/event'));
+var Event = options.db.model("Event");
 
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;

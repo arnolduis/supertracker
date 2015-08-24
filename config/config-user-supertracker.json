@@ -1,7 +1,0 @@
-{
-	"stpath": "/tracking",
-	"cors": {
-		"whitelist": ["http://edmdesigner.com"],
-		"methods": ["GET", "POST"]
-	}
-}

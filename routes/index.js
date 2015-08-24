@@ -5,9 +5,6 @@ var path = require('path');
 
  
 var requireFiles = function (directory, app, options) {
-
-console.log('options');
-
   fs.readdirSync(directory).forEach(function (fileName) {
     // Recurse if directory
     var target = path.join(directory, fileName);
@@ -20,6 +17,7 @@ console.log('options');
       if(fileName === 'index.js' && directory === __dirname) return;
  
       // Skip unknown filetypes
+      var validFileTypes = ["js"];
       if(validFileTypes.indexOf(fileName.split('.').pop()) === -1) return;
  
       // Require the file.

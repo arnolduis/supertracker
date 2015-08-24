@@ -1,7 +1,9 @@
-var Event = require('../models/event');
+// var Event = require('../models/event');
 var async = require('async');
 
 module.exports = function(app, options) {
+// var Event = options.db.model("Event");
+var Event = options.db.model("Event", require('../models/event'));
 
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;
