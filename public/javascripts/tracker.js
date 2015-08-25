@@ -13,6 +13,7 @@ function supertracker() {
 	var flushingLoop;
 	var referrer;
 	var date;
+	var initiated = false;
 
 
 	function init () {
@@ -30,7 +31,8 @@ function supertracker() {
         } else {
         	domain = "." + arrDomain[arrDomain.length] + "." + arrDomain[arrDomain.length - 1];
         }
-console.log("ST: domain: " + domain);
+		console.log("ST: domain: " + domain); // xxx
+
 
 		if (trackId) {
 			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
@@ -38,95 +40,111 @@ console.log("ST: domain: " + domain);
 			trackId = uuid();
 			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
 		}
-console.log("ST: trackId:" + trackId);
+		console.log("ST: trackId:" + trackId); //xxx
 
-		getScript("http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js", function(){
 
 
 			if (sessionStorage.supertrackerSessionId) {
 				sessionId = sessionStorage.supertrackerSessionId;
 				console.log('Sessionstorage on');
+				initiated = true;
+				onInit();
 			 } else {
-				geoip2.city(function (resCity) {
-					
-					console.log('Sessionstorage off');
-					var session = {};
-					session.track_id = trackId;
-					session.date = date;
-					session.screen_windowX = window.innerWidth;   // returns width of browser viewport
-					session.screen_windowY = window.innerHeight;   // returns height of browser viewport
-					session.screen_screenX = screen.width;
-					session.screen_screenY = screen.height;
+				getScript("http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js", function(){
+					geoip2.city(function (resCity) {
+						
+						console.log('Sessionstorage off');
+						var session = {};
+						session.track_id = trackId;
+						session.date = date;
+						session.screen_windowX = window.innerWidth;   // returns width of browser viewport
+						session.screen_windowY = window.innerHeight;   // returns height of browser viewport
+						session.screen_screenX = screen.width;
+						session.screen_screenY = screen.height;
 
-					
-						// ttt errorkezeles
+						
+							// ttt errorkezeles
 
-					session.location_ipAddress = resCity.traits.ip_address;
-					session.location_country =  resCity.country.names.en;
-					session.location_region =  resCity.subdivisions[0].names.en;
-					session.location_city = resCity.city.names.en;
+						session.location_ipAddress = resCity.traits.ip_address;
+						session.location_country =  resCity.country.names.en;
+						session.location_region =  resCity.subdivisions[0].names.en;
+						session.location_city = resCity.city.names.en;
 
 
-					var xhr = new XMLHttpRequest();
-					xhr.open('POST', '%path%/sessions');
-					xhr.setRequestHeader('Content-Type', 'application/json');
-					xhr.onload = function() {
-					    if (xhr.status === 200) {
-					        var res = JSON.parse(xhr.responseText);
-console.log("ST: sessions_response:");
-console.log(res);
-							sessionStorage.supertrackerSessionId = res.sessionId;
-							sessionId = res.sessionId;
+						var xhr = new XMLHttpRequest();
+						xhr.open('POST', '%path%/sessions');
+						xhr.setRequestHeader('Content-Type', 'application/json');
+						xhr.onload = function() {
+						    if (xhr.status === 200) {
+						        var res = JSON.parse(xhr.responseText);
+								console.log("ST: sessions_response:"); //xxx
+								console.log(res); //xxx
+								sessionStorage.supertrackerSessionId = res.sessionId;
+								sessionId = res.sessionId;
 
-					        if (res.errorMessage) {
-					        	alert(res.errorMessage);
-					        }
-					    } else {
-					    	console.log("session_post_error");
-					    }
-					};
-					xhr.send(JSON.stringify(session));
+						        if (res.errorMessage) {
+						        	alert(res.errorMessage);
+						        }
+						        initiated = true;
+								onInit();
+						    } else {
+						    	console.log("session_post_error");
+						    }
+						};
+						xhr.send(JSON.stringify(session));
 
+					});
 				});
 			}
 			flushingLoop = setInterval(flush, bufferTimeLimit);
-		});
+	}
+
+	function onInit () {
+		
 	}
 
 	function track(eventName, eventData, comment) {
+		if (initiated) {
 
-		// Preparing data
-		var event = {
-			"track_id": trackId,
-			"session_id": sessionId,
-			"name": eventName,
-			"referrer": referrer,
-			"properties": eventData,
-			"date": new Date(),
-			"comments": comment
-		};
-console.log(event);
+			// Preparing data
+			var event = {
+				"track_id": trackId,
+				"session_id": sessionId,
+				"name": eventName,
+				"referrer": referrer,
+				"properties": eventData,
+				"date": new Date(),
+				"comments": comment
+			};
+			console.log(event); //xxx
 
-		//Loading localstorage
-		if(typeof(Storage) !== "undefined") {
-			var eventBuffer;
+			//Loading localstorage
+			if(typeof(Storage) !== "undefined") {
+				var eventBuffer;
 
-			if (localStorage.eventBuffer) {
-				eventBuffer = JSON.parse(localStorage.eventBuffer);
-				eventBuffer.push(event);
+				if (localStorage.eventBuffer) {
+					eventBuffer = JSON.parse(localStorage.eventBuffer);
+					eventBuffer.push(event);
+				} else {
+					eventBuffer = [event];
+				}
+
+				localStorage.eventBuffer = JSON.stringify(eventBuffer);                
+
+				if (eventBuffer.length >= bufferSize) {
+					flush();
+				}
+
+
 			} else {
-				eventBuffer = [event];
+				console.log('Localstorage is not available...');
 			}
-
-			localStorage.eventBuffer = JSON.stringify(eventBuffer);                
-
-			if (eventBuffer.length >= bufferSize) {
-				flush();
-			}
-
-
 		} else {
-			console.log('Localstorage is not available...');
+			var origOnInit = onInit;
+			onInit = function () {
+				origOnInit();
+				track(eventName, eventData, comment);
+			};
 		}
 	}
 
@@ -140,7 +158,7 @@ console.log(event);
 				xhr.onload = function() {
 				    if (xhr.status === 200) {
 				        var res = JSON.parse(xhr.responseText);
-	console.log(res);
+						console.log(res); //xxx
 						localStorage.removeItem('eventBuffer');
 						clearInterval(flushingLoop);
 						flushingLoop = setInterval(flush, bufferTimeLimit);
