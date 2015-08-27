@@ -6,6 +6,7 @@ var eventSchema = new Schema({
 	session_id: { type: Schema.ObjectId, ref: 'Session' },
 	name: { type: String, required: true },
 	referrer: String,
+	current_url: String,
 	properties: Object, //ttt mixed type
   	date: { type: Date, default: Date.now },
 	comments: String

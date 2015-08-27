@@ -31,7 +31,7 @@ function supertracker() {
         } else {
         	domain = "." + arrDomain[arrDomain.length] + "." + arrDomain[arrDomain.length - 1];
         }
-		console.log("ST: domain: " + domain); // xxx
+		// console.log("ST: domain: " + domain); // xxx
 
 
 		if (trackId) {
@@ -40,20 +40,20 @@ function supertracker() {
 			trackId = uuid();
 			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
 		}
-		console.log("ST: trackId:" + trackId); //xxx
+		// console.log("ST: trackId:" + trackId); //xxx
 
 
 
 			if (sessionStorage.supertrackerSessionId) {
 				sessionId = sessionStorage.supertrackerSessionId;
-				console.log('Sessionstorage on');
+				// console.log('Sessionstorage on');
 				initiated = true;
 				onInit();
 			 } else {
 				getScript("http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js", function(){
 					geoip2.city(function (resCity) {
 						
-						console.log('Sessionstorage off');
+						// console.log('Sessionstorage off');
 						var session = {};
 						session.track_id = trackId;
 						session.date = date;
@@ -77,8 +77,8 @@ function supertracker() {
 						xhr.onload = function() {
 						    if (xhr.status === 200) {
 						        var res = JSON.parse(xhr.responseText);
-								console.log("ST: sessions_response:"); //xxx
-								console.log(res); //xxx
+								// console.log("ST: sessions_response:"); //xxx
+								// console.log(res); //xxx
 								sessionStorage.supertrackerSessionId = res.sessionId;
 								sessionId = res.sessionId;
 
@@ -112,11 +112,12 @@ function supertracker() {
 				"session_id": sessionId,
 				"name": eventName,
 				"referrer": referrer,
+				"current_url": window.location.href,
 				"properties": eventData,
 				"date": new Date(),
 				"comments": comment
 			};
-			console.log(event); //xxx
+			// console.log(event); //xxx
 
 			//Loading localstorage
 			if(typeof(Storage) !== "undefined") {
@@ -158,7 +159,7 @@ function supertracker() {
 				xhr.onload = function() {
 				    if (xhr.status === 200) {
 				        var res = JSON.parse(xhr.responseText);
-						console.log(res); //xxx
+						// console.log(res); //xxx
 						localStorage.removeItem('eventBuffer');
 						clearInterval(flushingLoop);
 						flushingLoop = setInterval(flush, bufferTimeLimit);
