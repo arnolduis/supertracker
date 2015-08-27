@@ -17,7 +17,9 @@ var User = options.db.model("User");
 
 	app.get(stpath+"/events", cors(corsOptions), getEvents); // get list of all events
 	app.post(stpath+"/events", cors(corsOptions), postEvents); // put event to db
+	app.post(stpath+"/events/external", cors(corsOptions), postExternalEvent); // put event to db
 	app.options(stpath+"/events", cors(corsOptions));
+	app.options(stpath+"/events/external", cors(corsOptions));
 	app.get(stpath+"/events/getNames", getNames); // get event names for picking
 
 	function getEvents(req, res) {
@@ -27,85 +29,140 @@ var User = options.db.model("User");
 	  	});
 	}
 
+	function postExternalEvent(req, res) {
+			if(req.body.properties && req.body.properties.externalEvent) {
+				User.findOne({ external_user_id: req.body.extUserId}, function(err, result) {
+					if (err) {
+						console.log(err);
+						return res.send(err);
+					}
+					if (!result || (result && result.length <= 0) ) {
+						console.log("No matching alias for the gieven user id.");
+						return res.send({ err: "No matching alias for the gieven user id."});
+					}
+
+					// Add the obtained track_id to external event
+					req.body.track_id = result.track_id;
+
+					Event.create(req.body, function(err, doc) {
+						if (err) {
+							console.log(err);
+							res.send('Server error, couldn\'t save events to server!');
+							return;
+						}
+						console.log("PROBABLY INSERÍTED EXTERNAL DOCUMENT");
+						console.log(doc);//xxx
+
+						// Creating server response
+
+						res.send( JSON.stringify({response: "Events saved"}) );
+					});
+
+				});
+			}
+		
+	}
+
 	function postEvents(req, res){
+		var external = [];
+
 		console.log("  ");//xxx
 		console.log("  ");//xxx
 		console.log("  ");//xxx
 		console.log("REQ.BODY:");//xxx
 		console.log(req.body);//xxx
 
-		if (!Array.isArray(req.body)) {
-			req.body = [req.body];
-		}
+		// if (!Array.isArray(req.body)) {
+		// 	req.body = [req.body];
+		// }
 
-		// Pre checking external events
-		for (var i = 0; i < req.body.length; i++) {
-			(function (i) {
-				if(req.body[i].properties && req.body[i].properties.externalEvent) {
-					console.log("Is external event");
-					User.findOne({ external_user_id: req.body[i].extUserId}, function(err, result) {
-						if (err) {
-							console.log(err);
-							return res.send(err);
-						}
-						console.log("RESULT:");//xxx
-						console.log(result);//xxx
-						console.log("REQ.BODY:");//xxx
-						console.log(req.body[i]);//xxx
+		Event.create(req.body, function(err, doc) {
+			if (err) {
+				console.log(err);
+				res.send('Server error, couldn\'t save events to server!');
+				return;
+			}
+			console.log("PROBABLY INSERÍTED DOCUMENT");
+			console.log(doc);//xxx
 
-						if (!result || (result && result.length <= 0) ) {
-							console.log("No matching alias for the gieven user id.");
-							return res.send({ err: "No matching alias for the gieven user id."});
-						}
+			// Creating server response
 
+			res.send( JSON.stringify({response: "Events saved"}) );
+		});
 
-						// Add the obtained track_id to external event
-						req.body[i].track_id = result.track_id;
+		// // Pre checking external events
+		// for (var i = 0; i < req.body.length; i++) {
+		// 	if(req.body[i].properties && req.body[i].properties.externalEvent) {
+		// 		// Remove external events from request
+		// 		var rest = req.body.splice(i + 1);
+		// 		external.push(req.body.splice(i));
+		// 		req.body = req.body.concat(rest);
+		// 	}
+		// }
 
-						console.log("REQ.BODY BEFORE CREATE:");//xxx
-						console.log(req.body[i]);//xxx
+		// console.log("REQ.BODY 2:");//xxx
+		// console.log(req.body[i]);//xxx
+		// console.log("EXTERNAL:");//xxx
+		// console.log(external);//xxx
 
-						// Insert external event onto database
-						Event.create(req.body[i], function(err, res) {
-							if (err) {
-								console.log(err);
-								return res.send(err);
-							}
+		// console.log("Is external event");
+		// User.findOne({ external_user_id: req.body[i].extUserId}, function(err, result) {
+		// 	if (err) {
+		// 		console.log(err);
+		// 		return res.send(err);
+		// 	}
+		// 	console.log("RESULT:");//xxx
+		// 	console.log(result);//xxx
+		// 	console.log("REQ.BODY:");//xxx
+		// 	console.log(req.body[i]);//xxx
 
-							console.log("Event saved:");//xxx
-							console.log(res);//xxx
-							
-							// Remove external event from request
-							var rest = req.body.splice(i + 1);
-							req.body.splice(i);
-							req.body = req.body.concat(rest);
-
-
-							// Saving the remaining normal events to server
-							if (req.body.length > 0) {
-								console.log("Saving normal event");//xxx
-								Event.create(req.body,function(err, doc) {
-									//ttt Validation? Some kind of?...
-									if (err) {
-										console.log(err);
-										return res.send('Server error, couldn\'t save events to server!');
-									}
+		// 	if (!result || (result && result.length <= 0) ) {
+		// 		console.log("No matching alias for the gieven user id.");
+		// 		return res.send({ err: "No matching alias for the gieven user id."});
+		// 	}
 
 
-									console.log("DOC:");//xxx
-									console.log(doc);//xxx
+		// 	// Add the obtained track_id to external event
+		// 	req.body[i].track_id = result.track_id;
 
-									res.send( JSON.stringify({ response: "All events has been saved into the Supertracker database."}) );
-								});
-							} else {
-								res.send( JSON.stringify({ response: "All events has been saved into the Supertracker database."}) );
-							}
-						});
+		// 				// Insert external event onto database
+						
 
-					});
-				}
-			})(i);
-		}
+		// 			});
+
+		// function createSimpleEvents (argument) {
+		// 	Event.create(req.body[i], function(err, res) {
+		// 		if (err) {
+		// 			console.log(err);
+		// 			return res.send(err);
+		// 		}
+
+		// 		console.log("Event saved:");//xxx
+		// 		console.log(res);//xxx
+				
+
+
+		// 		// Saving the remaining normal events to server
+		// 		if (req.body.length > 0) {
+		// 			console.log("Saving normal event");//xxx
+		// 			Event.create(req.body,function(err, doc) {
+		// 				//ttt Validation? Some kind of?...
+		// 				if (err) {
+		// 					console.log(err);
+		// 					return res.send('Server error, couldn\'t save events to server!');
+		// 				}
+
+
+		// 				console.log("DOC:");//xxx
+		// 				console.log(doc);//xxx
+
+		// 				res.send( JSON.stringify({ response: "All events has been saved into the Supertracker database."}) );
+		// 			});
+		// 		} else {
+		// 			res.send( JSON.stringify({ response: "All events has been saved into the Supertracker database."}) );
+		// 		}
+		// 	});
+		// }
 	}
 
 	function getNames(req, res) {

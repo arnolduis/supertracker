@@ -190,7 +190,8 @@ function supertracker() {
 		xhr.onload = function() {
 			if (xhr.status === 200) {
 				var userInfo = JSON.parse(xhr.responseText);
-				// console.log(userInfo);
+				console.log("ST USER SAVED:");
+				console.log(userInfo);
 			}
 		};
 		xhr.send(JSON.stringify(user));
