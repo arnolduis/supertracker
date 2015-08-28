@@ -4,7 +4,7 @@ var mongoJoin = new MJ();
 var strftime = require('strftime');
 
 module.exports = function(app, options) {
-var Event = options.db.model("Event");
+var Event = options.db.model("Event", require("../models/event"));
 var Session = options.db.model("Session");
 
     var stpath          = options.stpath;
