@@ -50,7 +50,7 @@ function supertracker() {
 				initiated = true;
 				onInit();
 			 } else {
-				getScript("/javascripts/geoip2.js", function(){
+				getScript("%path%/javascripts/geoip2.js", function(){
 					geoip2.city(function (resCity) {
 						
 						// console.log('Sessionstorage off');
