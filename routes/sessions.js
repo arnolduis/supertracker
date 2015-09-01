@@ -1,4 +1,9 @@
 var cors = require("cors");
+var node_geolite2 = require('node-geolite2');
+node_geolite2.init();
+node_geolite2.getGeoData("80.99.236.194", function (err, data) {
+	console.log(data);
+});
 module.exports = function (app, options) {
 	var Session = options.db.model("Session");
 	var stpath          = options.stpath;

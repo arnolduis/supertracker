@@ -1,6 +1,6 @@
 {
   "name": "supertracker",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "A super package for tracking and visualising user activity",
   "main": "./lib/supertracker.js",
   "bin": {
@@ -18,12 +18,12 @@
     "body-parser": "*",
     "cors": "~2.7.1",
     "express": ">3.0.0",
-    "mongoose": ">3.0.0",
     "mongo-fast-join": "*",
+    "mongoose": ">3.0.0",
     "nconf": "*",
-    "ua-parser": "*",
     "referer-parser": "*",
-    "strftime": "*"
+    "strftime": "*",
+    "ua-parser": "*"
   },
   "keywords": [
     "event",

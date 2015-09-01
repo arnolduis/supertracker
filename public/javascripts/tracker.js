@@ -50,8 +50,8 @@ function supertracker() {
 				initiated = true;
 				onInit();
 			 } else {
-				getScript("%path%/javascripts/geoip2.js", function(){
-					geoip2.city(function (resCity) {
+				// getScript("%path%/javascripts/geoip2.js", function(){
+					// geoip2.city(function (resCity) {
 						
 						// console.log('Sessionstorage off');
 						var session = {};
@@ -66,9 +66,9 @@ function supertracker() {
 							// ttt errorkezeles
 
 						session.location_ipAddress = resCity.traits.ip_address;
-						session.location_country =  resCity.country.names.en;
-						session.location_region =  resCity.subdivisions[0].names.en;
-						session.location_city = resCity.city.names.en;
+						// session.location_country =  resCity.country.names.en;
+						// session.location_region =  resCity.subdivisions[0].names.en;
+						// session.location_city = resCity.city.names.en;
 
 
 						var xhr = new XMLHttpRequest();
@@ -93,8 +93,8 @@ function supertracker() {
 						};
 						xhr.send(JSON.stringify(session));
 
-					});
-				});
+					// });
+				// });
 			}
 			flushingLoop = setInterval(flush, bufferTimeLimit);
 	}
@@ -267,23 +267,23 @@ function supertracker() {
 	    return "";
 	}
 
-	function getScript(source, callback) {
-	    var script = document.createElement('script');
-	    var prior = document.getElementsByTagName('script')[0];
-	    script.async = 1;
-	    prior.parentNode.insertBefore(script, prior);
+	// function getScript(source, callback) {
+	//     var script = document.createElement('script');
+	//     var prior = document.getElementsByTagName('script')[0];
+	//     script.async = 1;
+	//     prior.parentNode.insertBefore(script, prior);
 
-	    script.onload = script.onreadystatechange = function( _, isAbort ) {
-	        if(isAbort || !script.readyState || /loaded|complete/.test(script.readyState) ) {
-	            script.onload = script.onreadystatechange = null;
-	            script = undefined;
+	//     script.onload = script.onreadystatechange = function( _, isAbort ) {
+	//         if(isAbort || !script.readyState || /loaded|complete/.test(script.readyState) ) {
+	//             script.onload = script.onreadystatechange = null;
+	//             script = undefined;
 
-	            if(!isAbort) { if(callback) callback(); }
-	        }
-	    };
+	//             if(!isAbort) { if(callback) callback(); }
+	//         }
+	//     };
 
-	    script.src = source;
-	}
+	//     script.src = source;
+	// }
 
 	return {
 		init: init,
