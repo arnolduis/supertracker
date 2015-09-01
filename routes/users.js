@@ -19,17 +19,31 @@ module.exports = function(app, options) {
 	//   	});
 	// }
 
+		console.log("XXXXXXXXXXXXXXXXX");
+		console.log("XXXXXXXXXXXXXXXXX");
+		console.log("XXXXXXXXXXXXXXXXX");
 	function postUsers(req, res){
 	console.log(req.body);
 		// Saving to server
-		User.create(req.body,function(err) {
+		User.find({ track_is: req.body.track_id }, function(err, doc) {
 			if (err) {
 				console.log(err);
-				res.send('Server error, couldn\'t save events to server!');
+				res.send({err: "Couldnt save User tinto databse"});
 				return;
 			}
+			if (doc.length >= 0) {
+				res.send( JSON.stringify(req.body) );
+				return;
+			}
+			User.create(req.body,function(err) {
+				if (err) {
+					console.log(err);
+					res.send('Server error, couldn\'t save events to server!');
+					return;
+				}
 
-			res.send( JSON.stringify(req.body) );
+				res.send( JSON.stringify(req.body) );
+			});
 		});
 	}
 };
