@@ -8,7 +8,7 @@ var sessionSchema = {
 	screen_windowY: Number,
 	screen_screenX: Number,
 	screen_screenY: Number,
-	location_ipAddress: String,
+	location_ip: String,
 	location_country: String,
 	location_region: String,
 	location_city: String,

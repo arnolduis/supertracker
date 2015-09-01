@@ -65,7 +65,7 @@ function supertracker() {
 						
 							// ttt errorkezeles
 
-						session.location_ipAddress = resCity.traits.ip_address;
+						// session.location_ip = resCity.traits.ip_address;
 						// session.location_country =  resCity.country.names.en;
 						// session.location_region =  resCity.subdivisions[0].names.en;
 						// session.location_city = resCity.city.names.en;

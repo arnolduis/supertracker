@@ -21,6 +21,7 @@ module.exports = function (app, options) {
 		var r = new refererParser(req.headers.referer, req.protocol + '://' + req.get('host') + req.originalUrl);
 		var u = uaParser.parse(req.headers['user-agent']);
 
+		req.body.location_ip = req.ip;
 		req.body.ua_header = req.headers['user-agent'];
 	    req.body.browser_full = u.ua.toString();
 	    req.body.browser_version = u.ua.toVersionString();
