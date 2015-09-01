@@ -1,9 +1,5 @@
 var cors = require("cors");
-var node_geolite2 = require('node-geolite2');
-node_geolite2.init();
-node_geolite2.getGeoData("80.99.236.194", function (err, data) {
-	console.log(data);
-});
+
 module.exports = function (app, options) {
 	var Session = options.db.model("Session");
 	var stpath          = options.stpath;
@@ -21,7 +17,7 @@ module.exports = function (app, options) {
 		var r = new refererParser(req.headers.referer, req.protocol + '://' + req.get('host') + req.originalUrl);
 		var u = uaParser.parse(req.headers['user-agent']);
 
-		req.body.location_ip = req.ip;
+		req.body.location_ip = iptonum(req.ip);
 		req.body.ua_header = req.headers['user-agent'];
 	    req.body.browser_full = u.ua.toString();
 	    req.body.browser_version = u.ua.toVersionString();
@@ -54,4 +50,13 @@ module.exports = function (app, options) {
 			res.send({sessionId: session._id});
 		});
 	});
+
+	function iptonum(IPaddress) {
+	    var ip = IPaddress.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+	    if(ip) {
+	        return (+ip[1]<<24) + (+ip[2]<<16) + (+ip[3]<<8) + (+ip[4]);
+	    }
+	    // else ... ?
+	    return null;
+	}
 };
