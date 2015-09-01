@@ -103,7 +103,7 @@ function supertracker() {
 		
 	}
 
-	function track(eventName, eventData, comment) {
+	function track(eventName, eventData, comment, callback) {
 		if (initiated) {
 
 			// Preparing data
@@ -132,9 +132,16 @@ function supertracker() {
 
 				localStorage.eventBuffer = JSON.stringify(eventBuffer);                
 
-				if (eventBuffer.length >= bufferSize) {
-					flush();
+				// Check if it is called as async
+				if ( typeof arguments[arguments.length - 1] == "function") {
+					flush(callback);
+				} else {
+					if (eventBuffer.length >= bufferSize) {
+						flush();
+					}
 				}
+
+
 
 
 			} else {
@@ -149,7 +156,7 @@ function supertracker() {
 		}
 	}
 
-	function flush () {
+	function flush (callback) {
 		if(typeof(Storage) !== "undefined") {
 			if (localStorage.eventBuffer) {
 
@@ -159,14 +166,18 @@ function supertracker() {
 				xhr.onload = function() {
 				    if (xhr.status === 200) {
 				        var res = JSON.parse(xhr.responseText);
+				        if (res.errorMessage) {
+				        	alert(res.errorMessage);
+						}
 						// console.log(res); //xxx
 						localStorage.removeItem('eventBuffer');
 						clearInterval(flushingLoop);
 						flushingLoop = setInterval(flush, bufferTimeLimit);
 
-				        if (res.errorMessage) {
-				        	alert(res.errorMessage);
+						if (typeof callback == "function") {
+							callback();
 						}
+
 				    } else {
 				    	console.log("event_flush_error");
 				    }

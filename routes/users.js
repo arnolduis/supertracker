@@ -19,9 +19,6 @@ module.exports = function(app, options) {
 	//   	});
 	// }
 
-		console.log("XXXXXXXXXXXXXXXXX");
-		console.log("XXXXXXXXXXXXXXXXX");
-		console.log("XXXXXXXXXXXXXXXXX");
 	function postUsers(req, res){
 	console.log(req.body);
 		// Saving to server
