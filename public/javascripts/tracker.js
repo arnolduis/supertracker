@@ -196,7 +196,7 @@ function supertracker() {
 			var origOnInit = onInit;
 			onInit = function () {
 				origOnInit();
-				track(eventName, eventData, comment, callback);
+				track(eventName, properties, comment, callback);
 			};
 		}
 	}
