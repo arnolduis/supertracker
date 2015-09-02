@@ -103,9 +103,54 @@ function supertracker() {
 		
 	}
 
-	function track(eventName, eventData, comment, callback) {
-		if (initiated) {
+	function track(eventName, properties, comment, callback) {
+		// console.log("TRACK:");
+		// console.log(arguments);
+		// console.log("{");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
 
+		var args = [];
+		for (var i = 0; i < arguments.length; i++) {
+		    args.push(arguments[i]);
+		} 
+
+		eventName = args.shift();
+		if (args.length > 0)
+			if (typeof args[0] !== "function") {
+				properties = args.shift();
+			} else {
+				properties = null;
+				comment = null;
+				callback = args.shift();
+				args.length = 0;
+			}
+		if (args.length > 0)
+			if (typeof args[0] !== "function") {
+				comment = args.shift();
+			} else {
+				comment = null;
+				callback = args.shift();
+				args.length = 0;
+			}
+		if (args.length > 0) {
+			if (typeof args[0] !== "function") {
+				// comment = args.shift();
+			} else {
+				callback = args.shift();
+			}
+		}
+		// console.log("XXXX");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
+		// console.log("}");
+
+
+		if (initiated) {
 			// Preparing data
 			var event = {
 				"track_id": trackId,
@@ -113,7 +158,7 @@ function supertracker() {
 				"name": eventName,
 				"referrer": referrer,
 				"current_url": window.location.href,
-				"properties": eventData,
+				"properties": properties,
 				"date": new Date(),
 				"comments": comment
 			};
@@ -151,7 +196,7 @@ function supertracker() {
 			var origOnInit = onInit;
 			onInit = function () {
 				origOnInit();
-				track(eventName, eventData, comment);
+				track(eventName, eventData, comment, callback);
 			};
 		}
 	}
