@@ -29,7 +29,7 @@ function supertracker() {
         if (arrDomain.length === 1){
         	domain = null;
         } else {
-        	domain = "." + arrDomain[arrDomain.length] + "." + arrDomain[arrDomain.length - 1];
+        	domain = "." + arrDomain[arrDomain.length -1] + "." + arrDomain[arrDomain.length - 2];
         }
 		// console.log("ST: domain: " + domain); // xxx
 
