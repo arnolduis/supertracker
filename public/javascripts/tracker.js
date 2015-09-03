@@ -234,7 +234,45 @@ function supertracker() {
 		}
 	}
 
-	function identify(extUserId, extFlag) { //ttt flushing mechanism
+	function identify(extUserId, extFlag, callback) { //ttt flushing mechanism
+
+				// console.log("TRACK:");
+		// console.log(arguments);
+		// console.log("{");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
+
+		var args = [];
+		for (var i = 0; i < arguments.length; i++) {
+		    args.push(arguments[i]);
+		} 
+
+		extUserId = args.shift();
+		if (args.length > 0)
+			if (typeof args[0] !== "function") {
+				extFlag = args.shift();
+			} else {
+				extFlag = null;
+				callback = args.shift();
+				args.length = 0;
+			}
+		if (args.length > 0) {
+			if (typeof args[0] !== "function") {
+				// comment = args.shift();
+			} else {
+				callback = args.shift();
+			}
+		}
+		// console.log("XXXX");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
+		// console.log("}");
+
+
 		var user = {
 			"track_id": trackId,
 			"external_user_id": extUserId,
@@ -245,10 +283,20 @@ function supertracker() {
 		xhr.setRequestHeader('Content-Type', 'application/json');
 		xhr.onload = function() {
 			if (xhr.status === 200) {
-				console.log(xhr.responseText);
 				var userInfo = JSON.parse(xhr.responseText);
-				console.log("ST USER SAVED:");
+
 				console.log(userInfo);
+
+				if (userInfo.userSaved) {
+					if (typeof callback == "function") {
+						callback();
+						return;
+					}
+				}
+				if (typeof callback == "function") {
+					callback({err: "user couldnt be saved: " + userInfo});
+					return;
+				}
 			}
 		};
 		xhr.send(JSON.stringify(user));

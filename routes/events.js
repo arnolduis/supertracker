@@ -30,6 +30,7 @@ var User = options.db.model("User");
 	}
 
 	function postExternalEvent(req, res) {
+		console.log(req.body);
 			if(req.body.properties && req.body.properties.externalEvent) {
 				User.findOne({ external_user_id: req.body.extUserId}, function(err, result) {
 					if (err) {
