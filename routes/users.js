@@ -20,20 +20,20 @@ module.exports = function(app, options) {
 	// }
 
 	function postUsers(req, res){
-		console.log("ST: postUsers");
-		console.log(req.body);
+		// console.log("ST: postUsers");
+		// console.log(req.body);
 		// Saving to server
-		User.find({ track_id: req.body.track_id }, function(err, doc) {
-			if (err) {
-				console.log(err);
-				res.send({err: "Couldnt save User tinto databse"});
-				return;
-			}
-			if (doc.length > 0) {
-				console.log("ST: Track id already saved to user: " + doc);
-				res.send( JSON.stringify("ST: Track id already saved to user: " + doc) );
-				return;
-			}
+		// User.find({ track_id: req.body.track_id }, function(err, doc) {
+			// if (err) {
+			// 	console.log(err);
+			// 	res.send({err: "Couldnt save User tinto databse"});
+			// 	return;
+			// }
+			// if (doc.length > 0) {
+			// 	console.log("ST: Track id already saved to user: " + doc);
+			// 	res.send( JSON.stringify("ST: Track id 	already saved to user: " + doc) );
+			// 	return;
+			// }
 			User.create(req.body,function(err, createDoc) {
 				if (err) {
 					console.log(err);
@@ -46,6 +46,6 @@ module.exports = function(app, options) {
 
 				res.send( JSON.stringify({msg: "ST: User saved", userSaved : 1, user: req.body}) );
 			});
-		});
+		// });
 	}
 };
