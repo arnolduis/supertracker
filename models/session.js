@@ -32,6 +32,7 @@ var sessionSchema = {
 	referrer_medium: String,
 	referrer_search_parameter: String,
 	referrer_search_term: String,
-	referrer_uri: String
+	referrer_uri: String,
+	properties: Object
 };
 mongoose.model('Session', sessionSchema);
