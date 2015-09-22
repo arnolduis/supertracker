@@ -285,7 +285,6 @@ function supertracker() {
 
 	function track_links (query) {
 		var links = document.querySelectorAll(query);
-		console.log(links);
 		for (var i = 0; i < links.length; i++) {
 			console.log(links[i]);
 			links[i].setAttribute("onclick", "document.supertracker.track_link('"+ query +"', this); return false");
@@ -293,7 +292,6 @@ function supertracker() {
 	}
 
 	function track_link(query, element) {
-		console.log(element);
 		var trackData = query + "_" + element.getAttribute("href");
 		track( trackData, {link: true});
 		flush();
