@@ -286,7 +286,6 @@ function supertracker() {
 	function track_links (query) {
 		var links = document.querySelectorAll(query);
 		for (var i = 0; i < links.length; i++) {
-			console.log(links[i]);
 			links[i].setAttribute("onclick", "document.supertracker.track_link('"+ query +"', this); return false");
 		}
 	}
