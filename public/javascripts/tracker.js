@@ -100,6 +100,9 @@ function supertracker() {
 				// });
 			}
 
+
+			track_links(".track_footer");
+
 			flushingLoop = setInterval(flush, bufferTimeLimit);
 	}
 
@@ -280,6 +283,26 @@ function supertracker() {
 		xhr.send(JSON.stringify(user));
 	}
 
+	function track_links (query) {
+		var links = document.querySelectorAll(query);
+		console.log(links);
+		for (var i = 0; i < links.length; i++) {
+			console.log(links[i]);
+			links[i].setAttribute("onclick", "document.supertracker.track_link('"+ query +"', this); return false");
+		}
+	}
+
+	function track_link(query, element) {
+		console.log(element);
+		var trackData = query + "_" + element.getAttribute("href");
+		track( trackData, {link: true});
+		flush();
+		setTimeout(function () {
+			window.location = element.getAttribute("href");
+		},100);
+
+	}
+
 	function uuid() {
 
 		// Random entropy
@@ -371,7 +394,9 @@ function supertracker() {
 	return {
 		init: init,
 		track: track,
-		identify: identify
+		identify: identify,
+		track_link: track_link,
+		track_links: track_links
 	};
 }
 
