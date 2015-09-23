@@ -285,8 +285,13 @@ function supertracker() {
 
 	function track_links (query) {
 		var links = document.querySelectorAll(query);
+		var onclick = function() {
+			document.supertracker.track_link(query, this); 
+			return false;	
+		};
 		for (var i = 0; i < links.length; i++) {
-			links[i].setAttribute("onclick", "document.supertracker.track_link('"+ query +"', this); return false");
+			links[i].onclick = onclick;
+			// links[i].setAttribute("onclick", "document.supertracker.track_link('"+ query +"', this); return false");
 		}
 	}
 
