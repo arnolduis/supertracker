@@ -217,7 +217,7 @@ function supertracker() {
 
 	function identify(extUserId, extFlag, callback) { //ttt flushing mechanism
 
-				// console.log("TRACK:");
+		// console.log("TRACK:");
 		// console.log(arguments);
 		// console.log("{");
 		// console.log("eventName: " + eventName);
@@ -285,20 +285,43 @@ function supertracker() {
 
 	function track_links (query) {
 		var links = document.querySelectorAll(query);
-		var onclick = function(event) {
-			var trQuery = query.substring(1, query.length-1);
-			var trackData = event.target.getAttribute(trQuery);
-			track( trackData, {link: true});
-			flush();
-			mixpanel.track(trackData); //ttt
-			setTimeout(function () {
-				window.location = event.target.getAttribute("href");
-			},100);
-			return false;	
-		};
+
+
+		function onclickReplace (link, origOnclick) {
+
+			// var a = document.createElement("a");
+			// a.setAttribute("href", link.getAttribute("href"));
+			// a.onclick = link.onclick;
+
+			var onclick = function(event) {
+				console.log(link);
+				console.log(origOnclick);
+				console.log(query);
+				var trimmedQuery = query.substring(1, query.length-1); // trimming the enclosing "[" and "]"
+				var trackData = event.target.getAttribute(trimmedQuery);
+				track( trackData, {link: true});
+				flush();
+				mixpanel.track(trackData); //ttt
+
+				setTimeout(function () {
+					if (event.target.getAttribute("href")) {
+						window.location = event.target.getAttribute("href");
+					}
+					if (origOnclick) {
+						origOnclick(event);
+					}
+					// a.click();
+				},100);
+				return false;	
+			};
+
+			link.onclick = onclick;
+		}
+
 		for (var i = 0; i < links.length; i++) {
-			links[i].onclick = onclick;
-			// console.log(links[i].onclick);
+			var origOnclick = links[i].onclick;
+			// links[i].onclick = onclick;
+			onclickReplace(links[i], origOnclick);
 		}
 	}
 
