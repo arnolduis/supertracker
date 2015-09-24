@@ -285,23 +285,31 @@ function supertracker() {
 
 	function track_links (query) {
 		var links = document.querySelectorAll(query);
-		var onclick = function() {
-			document.supertracker.track_link(query, this); 
+		var onclick = function(event) {
+			var trQuery = query.substring(1, query.length-1);
+			var trackData = event.target.getAttribute(trQuery);
+			track( trackData, {link: true});
+			flush();
+			mixpanel.track(trackData); //ttt
+			setTimeout(function () {
+				window.location = event.target.getAttribute("href");
+			},100);
 			return false;	
 		};
 		for (var i = 0; i < links.length; i++) {
 			links[i].onclick = onclick;
-			// links[i].setAttribute("onclick", "document.supertracker.track_link('"+ query +"', this); return false");
+			// console.log(links[i].onclick);
 		}
 	}
 
 	function track_link(query, element) {
-		var trackData = query + "_" + element.getAttribute("href");
-		track( trackData, {link: true});
-		flush();
-		setTimeout(function () {
-			window.location = element.getAttribute("href");
-		},100);
+		// var trackData = query + "_" + element.getAttribute("href");
+		// track( trackData, {link: true});
+		// flush();
+		// mixpanel.track_link(); //ttt
+		// setTimeout(function () {
+		// 	window.location = element.getAttribute("href");
+		// },100);
 
 	}
 
