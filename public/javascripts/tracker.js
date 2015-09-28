@@ -404,7 +404,6 @@ function supertracker() {
 		init: init,
 		track: track,
 		identify: identify,
-		track_link: track_link,
 		track_links: track_links
 	};
 }
