@@ -101,8 +101,6 @@ function supertracker() {
 			}
 
 
-			track_links(".track_footer");
-
 			flushingLoop = setInterval(flush, bufferTimeLimit);
 	}
 
@@ -286,22 +284,13 @@ function supertracker() {
 	function track_links (query) {
 		var links = document.querySelectorAll(query);
 
-
 		function onclickReplace (link, origOnclick) {
 
-			// var a = document.createElement("a");
-			// a.setAttribute("href", link.getAttribute("href"));
-			// a.onclick = link.onclick;
-
 			var onclick = function(event) {
-				console.log(link);
-				console.log(origOnclick);
-				console.log(query);
 				var trimmedQuery = query.substring(1, query.length-1); // trimming the enclosing "[" and "]"
 				var trackData = event.target.getAttribute(trimmedQuery);
 				track( trackData, {link: true});
 				flush();
-				mixpanel.track(trackData); //ttt
 
 				setTimeout(function () {
 					if (event.target.getAttribute("href")) {
@@ -310,7 +299,6 @@ function supertracker() {
 					if (origOnclick) {
 						origOnclick(event);
 					}
-					// a.click();
 				},100);
 				return false;	
 			};
@@ -320,20 +308,8 @@ function supertracker() {
 
 		for (var i = 0; i < links.length; i++) {
 			var origOnclick = links[i].onclick;
-			// links[i].onclick = onclick;
 			onclickReplace(links[i], origOnclick);
 		}
-	}
-
-	function track_link(query, element) {
-		// var trackData = query + "_" + element.getAttribute("href");
-		// track( trackData, {link: true});
-		// flush();
-		// mixpanel.track_link(); //ttt
-		// setTimeout(function () {
-		// 	window.location = element.getAttribute("href");
-		// },100);
-
 	}
 
 	function uuid() {
