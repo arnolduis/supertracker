@@ -1,0 +1,82 @@
+<!-- Funnel Panel -->
+<div class="content">
+    <p><h1>Funnel Analysis</h1></p>
+    
+    <div class="widget" id="funnelPicker">
+        <h2>Funnel List</h2>
+        <select data-bind="options: funnels, optionsText: 'name', value: funnelSelected"></select>
+        <button data-bind="click: addFunnel">New Funnel</button>
+        <div>
+            <span class="label">From</span> <input type="text" id="funnel_date_from" data-bind="click: setSens('funnel_date_to', 'max');" readonly="true">
+            <span class="label">Till</span> <input type="text" id="funnel_date_to" data-bind="click: setSens('funnel_date_from', 'min');" readonly="true">
+        </div>
+    </div>
+
+    <div class="widget" id="funnelEditor">
+        <h2>Edit Funnel</h2>
+        <div data-bind="template: { name: 'funnel-template', data: funnelEdited }"></div>
+        <div>
+            <spab>Exact match:</span>
+            <input type="checkbox" data-bind="checked: exactMatch" />            
+        </div>
+        <button data-bind="click: saveFunnel">Save</button>
+        <button data-bind="click: deleteFunnel">Delete</button>
+        <button data-bind="click: applyFunnel">Show</button>
+    </div>
+
+    <div class="widget" id="funnelChart">
+        <h2>Chart</h2>
+        <div class="canvas-container">
+            <canvas id="funnelCanvas" width="680" height="300"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Funnel -->
+<script type="text/html" id='funnel-template'>
+    <div class="funnel">
+        <input  data-bind="value: $data.name, valueUpdate: 'afterkeydown'", placeholder='Funnel Name'>            
+        <div class="steps">
+            <!-- ko foreach: $data.steps -->
+            <div data-bind="template: { name: 'step-template', data: $data }"></div>
+            <!-- /ko -->
+        </div>
+        <button id="buttonAddStep" data-bind="click: $data.addStep">+</button>
+    </div>
+</script>
+
+<!-- Funnel Step -->
+<script type="text/html" id='step-template'>
+    <div class = 'step'>
+        <h2 data-bind="text:'Step ' + $index()"></h2>
+        <select data-bind="options: events, value: event"></select>
+        <select data-bind="options: properties, value: property", width="8"></select>
+        <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
+        <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
+        <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
+        <button data-bind="click: $parents[1].removeStep" class="removeStep">x</button>
+    </div>
+</script>
+
+<!-- Funnel Condition -->
+<script type="text/html" id='conditionTemplate'>
+    <div class="funnel">
+        <div class="steps">
+            <!-- ko foreach: $data.steps -->
+            <div data-bind="template: { name: 'conditionStepTemplate', data: $data }"></div>
+            <!-- /ko -->
+        </div>
+        <button id="buttonAddStep" data-bind="click: $data.addStep">+</button>
+    </div>
+</script>
+
+<!-- Funnel Condition Step -->
+<script type="text/html" id='conditionStepTemplate'>
+    <div class = 'step'>
+        <select data-bind="options: properties, value: property", width="8"></select>
+        <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
+        <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
+        <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
+        <button data-bind="click: $parents[1].removeStep" class="removeStep">x</button>
+    </div>
+</script>

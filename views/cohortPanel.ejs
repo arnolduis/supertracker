@@ -1,0 +1,27 @@
+<div class="content">
+    <p><h1>Segmentation Analysis</h1></p>
+
+
+    <div class="widget" id="segChart">
+        <h2>Segmentation Chart</h2>
+
+        <span class="label">From</span> <input type="text" id="segFrom">    
+        <select data-bind="options: intervals, value: segTimeInt"></select>
+        <div></div>
+        <span class="label">Event: </span> <select data-bind="options: events, value: segEvent"></select>
+        <div></div>
+        <span class="label">By: </span>    <select data-bind="options: properties, value: segGrpBy"></select>
+        <!-- <div>Where</div> -->
+
+            <!-- <div data-bind="template: { name: 'segCondTemplate', data: segCondition }"></div> -->
+
+        <button data-bind="click: applySegQuery">Show</button>
+
+
+        <div class="canvas-container">
+            <canvas id="segCanvas" width="680" height="300"></canvas>
+        </div>
+    </div>
+
+
+</div>

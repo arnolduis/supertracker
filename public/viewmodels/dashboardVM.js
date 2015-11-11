@@ -1,238 +1,7 @@
 $(document).ready(function() {
     // Overall viewmodel for this screen, along with initial state
 
-
-
-    function chartVM () {
-        // Chart.defaults.global.responsive = true;
-        var data = {
-            labels: ["Dummy"],
-            datasets: [
-                {
-                    label: "Funneel",
-                    fillColor: "rgba(0,0,220,0.7)",
-                    strokeColor: "rgba(220,220,220,0.8)",
-                    highlightFill: "rgba(220,220,220,0.75)",
-                    highlightStroke: "rgba(220,220,220,1)",
-                    data: [1]
-                }
-            ]
-        };
-        var funnelCtx = $("#funnelCanvas").get(0).getContext("2d");
-        var funnelChart = new Chart(funnelCtx).Bar(data);
-
-        return {
-            funnelCtx: funnelCtx,
-            funnelChart: funnelChart,
-            data: data
-        };
-    }
-
-    function stepVM (stepJson) {
-        var events = %events%;
-        var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
-        var operation_types = [  
-            { name: 'Happened', operators: [
-
-            ]},
-            { name: 'String', operators: [
-                { name: 'equals'       ,value: '=' },
-                { name: 'not equals'   ,value: '!=' },
-                { name: 'contains'     ,value: 'in' },
-                { name: 'not contains' ,value: '!in' },
-                { name: 'is set'       ,value: 'is setXXX' },
-                { name: 'not set'      ,value: 'not setXXX' }
-            ]},
-            { name: 'Number', operators: [
-                { name: 'in between'    ,value: 'in between XXX' },
-                { name: 'less than'     ,value: '<' },
-                { name: 'equal to'      ,value: '=' },
-                { name: 'greater than'  ,value: '>' }
-            ]},
-            { name: 'True/False', operators: [
-                { name: 'is'            ,value: '=' }
-            ]},
-            { name: 'Date', operators: [
-                { name: 'was XXX'       ,value: '<' }// tobb lepeses valasztas
-            ]}, 
-                { name: 'List', operators: [
-                    { name: 'contains'      ,value: 'containtX' }
-                ]}
-        ];
-
-        var operation_type = stepJson ? ko.observable(stepJson.operation_type) : ko.observable(operation_types[0]); // default needed becouse of the order of elements
-        var event          = stepJson ? ko.observable(stepJson.event)          : ko.observable();
-        var property       = stepJson ? ko.observable(stepJson.property)       : ko.observable();
-        var operator       = stepJson ? ko.observable(stepJson.operator)       : ko.observable();
-        var value          = stepJson ? ko.observable(stepJson.value)          : ko.observable("");
-
-        function toJson () {
-            return {
-                operation_type: operation_type(),
-                event: event(),
-                property: property(),
-                operator: operator(),
-                value: value()
-            };
-        }
-
-        return {
-            events: events,
-            properties: properties,
-            operation_type: operation_type,
-            operation_types: operation_types,
-            
-            event: event,
-            property: property,
-            operator: operator,
-            value: value,
-            //method
-            toJson: toJson
-        };
-    }
-
-    function funnelVM (funnelJson) {
-        var name = funnelJson ? ko.observable(funnelJson.name) : ko.observable();
-        var steps = ko.observableArray([]);
-        if (funnelJson) {
-            for (var i = 0; i < funnelJson.steps.length; i++) {
-                steps.push(stepVM(funnelJson.steps[i]));
-            }
-        } else {
-            steps.push(stepVM());
-        }
-
-
-
-        function addStep() {
-            steps.push(stepVM());
-        }
-
-        function removeStep (step) {
-            //ttt nem mukodik
-            console.log('removeStep');
-            steps.remove(step);
-        }
-
-        function toJson () {
-            var funnelJson = {name: "", steps: []};//ttt itt lehet hogy lehet roviditeni
-            funnelJson.name = name();
-            for (var i = 0; i < steps().length; i++) {
-                funnelJson.steps.push(steps()[i].toJson());
-            }
-            return  funnelJson;
-        }
-
-
-
-        return {
-            name: name,
-            steps: steps,
-            addStep: addStep,
-            removeStep: removeStep,
-            toJson: toJson
-        };
-    }
-
-    
-    function condStepVM (condStepJson) {
-        var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
-        var operation_types = [
-            { name: 'String', operators: [
-                { name: 'equals'       ,value: '=' },
-                { name: 'not equals'   ,value: '!=' },
-                { name: 'contains'     ,value: 'in' },
-                { name: 'not contains' ,value: '!in' },
-                { name: 'is set'       ,value: 'is setXXX' },
-                { name: 'not set'      ,value: 'not setXXX' }
-            ]},
-            { name: 'Number', operators: [
-                { name: 'in between'    ,value: 'in between XXX' },
-                { name: 'less than'     ,value: '<' },
-                { name: 'equal to'      ,value: '=' },
-                { name: 'greater than'  ,value: '>' }
-            ]},
-            { name: 'True/False', operators: [
-                { name: 'is'            ,value: '=' }
-            ]},
-            { name: 'Date', operators: [
-                { name: 'was XXX'       ,value: '<' }// tobb lepeses valasztas
-            ]}, 
-                { name: 'List', operators: [
-                    { name: 'contains'      ,value: 'containtX' }
-                ]}
-        ];
-
-        var operation_type = condStepJson ? ko.observable(condStepJson.operation_type) : ko.observable(operation_types[0]); // default needed becouse of the order of elements
-        var property       = condStepJson ? ko.observable(condStepJson.property)       : ko.observable();
-        var operator       = condStepJson ? ko.observable(condStepJson.operator)       : ko.observable();
-        var value          = condStepJson ? ko.observable(condStepJson.value)          : ko.observable("");
-
-        function toJson () {
-            return {
-                operation_type: operation_type(),
-                property: property(),
-                operator: operator(),
-                value: value()
-            };
-        }
-
-        return {
-            properties: properties,
-            operation_type: operation_type,
-            operation_types: operation_types,
-            
-            property: property,
-            operator: operator,
-            value: value,
-            //method
-            toJson: toJson
-        };
-    }
-
-    function conditionVM (conditionJson) {
-        var steps = ko.observableArray([]);
-        if (conditionJson) {
-            for (var i = 0; i < conditionJson.steps.length; i++) {
-                steps.push(stepVM(conditionJson.steps[i]));
-            }
-        } else {
-            steps.push(stepVM());
-        }
-
-
-
-        function addStep() {
-            steps.push(stepVM());
-        }
-
-        function removeStep (step) {
-            //ttt nem mukodik
-            console.log('removeStep');
-            steps.remove(step);
-        }
-
-        function toJson () {
-            var conditionJson = {name: "", steps: []};//ttt itt lehet hogy lehet roviditeni
-            conditionJson.name = name();
-            for (var i = 0; i < steps().length; i++) {
-                conditionJson.steps.push(steps()[i].toJson());
-            }
-            return  conditionJson;
-        }
-
-
-
-        return {
-            name: name,
-            steps: steps,
-            addStep: addStep,
-            removeStep: removeStep,
-            toJson: toJson
-        };
-    }
-
-    function dashboardVM(_userId) {   
+    function dashboardVM(_userId) {  
 
         var tstr = new Date().format('yyyy-mm-dd');
         var userId = _userId;
@@ -270,9 +39,11 @@ $(document).ready(function() {
 
         // Funnels
         var serverFunnels = %funnels%;
+
         var funnels = ko.observableArray();
-        var funnelSelected = ko.observable();
         var funnelEdited = ko.observable();
+        var funnelSelected = ko.observable();
+        var exactMatch = ko.observable(false);
         funnelSelected.subscribe(function () {
             if (funnelSelected()) {
                 funnelEdited(funnelVM(funnelSelected().toJson())); //ttt itten ez nagyon csuny a deletefunnellel egyutt. Nezd meg, hogy lehet e mashogyh megoldani, ha a selected elemet dropoljuk
@@ -383,10 +154,14 @@ $(document).ready(function() {
             
             var funnelEditedJSON = funnelEdited().toJson();
 
+
             console.log("DateFrom> "+$("#funnel_date_from").val());
             console.log("DateTo  > "+$("#funnel_date_to").val());
             funnelEditedJSON.from = $("#funnel_date_from").val();
             funnelEditedJSON.to = $("#funnel_date_to").val();
+            funnelEditedJSON.options = {
+                exact: exactMatch()
+            };
 
             var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEditedJSON});
             console.log(funnelEditedJSON);
@@ -434,8 +209,14 @@ $(document).ready(function() {
 
 
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /****************************************** COHORT ANALYSIS  *********************************************/
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /******************************************* COHORT ANALYSIS  *********************************************/
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /****************************************  SEGMENTATION ANALYSIS  *****************************************/
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /****************************************  UTILITY FUNCTIONS  *********************************************/
 
 
 
@@ -443,6 +224,156 @@ $(document).ready(function() {
 
 
 
+        function plusXDay(date, x){
+            var newday = new Date(date.toISOString());
+            newday.setDate(date.getDate() + x);
+            return newday;
+        }
+
+        function plusXMonth(date, x){
+            var newday = new Date(date.toISOString());
+            newday.setMonth(date.getMonth() + x);
+            return newday;
+        }
+
+
+        return {
+            funnels: funnels,
+            funnelSelected: funnelSelected,
+            funnelEdited: funnelEdited,
+            applyFunnel: applyFunnel,
+            exactMatch: exactMatch,
+            // userId: userId,
+            // // methods
+            addFunnel: addFunnel,
+            saveFunnel: saveFunnel,
+            deleteFunnel: deleteFunnel,
+            setSens: setSens,
+            // // Cohort
+            // retentionMX: retentionMX,
+            // cohRows: cohRows,
+            // cohCols: cohCols,
+            // applyCohort: applyCohort,
+            // setSensCohort: setSensCohort,
+            // // Segmentation
+            // events: events, //ttt valamit at kell itt gondolni
+            // segEvent: segEvent,
+            // segGrpBy: segGrpBy,
+            // segTimeInt: segTimeInt,
+            // properties: properties,
+            // intervals: intervals,
+            // applySegQuery: applySegQuery,
+            // segCondition: segCondition
+        };
+    }
+
+    function funnelVM (funnelJson) {
+        var name = funnelJson ? ko.observable(funnelJson.name) : ko.observable();
+        var steps = ko.observableArray([]);
+        if (funnelJson) {
+            for (var i = 0; i < funnelJson.steps.length; i++) {
+                steps.push(stepVM(funnelJson.steps[i]));
+            }
+        } else {
+            steps.push(stepVM());
+        }
+
+
+
+        function addStep() {
+            steps.push(stepVM());
+        }
+
+        function removeStep (step) {
+            //ttt nem mukodik
+            console.log('removeStep');
+            steps.remove(step);
+        }
+
+        function toJson () {
+            var funnelJson = {name: "", steps: []};//ttt itt lehet hogy lehet roviditeni
+            funnelJson.name = name();
+            for (var i = 0; i < steps().length; i++) {
+                funnelJson.steps.push(steps()[i].toJson());
+            }
+            return  funnelJson;
+        }
+
+
+
+        return {
+            name: name,
+            steps: steps,
+            addStep: addStep,
+            removeStep: removeStep,
+            toJson: toJson
+        };
+    }
+
+    function stepVM (stepJson) {
+        var events = %events%;
+        var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
+        var operation_types = [  
+            { name: 'Happened', operators: [
+
+            ]},
+            { name: 'String', operators: [
+                { name: 'equals'       ,value: '=' },
+                { name: 'not equals'   ,value: '!=' },
+                { name: 'contains'     ,value: 'in' },
+                { name: 'not contains' ,value: '!in' },
+                { name: 'is set'       ,value: 'is setXXX' },
+                { name: 'not set'      ,value: 'not setXXX' }
+            ]},
+            { name: 'Number', operators: [
+                { name: 'in between'    ,value: 'in between XXX' },
+                { name: 'less than'     ,value: '<' },
+                { name: 'equal to'      ,value: '=' },
+                { name: 'greater than'  ,value: '>' }
+            ]},
+            { name: 'True/False', operators: [
+                { name: 'is'            ,value: '=' }
+            ]},
+            { name: 'Date', operators: [
+                { name: 'was XXX'       ,value: '<' }// tobb lepeses valasztas
+            ]}, 
+                { name: 'List', operators: [
+                    { name: 'contains'      ,value: 'containtX' }
+                ]}
+        ];
+
+        var operation_type = stepJson ? ko.observable(stepJson.operation_type) : ko.observable(operation_types[0]); // default needed becouse of the order of elements
+        var event          = stepJson ? ko.observable(stepJson.event)          : ko.observable();
+        var property       = stepJson ? ko.observable(stepJson.property)       : ko.observable();
+        var operator       = stepJson ? ko.observable(stepJson.operator)       : ko.observable();
+        var value          = stepJson ? ko.observable(stepJson.value)          : ko.observable("");
+
+        function toJson () {
+            return {
+                operation_type: operation_type(),
+                event: event(),
+                property: property(),
+                operator: operator(),
+                value: value()
+            };
+        }
+
+        return {
+            events: events,
+            properties: properties,
+            operation_type: operation_type,
+            operation_types: operation_types,
+            
+            event: event,
+            property: property,
+            operator: operator,
+            value: value,
+            //method
+            toJson: toJson
+        };
+    }
+
+    function retentionPanelVM () {
         var cohRows = ko.observable(5);
         var cohCols = ko.observable(12);
         var retentionMX = ko.observableArray(); 
@@ -502,220 +433,178 @@ $(document).ready(function() {
                     }
                 }
                 retentionMX(res);
-     
+        
             })
             .fail(function() {
                 console.log("error");
             });
         }
+    }
 
-
-
-
-
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /*********************************************  SEGMENTATION ANALYSIS  ******************************************/
-
-
-
-
-
-
-
-
+    function segmentationPanelVM () {
         var events = %events%;
-        var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
-        var intervals = ['30 days','24 weeks','12 months'];
-        var segCondition = ko.observable({});
+              var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
+              var intervals = ['30 days','24 weeks','12 months'];
+              var segCondition = ko.observable({});
 
-        var segFrom = null; //ttt custom binding
-        var segTimeInt = ko.observable(); // hour, day, week month
-        var segEvent = ko.observable(); // one event
-        var segGrpBy = ko.observable(); // one property
-        var segData = {}; // filling up the chart
+              var segFrom = null; //ttt custom binding
+              var segTimeInt = ko.observable(); // hour, day, week month
+              var segEvent = ko.observable(); // one event
+              var segGrpBy = ko.observable(); // one property
+              var segData = {}; // filling up the chart
 
-        // var segCond =  {
-        //     "$or": [{
-        //             "sessionId": "lolo"
-        //         }, {
-        //             "sessionId": "lolo"
-        //     }]
-        // };
-
-
-
-        // Calendar
-        var segCalendar = new dhtmlXCalendarObject("segFrom");
-        $("#segFrom").val("2014-01-01");
+              // var segCond =  {
+              //     "$or": [{
+              //             "sessionId": "lolo"
+              //         }, {
+              //             "sessionId": "lolo"
+              //     }]
+              // };
 
 
-        // Chart
-        function applySegQuery() {
-            segFrom = new Date($('#segFrom').val() + 'T00:00:00Z');
-            var xLabels = [];
-            
-            switch (segTimeInt()) {
-                case '30 days':
-                    segTo = plusXDay(segFrom, 30);
-                    for (var i = 0; i < 30; i++) {
-                        xLabels[i] = plusXDay(segFrom, i).format('mm-dd') ;
-                    }
-                    break; 
-                case '24 weeks':
-                    segTo = plusXDay(segFrom, 168);
-                    for (var i = 0; i < 24; i++) {
-                        xLabels[i] = plusXDay(segFrom, i * 7).format('mm-dd') ;
-                    }
 
-                    // while(iDate.gerDay() == 0) {
-                    //     iDate.setDate(iDate.getDate() - 1);
-                    // }
-                    break; 
-                case '12 months':
-                    segTo = plusXMonth(segFrom, 12);
-                    for (var i = 0; i < 12; i++) {
-                        xLabels[i] = plusXMonth(segFrom, i * 1).format('mm-dd') ;
-                    }
-                    break; 
-                default: 
-                    segTo = plusXDay(segFrom, 30);
-                    for (var i = 0; i < 30; i++) {
-                        xLabels[i] = plusXDay(segFrom, i).format('mm-dd') ;
+              // Calendar
+              var segCalendar = new dhtmlXCalendarObject("segFrom");
+              $("#segFrom").val("2014-01-01");
+
+
+              // Chart
+              function applySegQuery() {
+                  segFrom = new Date($('#segFrom').val() + 'T00:00:00Z');
+                  var xLabels = [];
+                  
+                  switch (segTimeInt()) {
+                      case '30 days':
+                          segTo = plusXDay(segFrom, 30);
+                          for (var i = 0; i < 30; i++) {
+                              xLabels[i] = plusXDay(segFrom, i).format('mm-dd') ;
+                          }
+                          break; 
+                      case '24 weeks':
+                          segTo = plusXDay(segFrom, 168);
+                          for (var i = 0; i < 24; i++) {
+                              xLabels[i] = plusXDay(segFrom, i * 7).format('mm-dd') ;
+                          }
+
+                          // while(iDate.gerDay() == 0) {
+                          //     iDate.setDate(iDate.getDate() - 1);
+                          // }
+                          break; 
+                      case '12 months':
+                          segTo = plusXMonth(segFrom, 12);
+                          for (var i = 0; i < 12; i++) {
+                              xLabels[i] = plusXMonth(segFrom, i * 1).format('mm-dd') ;
+                          }
+                          break; 
+                      default: 
+                          segTo = plusXDay(segFrom, 30);
+                          for (var i = 0; i < 30; i++) {
+                              xLabels[i] = plusXDay(segFrom, i).format('mm-dd') ;
+                      }
+                  }
+
+                  var data = {
+                      segFrom: segFrom,
+                      segTimeInt: segTimeInt(),
+                      segEvent: segEvent(),
+                      segGrpBy: segGrpBy(),
+
+                  };
+
+                  $.ajax({
+                      url: '%path%/segmentation/apply',
+                      type: 'POST',
+                      contentType: 'application/json',
+                      data: JSON.stringify(data)
+                  })
+                  .done(function(res) {
+                      console.log("success");
+
+                      $('#segCanvas').replaceWith('<canvas id="segCanvas" width="680" height="300"></canvas>');
+                      var segCtx = document.getElementById("segCanvas").getContext("2d");
+                      var segOptions = {
+                          multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>",
+                          legendTemplate : '<ul>' /
+                                            +'<% for (var i=0; i<datasets.length; i++) { %>'  /
+                                              +'<li>' /
+                                              +'<span style=\"background-color:<%=datasets[i].lineColor%>\"></span>'  /
+                                              +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'    /
+                                            +'</li>'  /
+                                          +'<% } %>'  /
+                                        +'</ul>'  
+                          };
+                      if (res.length === 0) {
+                          segCtx.font="40px Georgia"; //ttt
+                          segCtx.fillText("Fosi az adat, maki!",10,50);
+                          var  segData = {
+                              labels: xLabels,
+                              datasets: []
+                          };
+                      } else {
+                          var segData = fillsegData(res, xLabels);
+                          var segChart = new Chart(segCtx).Line(segData, segOptions); 
+                      }
+                  })
+                  .fail(function() {
+                      console.log("error");
+                  });
+              }
+
+
+              function fillsegData (res, xLabels) {
+                  var segData = {
+                      labels: xLabels,
+                      datasets: []
+                  };
+
+
+                  for (var i = 0; i < res.length; i++) {
+                      var datasetSchema = {
+                          label: '',
+                          fillColor: ",0.2)",
+                          strokeColor: ",1)",
+                          pointColor: ",1)",
+                          pointStrokeColor: "#fff",
+                          pointHighlightFill: "#fff",
+                          pointHighlightStroke: ",1)",
+                          data: []
+                      };
+                      var color = "rgba(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255);
+
+                      datasetSchema.label = res[i].grpBy;
+                      datasetSchema.fillColor = color + datasetSchema.fillColor;
+                      datasetSchema.strokeColor = color + datasetSchema.strokeColor;
+                      datasetSchema.pointColor = color + datasetSchema.pointColor;
+                      datasetSchema.pointHighlightStroke = color + datasetSchema.pointHighlightStroke;
+                      datasetSchema.data = res[i].data;
+                      segData.datasets.push(datasetSchema);
+                  }
+                  return segData;
+              }
+    }
+
+    function chartVM () {
+        // Chart.defaults.global.responsive = true;
+        var data = {
+            labels: ["Dummy"],
+            datasets: [
+                {
+                    label: "Funneel",
+                    fillColor: "rgba(0,0,220,0.7)",
+                    strokeColor: "rgba(220,220,220,0.8)",
+                    highlightFill: "rgba(220,220,220,0.75)",
+                    highlightStroke: "rgba(220,220,220,1)",
+                    data: [1]
                 }
-            }
-
-            var data = {
-                segFrom: segFrom,
-                segTimeInt: segTimeInt(),
-                segEvent: segEvent(),
-                segGrpBy: segGrpBy(),
-
-            };
-
-            $.ajax({
-                url: '%path%/segmentation/apply',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data)
-            })
-            .done(function(res) {
-                console.log("success");
-
-                $('#segCanvas').replaceWith('<canvas id="segCanvas" width="680" height="300"></canvas>');
-                var segCtx = document.getElementById("segCanvas").getContext("2d");
-                var segOptions = {
-                    multiTooltipTemplate: "<%= datasetLabel %> - <%= value %>",
-                    legendTemplate : '<ul>' /
-                                      +'<% for (var i=0; i<datasets.length; i++) { %>'  /
-                                        +'<li>' /
-                                        +'<span style=\"background-color:<%=datasets[i].lineColor%>\"></span>'  /
-                                        +'<% if (datasets[i].label) { %><%= datasets[i].label %><% } %>'    /
-                                      +'</li>'  /
-                                    +'<% } %>'  /
-                                  +'</ul>'  
-                    };
-                if (res.length === 0) {
-                    segCtx.font="40px Georgia"; //ttt
-                    segCtx.fillText("Fosi az adat, maki!",10,50);
-                    var  segData = {
-                        labels: xLabels,
-                        datasets: []
-                    };
-                } else {
-                    var segData = fillsegData(res, xLabels);
-                    var segChart = new Chart(segCtx).Line(segData, segOptions); 
-                }
-            })
-            .fail(function() {
-                console.log("error");
-            });
-        }
-
-
-        function fillsegData (res, xLabels) {
-            var segData = {
-                labels: xLabels,
-                datasets: []
-            };
-
-
-            for (var i = 0; i < res.length; i++) {
-                var datasetSchema = {
-                    label: '',
-                    fillColor: ",0.2)",
-                    strokeColor: ",1)",
-                    pointColor: ",1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: ",1)",
-                    data: []
-                };
-                var color = "rgba(" + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255);
-
-                datasetSchema.label = res[i].grpBy;
-                datasetSchema.fillColor = color + datasetSchema.fillColor;
-                datasetSchema.strokeColor = color + datasetSchema.strokeColor;
-                datasetSchema.pointColor = color + datasetSchema.pointColor;
-                datasetSchema.pointHighlightStroke = color + datasetSchema.pointHighlightStroke;
-                datasetSchema.data = res[i].data;
-                segData.datasets.push(datasetSchema);
-            }
-            return segData;
-        }
-
-
-
-
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /******************************************  UTILITY FUNCTIONS  ***********************************************/
-
-
-
-
-
-
-
-        function plusXDay(date, x){
-            var newday = new Date(date.toISOString());
-            newday.setDate(date.getDate() + x);
-            return newday;
-        }
-
-        function plusXMonth(date, x){
-            var newday = new Date(date.toISOString());
-            newday.setMonth(date.getMonth() + x);
-            return newday;
-        }
-
+            ]
+        };
+        var funnelCtx = $("#funnelCanvas").get(0).getContext("2d");
+        var funnelChart = new Chart(funnelCtx).Bar(data);
 
         return {
-            funnels: funnels,
-            funnelSelected: funnelSelected,
-            funnelEdited: funnelEdited,
-            applyFunnel: applyFunnel,
-            userId: userId,
-            // methods
-            addFunnel: addFunnel,
-            saveFunnel: saveFunnel,
-            deleteFunnel: deleteFunnel,
-            setSens: setSens,
-            // Cohort
-            retentionMX: retentionMX,
-            cohRows: cohRows,
-            cohCols: cohCols,
-            applyCohort: applyCohort,
-            setSensCohort: setSensCohort,
-            // Segmentation
-            events: events, //ttt valamit at kell itt gondolni
-            segEvent: segEvent,
-            segGrpBy: segGrpBy,
-            segTimeInt: segTimeInt,
-            properties: properties,
-            intervals: intervals,
-            applySegQuery: applySegQuery,
-            segCondition: segCondition
+            funnelCtx: funnelCtx,
+            funnelChart: funnelChart,
+            data: data
         };
     }
 
