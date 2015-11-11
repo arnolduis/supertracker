@@ -47,9 +47,19 @@ var Event = options.db.model("Event", require("../models/event"));
 		    funnel.steps[i] = 0;
 		}
 
-		var map = function(){
-		    emit( this.session_id, this.name);
-		};
+		var map;
+
+		if (req.body.funnel.options && !req.body.funnel.options.userwise) {
+			map = function(){
+			    emit( this.track_id, this.name );
+			};
+		} else {
+			map = function(){
+			    emit( this.session_id, this.name );
+			};
+		}
+
+
 		var reduce = function(key, values) {
 		    for (var j = 0; j < values.length; j++) {
 		        var k = 0;

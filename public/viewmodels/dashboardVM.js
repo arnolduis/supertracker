@@ -44,6 +44,7 @@ $(document).ready(function() {
         var funnelEdited = ko.observable();
         var funnelSelected = ko.observable();
         var exactMatch = ko.observable(false);
+        var userwiseMatch = ko.observable(false);
         funnelSelected.subscribe(function () {
             if (funnelSelected()) {
                 funnelEdited(funnelVM(funnelSelected().toJson())); //ttt itten ez nagyon csuny a deletefunnellel egyutt. Nezd meg, hogy lehet e mashogyh megoldani, ha a selected elemet dropoljuk
@@ -160,7 +161,8 @@ $(document).ready(function() {
             funnelEditedJSON.from = $("#funnel_date_from").val();
             funnelEditedJSON.to = $("#funnel_date_to").val();
             funnelEditedJSON.options = {
-                exact: exactMatch()
+                exact: exactMatch(),
+                userwise: userwiseMatch()
             };
 
             var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEditedJSON});
@@ -243,6 +245,7 @@ $(document).ready(function() {
             funnelEdited: funnelEdited,
             applyFunnel: applyFunnel,
             exactMatch: exactMatch,
+            userwiseMatch: userwiseMatch,
             // userId: userId,
             // // methods
             addFunnel: addFunnel,
