@@ -162,7 +162,8 @@ $(document).ready(function() {
             funnelEditedJSON.to = $("#funnel_date_to").val();
             funnelEditedJSON.options = {
                 exact: exactMatch(),
-                userwise: userwiseMatch()
+                userwise: userwiseMatch(),
+                newUsers: true
             };
 
             var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEditedJSON});
