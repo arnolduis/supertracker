@@ -49,7 +49,7 @@ var Event = options.db.model("Event", require("../models/event"));
 
 		var map;
 
-		if (req.body.funnel.options && !req.body.funnel.options.userwise) {
+		if (req.body.funnel.options && req.body.funnel.options.userwise) {
 			map = function(){
 			    emit( this.track_id, this.name );
 			};
