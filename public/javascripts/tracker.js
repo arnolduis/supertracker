@@ -39,10 +39,12 @@ function supertracker() {
 		}
 
 		if (trackId) {
-			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
+			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain		
 		} else {
 			trackId = uuid();
 			if (storage) {
+				// If no trackId then this is the first session fo the trackid
+				// session.first_session = true;
 				setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
 			}
 		}
@@ -356,7 +358,7 @@ function supertracker() {
 			return (screen.height*screen.width).toString(16);
 		}
 
-		return (D()+"-"+R()+"-"+UA()+"-"+S());
+		return (D()+"-"+S()+"-"+UA()+"-"+R());
 	}
 
 	function setCookie(cname, cvalue, exdays, cdomain) {
