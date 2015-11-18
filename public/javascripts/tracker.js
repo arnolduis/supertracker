@@ -18,7 +18,7 @@ function supertracker() {
 	var evBuffer = eventBuffer();
 
 	// Init function
-	function init () {
+	function init (options) {
 		// userId  = '%userId%';
 		referrer = document.referrer;
 		date = new Date();
@@ -60,8 +60,11 @@ function supertracker() {
 						
 						// console.log('Sessionstorage off');
 						var session = {};
+						if (options.properties) session.properties = options.properties;
+						if (!storage) {
+							if (session.properties) session.properties.cookiesDisabled = true;
+						}
 						session.track_id = trackId;
-						if (!storage) session.properties = { cookiesDisabled: true };
 						session.date = date;
 						session.screen_windowX = window.innerWidth;   // returns width of browser viewport
 						session.screen_windowY = window.innerHeight;   // returns height of browser viewport
