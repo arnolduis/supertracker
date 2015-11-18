@@ -40,13 +40,13 @@ module.exports = function (app, options) {
     	req.body.referrer_search_term = r.search_term;
     	req.body.referrer_uri = JSON.stringify(r.uri);
 
-		var session = new Session(req.body);
-
-		Session.create(req.body, function (err) {
+		Session.create(req.body, function (err, session) {
 			if(err) {
 				console.log(err);
 				return res.send({err: "Couldnt save session"});
 			}
+			console.log("ST: SESSION CREATED:");
+			console.log("_id:", session._id);
 			res.send({sessionId: session._id});
 		});
 	});
