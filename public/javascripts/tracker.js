@@ -60,9 +60,15 @@ function supertracker() {
 						
 						// console.log('Sessionstorage off');
 						var session = {};
-						if (options.properties) session.properties = options.properties;
+						if (options.properties) {
+							session.properties = options.properties;
+						}
 						if (!storage) {
-							if (session.properties) session.properties.cookiesDisabled = true;
+							if (session.properties) {
+								session.properties.cookiesDisabled = true;
+							} else {
+								session.properties = {cookiesDisabled: true};
+							}
 						}
 						session.track_id = trackId;
 						session.date = date;
