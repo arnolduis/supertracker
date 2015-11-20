@@ -9,6 +9,7 @@ var Funnel = options.db.model("Funnel");
 var Event = options.db.model("Event", require("../models/event"));
 var Session = options.db.model("Session");
 
+
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;
 	var bufferTimeLimit = options.bufferTimeLimit;
@@ -44,7 +45,10 @@ var Session = options.db.model("Session");
 	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
 
-		console.log(req.body);
+		var fromDate = new Date(req.body.funnel.from + "T00:00:00.000Z");
+		var toDate = new Date(req.body.funnel.to + "T23:59:59.999Z");
+
+		// console.log(req.body);
 		var events = [];
 		var funnel = {steps: []};
 		var debug = {steps:[]};
@@ -58,8 +62,8 @@ var Session = options.db.model("Session");
 			scope    : { events: events, funnel:funnel, debug: debug},
 			query    : {
 				date: {
-			        $gte: new Date(req.body.funnel.from + "T00:00:00.000Z"),
-					$lt: new Date(req.body.funnel.to + "T23:59:59.999Z")
+			        $gte: fromDate,
+					$lt: toDate
 				}
 			}, 
 			sort     : { date: 1 },
@@ -104,42 +108,30 @@ var Session = options.db.model("Session");
 		}
 
 		// First users
-		// if (req.body.funnel.options && req.body.funnel.options.newUsers) {
-		// 	options.query.first_session = true;
-		// }
+		if (req.body.funnel.options && req.body.funnel.options.newUsers) {
+			options.query.first_session = true;
+		}
 
-		// New Users
-		// Session.find({first_session: true}, {_id: 1}, function (err, docs) {
-		// 	if (err) {
-		// 		console.log(err);
-		// 		return res.send(err);
+		// New users
+		var newUsers;	
+		// Session.find({first_session: true, date: { $gte: fromDate, $lt: toDate }},{_id: 1, date: -1},{}, function (err, newUserFirstSessions) {
+		// 	if (err) {console.log(err); res.send(err); return;};
+
+		// 	var newUserFirstSessionIds = [];
+
+		// 	for (var i = 0; i < newUserFirstSessions.length; i++) {
+		// 		newUserFirstSessionIds.push(newUserFirstSessions[i]._id);
 		// 	}
 
-		// 	var firstSessions = [];
-		// 	for (var i = 0; i < docs.length; i++) {
-		// 		firstSessions.push(docs[i]._id);
-		// 	}
+		// 	console.log(newUserFirstSessionIds);
 
-		// 	console.log(firstSessions);
 
-		// 	options.query.session_id = { $in: firstSessions };
-
-		// 	Event.mapReduce(options, function (err, model, stats) {
-		// 		if (err) {
-		// 			console.log(err);
-		// 			return res.send({err: err});
-		// 		}
-		// 	  model.find().exec(function (err, docs) {
-		// 	  	if (err) return console.log(err);
-		// 	  	if (docs.length > 0) {
-		// 	    	res.send(docs[docs.length-1].value.steps);
-		// 	  	} else {
-		// 	  		res.send({});
-		// 	  	}
-		// 	  });
-		// 	});
+		// 	// process.exit();
+		// 	// res.send(doc.length);
 		// });
-		// return;
+
+		// console.log(newUsers);
+
 
 		Event.mapReduce(options, function (err, model, stats) {
 			if (err) {
@@ -155,6 +147,7 @@ var Session = options.db.model("Session");
 		  	}
 		  });
 		});
+
 
 	});
 };
