@@ -109,45 +109,45 @@ var Session = options.db.model("Session");
 
 		// First users
 		if (req.body.funnel.options && req.body.funnel.options.newUsers) {
-			options.query.first_session = true;
+
+			var newUsers;
+			Session.find({first_session: true, date: { $gte: fromDate, $lt: toDate }},{track_id: 1},{}, function (err, newUserFirstSessions) {
+				if (err) {
+					console.log(err); 
+					res.send(err); 
+					return;
+				}
+
+				var newUserTrackIds = [];
+
+				for (var i = 0; i < newUserFirstSessions.length; i++) {
+					newUserTrackIds.push(newUserFirstSessions[i].track_id);
+				}
+
+				options.query.track_id = { $in:  newUserTrackIds };
+
+				mapreduce(options);
+			});
+		} else {
+			mapreduce(options);
 		}
 
-		// New users
-		var newUsers;	
-		// Session.find({first_session: true, date: { $gte: fromDate, $lt: toDate }},{_id: 1, date: -1},{}, function (err, newUserFirstSessions) {
-		// 	if (err) {console.log(err); res.send(err); return;};
 
-		// 	var newUserFirstSessionIds = [];
-
-		// 	for (var i = 0; i < newUserFirstSessions.length; i++) {
-		// 		newUserFirstSessionIds.push(newUserFirstSessions[i]._id);
-		// 	}
-
-		// 	console.log(newUserFirstSessionIds);
-
-
-		// 	// process.exit();
-		// 	// res.send(doc.length);
-		// });
-
-		// console.log(newUsers);
-
-
-		Event.mapReduce(options, function (err, model, stats) {
-			if (err) {
-				console.log(err);
-				return res.send({err: err});
-			}
-		  model.find().exec(function (err, docs) {
-		  	if (err) return console.log(err);
-		  	if (docs.length > 0) {
-		    	res.send(docs[docs.length-1].value.steps);
-		  	} else {
-		  		res.send({});
-		  	}
-		  });
-		});
-
-
+		function mapreduce (options) {
+			Event.mapReduce(options, function (err, model, stats) {
+				if (err) {
+					console.log(err);
+					return res.send({err: err});
+				}
+				model.find().exec(function (err, docs) {
+					if (err) return console.log(err);
+					if (docs.length > 0) {
+						res.send(docs[docs.length-1].value.steps);
+					} else {
+						res.send({});
+					}
+				});
+			});
+		}
 	});
 };
