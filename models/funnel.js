@@ -4,6 +4,8 @@ var funnelSchema = {
 	userId: { type: String, required: true },
 	funnel: {
 		name: String,
+		dateFrom: Date,
+		dateTo: Date,
 		steps: [{
 			event: String,
 			operation_type: {

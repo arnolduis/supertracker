@@ -20,7 +20,7 @@ var Session = options.db.model("Session");
 	app.post(stpath+"/funnels", function(req, res) {
 
 		console.log('routes/funnels.post');
-		console.log(req.body.funnel.name);
+		console.log(req.body);
 
 		Funnel.findOneAndUpdate({'funnel.name': req.body.funnel.name}, req.body, {upsert: true}, function(err) { //qqq Ez Restful? Mert update es create kulon van
 			if (err) return res.send(err);
@@ -45,8 +45,8 @@ var Session = options.db.model("Session");
 	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
 
-		var fromDate = new Date(req.body.funnel.from + "T00:00:00.000Z");
-		var toDate = new Date(req.body.funnel.to + "T23:59:59.999Z");
+		var fromDate = new Date(req.dateFrom);
+		var toDate = new Date(req.dateTo);
 
 		// console.log(req.body);
 		var events = [];
