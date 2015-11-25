@@ -145,11 +145,11 @@ $(document).ready(function() {
             
             var funnelEditedJSON = funnelEdited().toJson();
 
-            console.log("DateFrom> "+$("#funnel_date_from").val());
-            console.log("DateTo  > "+$("#funnel_date_to").val());
+            // console.log("DateFrom> "+$("#funnel_date_from").val());
+            // console.log("DateTo  > "+$("#funnel_date_to").val());
 
             var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEditedJSON});
-            console.log(funnelEditedJSON);
+            // console.log(funnelEditedJSON);
             $.ajax({
                 url: '%path%/funnels/apply',
                 type: 'POST',
@@ -157,8 +157,8 @@ $(document).ready(function() {
                 data: funnelToBeSentString
             })
             .done(function(res) {
-                console.log("success");
-                console.log(res);
+                // console.log("success");
+                // console.log(res);
                 funnelChart.data.labels = [];
                 for (var i = 0; i < res.length; i++) {
                     funnelChart.data.labels.push(funnelEditedJSON.steps[i].event);
@@ -265,12 +265,44 @@ $(document).ready(function() {
         var dateTo;
         var timeFrom = ko.observable();
         var timeTo   = ko.observable();
-        var funnelCalendar = new dhtmlXCalendarObject(["funnel_date_from","funnel_date_to"]);
-        funnelCalendar.setDate(new Date());
+
+        var dateFromDate = ko.observable(new Date());
+        var dateToDate = ko.observable(new Date());
+
+        (function() {
+            var customName = "funnel";
+            var calendars = {};
+            var calendarsId = 0;
+
+            ko.bindingHandlers.dhtmlXCalendar = {
+                init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var value = valueAccessor();
+                    console.log(value);
+                    element.setAttribute("data-calendarsId", calendarsId);
+                    element.id = customName + "Calendar_" + calendarsId;
+                    calendars[calendarsId] =  new dhtmlXCalendarObject(element.id);
+                    calendars[calendarsId].hideTime();
+                    element.value = calendars[calendarsId].getDate().toISOString().split("T")[0]; // ttt redundant
+                    calendars[calendarsId].attachEvent("onClick", function(date, state){
+                        console.log("xxx", date, state);
+                        value.value(calendars[element.dataset.calendarsid].getDate());
+                    });
+
+                    calendarsId++;
+                },
+                update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var value = valueAccessor();
+
+                    var calendarsId = element.dataset.calendarsid;
+
+                    calendars[calendarsId].setSensitiveRange(value.min && value.min().toISOString().split("T")[0], value.max && value.max().toISOString().split("T")[0]);
+                    calendars[calendarsId].setDate(value.value().toISOString().split("T")[0]);
+                }
+            };
+        }());
 
         // Init
 
-        funnelCalendar.hideTime();
         
         var tmpDateFrom;
         var tmpDateTo;
@@ -286,8 +318,8 @@ $(document).ready(function() {
             dateFrom = funnelJson.dateFrom;
             dateTo = funnelJson.dateTo;
 
-            $("#funnel_date_from").val(dateFrom.toISOString().split("T")[0]); 
-            $("#funnel_date_to").val(dateFrom.toISOString().split("T")[0]);
+            // document.getElementById("funnel_date_from").value = dateFrom.toISOString().split("T")[0];
+            // document.getElementById("funnel_date_to").value = dateTo.toISOString().split("T")[0];
 
             timeFrom(dateFrom.toISOString().split("T")[1].split(".")[0]);
             timeTo(dateFrom.toISOString().split("T")[1].split(".")[0]);
@@ -300,8 +332,8 @@ $(document).ready(function() {
             dateFrom = new Date();
             dateTo = new Date();
 
-            $("#funnel_date_from").val(dateFrom.toISOString().split("T")[0]); 
-            $("#funnel_date_to").val(dateTo.toISOString().split("T")[0]);
+            // document.getElementById("funnel_date_from").value = dateFrom.toISOString().split("T")[0];
+            // document.getElementById("funnel_date_to").value = dateTo.toISOString().split("T")[0];
 
             timeFrom(dateFrom.toISOString().split("T")[1].split(".")[0]);
             timeTo(dateTo.toISOString().split("T")[1].split(".")[0]);
@@ -396,11 +428,15 @@ $(document).ready(function() {
             return true;
         }     
 
+
+
         return {
             name: name,
             steps: steps,
             dateFrom: dateFrom,
             dateTo: dateTo,
+            dateFromDate: dateFromDate,
+            dateToDate: dateToDate,
             timeFrom: timeFrom,
             timeTo: timeTo,
             exactMatch: exactMatch,
@@ -414,6 +450,8 @@ $(document).ready(function() {
             getDates: getDates
         };
     }
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////       STEPVM:JS        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
