@@ -98,6 +98,11 @@ button, select, input {
     max-width: 170px; 
 }
 
+.fullDate {
+    max-width: 400px;   
+    width: 400px;   
+}
+
 button
 {
     color: #627b86;

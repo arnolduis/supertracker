@@ -45,10 +45,12 @@ var Session = options.db.model("Session");
 	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
 
-		var fromDate = new Date(req.dateFrom);
-		var toDate = new Date(req.dateTo);
 
-		// console.log(req.body);
+		var dateFrom = new Date(req.body.funnel.dateFrom);
+		var dateTo = new Date(req.body.funnel.dateTo);
+
+		console.log(JSON.stringify(req.body));
+
 		var events = [];
 		var funnel = {steps: []};
 		var debug = {steps:[]};
@@ -62,8 +64,8 @@ var Session = options.db.model("Session");
 			scope    : { events: events, funnel:funnel, debug: debug},
 			query    : {
 				date: {
-			        $gte: fromDate,
-					$lt: toDate
+			        $gte: dateFrom,
+					$lt: dateTo
 				}
 			}, 
 			sort     : { date: 1 },
@@ -111,7 +113,7 @@ var Session = options.db.model("Session");
 		if (req.body.funnel.options && req.body.funnel.options.newUsers) {
 
 			var newUsers;
-			Session.find({first_session: true, date: { $gte: fromDate, $lt: toDate }},{track_id: 1},{}, function (err, newUserFirstSessions) {
+			Session.find({first_session: true, date: { $gte: dateFrom, $lt: dateTo }},{track_id: 1},{}, function (err, newUserFirstSessions) {
 				if (err) {
 					console.log(err); 
 					res.send(err); 

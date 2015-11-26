@@ -6,6 +6,7 @@ var funnelSchema = {
 		name: String,
 		dateFrom: Date,
 		dateTo: Date,
+		options: Object,
 		steps: [{
 			event: String,
 			operation_type: {

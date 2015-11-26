@@ -40,6 +40,11 @@ $(document).ready(function() {
                 name: 'Dummy',
                 dateFrom: new Date(), 
                 dateTo:   new Date(), 
+                options: {
+                    exact: false,
+                    userwise: false,
+                    newUsers: false
+                },
                 steps:[stepVM().toJson()]
             }));
         }
@@ -61,9 +66,7 @@ $(document).ready(function() {
         function saveFunnel () {
             console.log('Saving funnel');
 
-
-
-            var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEdited()});
+            var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEdited().toJson()});
 
             $.ajax({
                 url: '%path%/funnels',
@@ -124,6 +127,11 @@ $(document).ready(function() {
                             name: 'Dummy',
                             dateFrom: new Date(), 
                             dateTo:   new Date(), 
+                            options: {
+                                exact: false,
+                                userwise: false,
+                                newUsers: false
+                            },
                             steps:[stepVM().toJson()]
                         }));
                     }
@@ -144,9 +152,6 @@ $(document).ready(function() {
         function applyFunnel () {
             
             var funnelEditedJSON = funnelEdited().toJson();
-
-            // console.log("DateFrom> "+$("#funnel_date_from").val());
-            // console.log("DateTo  > "+$("#funnel_date_to").val());
 
             var funnelToBeSentString = JSON.stringify({userId: userId, funnel: funnelEditedJSON});
             // console.log(funnelEditedJSON);
@@ -256,18 +261,34 @@ $(document).ready(function() {
 
     function funnelVM (funnelJson) {
 
+        var now = new Date();
         var name  = ko.observable();
         var steps = ko.observableArray([]);
-        var exactMatch = ko.observable(false);
-        var userwiseMatch = ko.observable(false);
+        var exact = ko.observable(false);
+        var userwise = ko.observable(false);
         var newUsers = ko.observable(false);
-        var dateFrom;
-        var dateTo;
-        var timeFrom = ko.observable();
-        var timeTo   = ko.observable();
-
         var dateFromDate = ko.observable(new Date());
         var dateToDate = ko.observable(new Date());
+        var timeFrom = ko.observable(now.toISOString().split("T")[1].split(".")[0]);
+        var timeTo   = ko.observable(now.toISOString().split("T")[1].split(".")[0]);
+        var dateFrom = ko.computed(function () {
+            var _timeFrom = timeFrom();
+            var _dateFromDate = dateFromDate();
+
+            if (!validateTime(_timeFrom)) {
+                return console.log("Time is not valid. Provide it in a HH:MM:ss, or H:M:s  format");
+            } 
+            return new Date(_dateFromDate.toISOString().split("T")[0]+"T"+_timeFrom);
+        });
+        var dateTo = ko.computed(function () {
+            var _timeTo = timeTo();
+            var _dateToDate = dateToDate();
+            if (!validateTime(_timeTo)) {
+                return console.log("Time is not valid. Provide it in a HH:MM:ss, or H:M:s  format");
+            } 
+            return new Date(_dateToDate.toISOString().split("T")[0]+"T"+_timeTo);
+        });
+
 
         (function() {
             var customName = "funnel";
@@ -302,8 +323,6 @@ $(document).ready(function() {
         }());
 
         // Init
-
-        
         var tmpDateFrom;
         var tmpDateTo;
 
@@ -311,69 +330,25 @@ $(document).ready(function() {
 
             name(funnelJson.name);
 
+            exact(funnelJson.options.exact);
+            userwise(funnelJson.options.userwise);
+            newUsers(funnelJson.options.newUsers);
+
             for (var i = 0; i < funnelJson.steps.length; i++) {
                 steps.push(stepVM(funnelJson.steps[i]));
             }
 
-            dateFrom = funnelJson.dateFrom;
-            dateTo = funnelJson.dateTo;
+            dateFromDate(new Date(ko.unwrap(funnelJson.dateFrom)));
+            dateToDate(new Date(ko.unwrap(funnelJson.dateTo)));
 
-            // document.getElementById("funnel_date_from").value = dateFrom.toISOString().split("T")[0];
-            // document.getElementById("funnel_date_to").value = dateTo.toISOString().split("T")[0];
-
-            timeFrom(dateFrom.toISOString().split("T")[1].split(".")[0]);
-            timeTo(dateFrom.toISOString().split("T")[1].split(".")[0]);
+            timeFrom(new Date(funnelJson.dateFrom).toISOString().split("T")[1].split(".")[0]);
+            timeTo(new Date(funnelJson.dateTo).toISOString().split("T")[1].split(".")[0]);
 
         } else {
 
             name = "";
             steps.push(stepVM());
-
-            dateFrom = new Date();
-            dateTo = new Date();
-
-            // document.getElementById("funnel_date_from").value = dateFrom.toISOString().split("T")[0];
-            // document.getElementById("funnel_date_to").value = dateTo.toISOString().split("T")[0];
-
-            timeFrom(dateFrom.toISOString().split("T")[1].split(".")[0]);
-            timeTo(dateTo.toISOString().split("T")[1].split(".")[0]);
         }
-
-        timeFrom.subscribe(function() {
-            var dates = getDates();
-            if(validateTime(timeFrom())) {
-                dateFrom = new Date(dates[1] + "T" + timeFrom());
-            } else {
-                dateFrom = new Date(dates[1] + "T" + "00.00.00");
-            }
-        });
-
-        timeTo.subscribe(function() {
-            var dates = getDates();
-            if(validateTime(timeTo())) {
-                dateFrom = new Date(dates[1] + "T" + timeTo());
-            } else {
-                dateFrom = new Date(dates[1] + "T" + "00.00.00");
-            }
-        });
-
-        // timeFrom.subscribe(function() {
-        //     var dates = getDates();
-        //     if(validateTime(timeFrom())) {
-        //         dateFrom = new Date(dates[1] + "T" + timeFrom());
-        //     } else {
-        //         dateFrom = new Date(dates[1] + "T" + "00.00.00");
-        //     }
-        // });
-
-        // timeFrom.subscribe(function() {
-        //     var dates = getDates();
-        //     if(validateTime(timeFrom())) {
-        //         dateFrom = new Date(dates[1] + "T" + timeFrom());
-        //     } else {
-        //         dateFrom = new Date(dates[1] + "T" + "00.00.00");
-        //     }
-        // });
 
         function addStep() {
             steps.push(stepVM());
@@ -390,12 +365,14 @@ $(document).ready(function() {
 
             var funnelJson = {
                 name: name(), 
-                dateFrom: dateFrom, 
-                dateTo: dateTo, 
+                dateFrom: dateFrom(), 
+                dateTo: dateTo(), 
                 steps: [],
-                exactMatch: ko.observable(false),
-                userwiseMatch: ko.observable(false),
-                newUsers: ko.observable(false)
+                options: {
+                    exact: exact(),
+                    userwise: userwise(),
+                    newUsers: newUsers()
+                }
             };
             for (var i = 0; i < steps().length; i++) {
                 funnelJson.steps.push(steps()[i].toJson());
@@ -439,8 +416,8 @@ $(document).ready(function() {
             dateToDate: dateToDate,
             timeFrom: timeFrom,
             timeTo: timeTo,
-            exactMatch: exactMatch,
-            userwiseMatch: userwiseMatch,
+            exact: exact,
+            userwise: userwise,
             newUsers: newUsers,
 
             addStep: addStep,
