@@ -21,11 +21,46 @@ module.exports = function(app, options) {
 				Funnel.find({userId: req.supertracker.userId}, {userId:1, funnel:1, _id:0}, function (err, funnels) {
 			  		if (err) res.send(err);
 
-					result = result.replace(/%path%/g, stpath);
-					result = result.replace(/%userId%/g, req.supertracker.userId);
-					result = result.replace(/%events%/g, JSON.stringify(events));
-					result = result.replace(/%funnels%/g, JSON.stringify(funnels));
-			        res.send(result);
+			  		var options = {};
+
+			  		var distinct = { distinct: []};
+
+			  		options.scope = {distinct: distinct};
+
+			  		options.map = function () {
+			  			if (this.properties) {
+			  				for (var i in this.properties) {
+			  					emit(i, null);
+			  				}
+			  			}
+			  		};
+
+			  		options.reduce = function (key, values) {
+			  			return null;
+			  		};
+
+			  		options.out = { inline: 1};
+
+			  		Event.mapReduce(options, function (err, model, stats) {
+			  			if (err) {
+			  				console.log(err);
+			  				return res.send({err: err});
+			  			}
+			  			var properties = [];
+			  			for (var i = 0; i < model.length; i++) {
+			  				properties.push(model[i]._id);
+			  			}
+
+			  			console.log("properties", properties);
+			  			console.log("stats", stats);
+						result = result.replace(/%path%/g, stpath);
+						result = result.replace(/__properties__/g, JSON.stringify(properties));
+						result = result.replace(/%userId%/g, req.supertracker.userId);
+						result = result.replace(/%events%/g, JSON.stringify(events));
+						result = result.replace(/%funnels%/g, JSON.stringify(funnels));
+				        res.send(result);
+			  		});
+
 				});
 			});
 		});

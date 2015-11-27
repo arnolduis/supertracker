@@ -436,7 +436,9 @@ $(document).ready(function() {
 
     function stepVM (stepJson) {
         var events = %events%;
+        var customProps = __properties__;
         var properties = ['','Browser','City','Country','Initial Referrer','Initial referring domain','Operating System', 'Referrer','Region','Screen Height','Screen Width'];
+        properties = properties.concat(customProps);
         var operation_types = [  
             { name: 'Happened', operators: [
 
