@@ -23,10 +23,6 @@ module.exports = function(app, options) {
 
 			  		var options = {};
 
-			  		var distinct = { distinct: []};
-
-			  		options.scope = {distinct: distinct};
-
 			  		options.map = function () {
 			  			if (this.properties) {
 			  				for (var i in this.properties) {
@@ -51,8 +47,6 @@ module.exports = function(app, options) {
 			  				properties.push(model[i]._id);
 			  			}
 
-			  			console.log("properties", properties);
-			  			console.log("stats", stats);
 						result = result.replace(/%path%/g, stpath);
 						result = result.replace(/__properties__/g, JSON.stringify(properties));
 						result = result.replace(/%userId%/g, req.supertracker.userId);
