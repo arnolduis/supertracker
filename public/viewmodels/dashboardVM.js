@@ -267,6 +267,7 @@ $(document).ready(function() {
         var exact = ko.observable(false);
         var userwise = ko.observable(false);
         var newUsers = ko.observable(false);
+        var sessionProperties = ko.observable("{}");
         var dateFromDate = ko.observable(new Date());
         var dateToDate = ko.observable(new Date());
         var timeFrom = ko.observable(now.toISOString().split("T")[1].split(".")[0]);
@@ -329,7 +330,7 @@ $(document).ready(function() {
         if (funnelJson) {
 
             name(funnelJson.name);
-
+            sessionProperties(funnelJson.sessionProperties || "{}");
             exact(funnelJson.options.exact);
             userwise(funnelJson.options.userwise);
             newUsers(funnelJson.options.newUsers);
@@ -362,11 +363,11 @@ $(document).ready(function() {
         }
 
         function toJson () {
-
             var funnelJson = {
                 name: name(), 
                 dateFrom: dateFrom(), 
-                dateTo: dateTo(), 
+                dateTo: dateTo(),
+                sessionProperties: sessionProperties(),
                 steps: [],
                 options: {
                     exact: exact(),
@@ -416,6 +417,7 @@ $(document).ready(function() {
             dateToDate: dateToDate,
             timeFrom: timeFrom,
             timeTo: timeTo,
+            sessionProperties: sessionProperties,
             exact: exact,
             userwise: userwise,
             newUsers: newUsers,

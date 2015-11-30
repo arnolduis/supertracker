@@ -7,6 +7,7 @@ var funnelSchema = {
 		dateFrom: Date,
 		dateTo: Date,
 		options: Object,
+		sessionProperties: String,
 		steps: [{
 			event: String,
 			operation_type: {

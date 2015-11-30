@@ -30,6 +30,11 @@
         <input  data-bind="value: $data.name, valueUpdate: 'afterkeydown'", placeholder='Funnel Name'>            
         <button data-bind="click: $parent.saveFunnel">Save</button>
         <button data-bind="click: $parent.deleteFunnel">Delete</button>
+        <div>
+            Session Properties:
+            <textarea rows="8" cols="50" data-bind="value: sessionProperties">
+            </textarea>
+        </div>
         <div class="steps">
             <!-- ko foreach: $data.steps -->
             <div data-bind="template: { name: 'step-template', data: $data }"></div>

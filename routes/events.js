@@ -13,7 +13,7 @@ var User = options.db.model("User");
 	var mwAuth			= options.mwAuth;
 	var corsOptions     = options.corsOptions;
 
-	console.log(corsOptions);//xxx
+	// console.log(corsOptions);//xxx
 
 	app.get(stpath+"/events", cors(corsOptions), getEvents); // get list of all events
 	app.post(stpath+"/events", cors(corsOptions), postEvents); // put event to db
