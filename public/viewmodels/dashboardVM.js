@@ -195,8 +195,9 @@ $(document).ready(function() {
         }
 
 
-
-
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /****************************************** USERPATH ANALYSIS  ********************************************/
+        var userPath = userPathVM();
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,13 +208,6 @@ $(document).ready(function() {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /****************************************  UTILITY FUNCTIONS  *********************************************/
-
-
-
-        
-
-
-
         function plusXDay(date, x){
             var newday = new Date(date.toISOString());
             newday.setDate(date.getDate() + x);
@@ -228,6 +222,7 @@ $(document).ready(function() {
 
 
         return {
+            // Funnel
             funnels: funnels,
             funnelSelected: funnelSelected,
             funnelEdited: funnelEdited,
@@ -237,6 +232,8 @@ $(document).ready(function() {
             addFunnel: addFunnel,
             saveFunnel: saveFunnel,
             deleteFunnel: deleteFunnel,
+            // UserPath
+            userPath: userPath,
             // // Cohort
             // retentionMX: retentionMX,
             // cohRows: cohRows,
@@ -254,6 +251,59 @@ $(document).ready(function() {
             // segCondition: segCondition
         };
     }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////       USERPATHVM:JS        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    function userPathVM (userPathJson) {
+        var userPaths = ko.observableArray();
+
+        function show () {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '%path%/userPaths');
+            xhr.send(null);
+            xhr.onreadystatechange = function () {
+                var DONE = 4; // readyState 4 means the request is done.
+                var OK = 200; // status 200 is a successful return.
+                    if (xhr.status === OK) {
+                        // console.log("response:", JSON.parse(xhr.responseText)); // 'This is the returned text.'
+                        console.log("response:", xhr.responseText); // 'This is the returned text.'
+                        // userPaths(xhr.responseText);
+                    } else {
+                        console.log('Error: ' + xhr.status); // An error occurred during the request.
+                    }
+            };
+        }
+
+
+        // userPaths([
+        //     {
+        //         name: "gyula@mittomenmi",
+        //         sessions: [
+        //             {
+        //                 name:"session1",
+        //                 events: ["1", "2", "3"]
+        //             },
+        //             {
+        //                 name: "session2",
+        //                 events: ["1", "2", "3"]
+        //             }
+        //         ]
+        //     }
+        // ]);
+
+        return {
+            userPaths: userPaths,
+            show: show
+        };
+    }
+
+
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////       FUNNELVM:JS        //////////////////////////////////////////////////////////////////////////////////////////////////////////////
