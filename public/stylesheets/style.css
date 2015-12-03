@@ -149,3 +149,25 @@ table.cohortTable td {
     border-color: #666666;
     background-color: #ffffff;
 }
+
+td {
+    /*border: 1px solid red;*/
+    padding: 3px;
+    vertical-align: top;
+}
+
+table.userpath tbody:nth-child(odd) {
+    background: #f1f1f1;
+}
+
+table.userpath tbody:nth-child(even) {
+    background: pink;
+}
+
+table.userpath {
+    width: 100%;
+}
+
+table.userpath tr {
+    border-bottom: 1px solid black;
+}

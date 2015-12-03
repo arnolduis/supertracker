@@ -11,20 +11,25 @@
 	<button data-bind="click: show">Show</button>
 		
 	</div>
-	<table>
+	<table class="userpath">
 	    <thead>
-	        <tr><th>User</th><th>Sessions</th><th>Events</th></tr>
+	        <tr><th>User</th><th>Sessions</th><th>Date</th><th>Events</th></tr>
 	    </thead>
-	    <tbody data-bind="foreach: userPaths">
-	    	<!-- ko foreach: $data.sessions -->
-		        <tr>
-		            <!-- ko if: $index() == 0 -->
-		            <td data-bind="attr:{rowspan : $parent.sessions.length}, text: $parent.name"></td>
-		            <!-- /ko -->
-		            <td data-bind="text: $data.name"></td>
-		            <td data-bind="text: $data.events"></td>
-		        </tr>
-	    	<!-- /ko -->
-	    </tbody>
+	    <!-- ko foreach: userPaths -->
+		    <tbody>
+		    	<!-- ko foreach: $data.sessions -->
+			        <tr>
+			            <!-- ko if: $index() == 0 -->
+			            <td data-bind="attr:{rowspan : $parent.sessions.length}, text: $parent.name"></td>
+			            <!-- /ko -->
+			            <td data-bind="text: $data.name"></td>
+			            <td data-bind="text: $data.date"></td>
+			            <td data-bind="foreach: $data.events">
+				            <div data-bind="text: $data"></div>
+			            </td>
+			        </tr>
+		    	<!-- /ko -->
+		    </tbody>
+	    <!-- /ko -->
 	</table>
 </script>

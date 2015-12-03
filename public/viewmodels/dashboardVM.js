@@ -270,8 +270,9 @@ $(document).ready(function() {
                 var OK = 200; // status 200 is a successful return.
                     if (xhr.status === OK) {
                         // console.log("response:", JSON.parse(xhr.responseText)); // 'This is the returned text.'
-                        console.log("response:", xhr.responseText); // 'This is the returned text.'
-                        // userPaths(xhr.responseText);
+                        // console.log("response:", xhr.responseText); // 'This is the returned text.'
+                        // console.log(JSON.parse(xhr.responseText));
+                        userPaths(JSON.parse(xhr.responseText));
                     } else {
                         console.log('Error: ' + xhr.status); // An error occurred during the request.
                     }
