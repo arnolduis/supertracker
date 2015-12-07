@@ -74,7 +74,7 @@ var User = options.db.model("User");
 					tmp.push({
 						name: aggregation[i]._id.session_id, 
 						events: aggregation[i].events,
-						date: aggregation[i].dates[0]
+						dates: aggregation[i].dates
 					});
 					shrink[dict[aggregation[i]._id.track_id]] = tmp;
 				}
