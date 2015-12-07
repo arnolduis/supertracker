@@ -1,26 +1,27 @@
-var cors = require('cors');
+var cors = require("cors");
 var ObjectId = require("mongoose").Types.ObjectId;
 
 module.exports = function(app, options) {
 var Event = options.db.model("Event", require("../models/event"));
 var User = options.db.model("User");
 // var Event = options.db.model("Event");
-
+app.use(function (req, res, next) {
+	console.log("HelloBello!!!!!!!");
+	next();
+});
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;
 	var bufferTimeLimit = options.bufferTimeLimit;
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
-	var corsOptions     = options.corsOptions;
 
-	// console.log(corsOptions);//xxx
+	app.get(stpath+"/events"              , getEvents); // get list of all events
+	app.get(stpath+"/events/getNames"     , getNames); // get event names for picking
+	app.post(stpath+"/events"             , postEvents); // put event to db
 
-	app.get(stpath+"/events", cors(corsOptions), getEvents); // get list of all events
-	app.post(stpath+"/events", cors(corsOptions), postEvents); // put event to db
-	app.post(stpath+"/events/external", cors(corsOptions), postExternalEvent); // put event to db
-	app.options(stpath+"/events", cors(corsOptions));
-	app.options(stpath+"/events/external", cors(corsOptions));
-	app.get(stpath+"/events/getNames", getNames); // get event names for picking
+	app.options(stpath+"/events/external" , cors(options.corsOptions));
+	app.post(stpath+"/events/external"    , cors(options.corsOptions), postExternalEvent); // put event to db
+	
 
 	function getEvents(req, res) {
 		Event.find({}, function (err, events) {
@@ -30,7 +31,6 @@ var User = options.db.model("User");
 	}
 
 	function postExternalEvent(req, res) {
-		console.log(req.body);
 			if(req.body.properties && req.body.properties.externalEvent) {
 				User.findOne({ external_user_id: req.body.extUserId}, function(err, result) {
 					if (err) {
