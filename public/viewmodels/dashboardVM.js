@@ -44,7 +44,8 @@ $(document).ready(function() {
                     exact: false,
                     userwise: false,
                     newUsers: false,
-                    longestFunnel: false
+                    longestFunnel: false,
+                    linearFunnel: false
                 },
                 steps:[stepVM().toJson()]
             }));
@@ -132,7 +133,8 @@ $(document).ready(function() {
                                 exact: false,
                                 userwise: false,
                                 newUsers: false,
-                                longestFunnel: false
+                                longestFunnel: false,
+                                linearFunnel: false
                             },
                             steps:[stepVM().toJson()]
                         }));
@@ -321,6 +323,7 @@ $(document).ready(function() {
         var userwise = ko.observable(false);
         var newUsers = ko.observable(false);
         var longestFunnel = ko.observable(false);
+        var linearFunnel = ko.observable(false);
         var sessionProperties = ko.observable("{}");
         var dateFromDate = ko.observable(new Date());
         var dateToDate = ko.observable(new Date());
@@ -389,6 +392,7 @@ $(document).ready(function() {
             userwise(funnelJson.options.userwise);
             newUsers(funnelJson.options.newUsers);
             longestFunnel(funnelJson.options.longestFunnel);
+            linearFunnel(funnelJson.options.linearFunnel);
 
             for (var i = 0; i < funnelJson.steps.length; i++) {
                 steps.push(stepVM(funnelJson.steps[i]));
@@ -428,7 +432,8 @@ $(document).ready(function() {
                     exact: exact(),
                     userwise: userwise(),
                     newUsers: newUsers(),
-                    longestFunnel: longestFunnel()
+                    longestFunnel: longestFunnel(),
+                    linearFunnel: linearFunnel()
                 }
             };
             for (var i = 0; i < steps().length; i++) {
@@ -478,6 +483,7 @@ $(document).ready(function() {
             userwise: userwise,
             newUsers: newUsers,
             longestFunnel: longestFunnel,
+            linearFunnel: linearFunnel,
 
             addStep: addStep,
             removeStep: removeStep,

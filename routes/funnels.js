@@ -49,6 +49,7 @@ var Session = options.db.model("Session");
 	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
 
+		console.log(req.body.funnel);
 		var sessionProperties = JSON.parse(req.body.funnel.sessionProperties);
 
 		var dateFrom = new Date(req.body.funnel.dateFrom);
@@ -82,10 +83,25 @@ var Session = options.db.model("Session");
 			emit( this.track_id, this.name );
 		}
 		// Reduce
+		function linearReduce (key, values) {
+			print("linear reduce");
+			var funnelLength = 0;
+			var i;
+			for (i = 0; i < values.length; i++) {
+				if(events[funnelLength] === values[i]) {
+					funnelLength++;
+				}
+			}
+			for (i = 0; i < funnelLength; i++) {
+				funnel.steps[i]++;	
+			}
+			return funnel;
+		}
 		function allfunnelReduce (key, values) {
+			print("allfunnel reduce");
 			// print(values);
 			// print(JSON.stringify(values));
-			print("reduce  ", JSON.stringify(values));
+			// print("reduce  ", JSON.stringify(values));
 		    for (var j = 0; j < values.length; j++) {
 		        var k = 0;
 		        while( (j+k) < values.length && values[j+k] == events[k]) {
@@ -96,6 +112,7 @@ var Session = options.db.model("Session");
 		    return funnel;
 		}
 		function longestFunnelReduce (key, values) {
+			print("Longest reduce");
 			// print(values);
 			// print(JSON.stringify(values));
 			// print("reduce  ", JSON.stringify(values));
@@ -116,13 +133,14 @@ var Session = options.db.model("Session");
 		}
 
 
+
 		// map
 		options.map = sessionwiseMap;
 		// reduce
 		options.reduce = allfunnelReduce;
 		// finalize
 		options.finalize = function(key, redValues) {
-			print("finalize", events[0] == redValues);
+			// print("finalize", events[0] == redValues);
 		    if(redValues == events[0]){
 		        funnel.steps[0]++;
 		    }
@@ -144,7 +162,15 @@ var Session = options.db.model("Session");
 		if (req.body.funnel.options && req.body.funnel.options.longestFunnel) {
 			options.reduce = longestFunnelReduce;
 		} 
-		
+		// Linear funnel
+		if (req.body.funnel.options && req.body.funnel.options.linearFunnel) {
+			options.reduce = linearReduce;
+		} 
+
+		process.stdout.write("Map function:    ");
+		console.log(options.map);
+		process.stdout.write("Reduce function: ");
+		console.log(options.reduce);
 
 		// Search for the needed sessions
 		sessionProperties.date = { $gte: dateFrom, $lt: dateTo };
