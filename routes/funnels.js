@@ -91,6 +91,9 @@ var Session = options.db.model("Session");
 				if(events[funnelLength] === values[i]) {
 					funnelLength++;
 				}
+				if (events.length === funnelLength) {
+					break;
+				}
 			}
 			for (i = 0; i < funnelLength; i++) {
 				funnel.steps[i]++;	
