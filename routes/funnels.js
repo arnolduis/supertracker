@@ -54,7 +54,6 @@ var Session = options.db.model("Session");
 		var dateFrom = new Date(req.body.funnel.dateFrom);
 		var dateTo = new Date(req.body.funnel.dateTo);
 
-		// console.log(JSON.stringify(req.body));
 
 		var events = [];
 		var funnel = {steps: []};
@@ -68,30 +67,25 @@ var Session = options.db.model("Session");
 		var options = {
 			scope    : { events: events, funnel:funnel, debug: debug},
 			query    : {
-				date: {
-			        $gte: dateFrom,
-					$lt: dateTo
-				}
+				name: {$in: events}
 			}, 
 			sort     : { date: 1 },
-			out      : "funnelResult",
+			out      : { inline: 1},
 		};
 
-
-
-		// map
-		if (req.body.funnel.options && req.body.funnel.options.userwise) {
-			options.map = function(){
-			    emit( this.track_id, this.name );
-			};
-		} else {
-			options.map = function(){
-			    emit( this.session_id, this.name );
-			};
+		// Function choices
+		// Map
+		function sessionwiseMap () {
+			emit( this.session_id, this.name );
 		}
-
-		// reduce
-		options.reduce = function(key, values) {
+		function userwiseMap () {
+			emit( this.track_id, this.name );
+		}
+		// Reduce
+		function allfunnelReduce (key, values) {
+			// print(values);
+			// print(JSON.stringify(values));
+			print("reduce  ", JSON.stringify(values));
 		    for (var j = 0; j < values.length; j++) {
 		        var k = 0;
 		        while( (j+k) < values.length && values[j+k] == events[k]) {
@@ -99,59 +93,83 @@ var Session = options.db.model("Session");
 		            k++;
 		        }
 		    }
-
 		    return funnel;
-		};
+		}
+		function longestFunnelReduce (key, values) {
+			// print(values);
+			// print(JSON.stringify(values));
+			// print("reduce  ", JSON.stringify(values));
+			funnelLength = 0;
+		    for (var j = 0; j < values.length; j++) {
+		        var k = 0;
+		        while( (j+k) < values.length && values[j+k] == events[k]) {
+		            k++;
+		        }
+		        if (k > funnelLength) {
+		        	funnelLength = k;
+		        }
+		    }
+		    for (var i = 0; i < funnelLength; i++) {
+		    	funnel.steps[i]++;	
+		    }
+		    return funnel;
+		}
 
+
+		// map
+		options.map = sessionwiseMap;
+		// reduce
+		options.reduce = allfunnelReduce;
 		// finalize
 		options.finalize = function(key, redValues) {
-		    if(typeof redValues === 'string'){
+			print("finalize", events[0] == redValues);
+		    if(redValues == events[0]){
 		        funnel.steps[0]++;
 		    }
 		    return funnel;
 		};
-		
-
+		//Userwise matching
+		if (req.body.funnel.options && req.body.funnel.options.userwise) {
+			options.map = userwiseMap;
+		} 
 		// Exact funnel matching
-		if (req.body.funnel.options && !req.body.funnel.options.exact) {
-			options.query.name = {$in: events};
+		if (req.body.funnel.options && req.body.funnel.options.exact) {
+			delete options.query.name;
 		}
-
 		// First users
 		if (req.body.funnel.options && req.body.funnel.options.newUsers) {
 			sessionProperties.first_session = true;
 		} 
+		// Longest funnel
+		if (req.body.funnel.options && req.body.funnel.options.longestFunnel) {
+			options.reduce = longestFunnelReduce;
+		} 
+		
 
-		// Decide if Session examination needed, or not
-		if (req.body.funnel.options && req.body.funnel.options.newUsers ||
-			Object.keys(sessionProperties).length > 0) {
+		// Search for the needed sessions
+		sessionProperties.date = { $gte: dateFrom, $lt: dateTo };
+		Session.find(sessionProperties,{session_id: 1, track_id: 1},{}, function (err, goodPropSessions) {
+			if (err) {
+				console.log(err); 
+				res.send(err); 
+				return;
+			}
 
-			sessionProperties.date = { $gte: dateFrom, $lt: dateTo };
+			var goodPropSessionIds = [];
 
-			Session.find(sessionProperties,{session_id: 1, track_id: 1},{}, function (err, goodPropSessions) {
-				if (err) {
-					console.log(err); 
-					res.send(err); 
-					return;
-				}
+			for (var i = 0; i < goodPropSessions.length; i++) {
+				goodPropSessionIds.push(goodPropSessions[i]._id);
+			}
 
-				var goodPropSessionIds = [];
+			// console.log(goodPropSessionIds);
+			// console.log("goodPropSessions count:", goodPropSessions.length);
 
-				for (var i = 0; i < goodPropSessions.length; i++) {
-					goodPropSessionIds.push(goodPropSessions[i]._id);
-				}
+			options.query.session_id = { $in:  goodPropSessionIds };
 
-				console.log(goodPropSessionIds);
-				console.log("goodPropSessions count:", goodPropSessions.length);
-
-				options.query.session_id = { $in:  goodPropSessionIds };
-
-				// console.log(goodPropSessionIds);
-				mapreduce(options);
-			});
-		} else {
+			// console.log(goodPropSessionIds);
 			mapreduce(options);
-		}
+		});
+
 
 		function mapreduce (options) {
 			Event.mapReduce(options, function (err, model, stats) {
@@ -159,14 +177,11 @@ var Session = options.db.model("Session");
 					console.log(err);
 					return res.send({err: err});
 				}
-				model.find().exec(function (err, docs) {
-					if (err) return console.log(err);
-					if (docs.length > 0) {
-						res.send(docs[docs.length-1].value.steps);
-					} else {
-						res.send({});
-					}
-				});
+				if (model.length > 0) {
+					res.send(model[model.length-1].value.steps);
+				} else {
+					res.send({});
+				}
 			});
 		}
 	});
