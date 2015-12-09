@@ -43,7 +43,8 @@ $(document).ready(function() {
                 options: {
                     exact: false,
                     userwise: false,
-                    newUsers: false
+                    newUsers: false,
+                    longestFunnel: false
                 },
                 steps:[stepVM().toJson()]
             }));
@@ -130,7 +131,8 @@ $(document).ready(function() {
                             options: {
                                 exact: false,
                                 userwise: false,
-                                newUsers: false
+                                newUsers: false,
+                                longestFunnel: false
                             },
                             steps:[stepVM().toJson()]
                         }));
@@ -318,6 +320,7 @@ $(document).ready(function() {
         var exact = ko.observable(false);
         var userwise = ko.observable(false);
         var newUsers = ko.observable(false);
+        var longestFunnel = ko.observable(false);
         var sessionProperties = ko.observable("{}");
         var dateFromDate = ko.observable(new Date());
         var dateToDate = ko.observable(new Date());
@@ -385,6 +388,7 @@ $(document).ready(function() {
             exact(funnelJson.options.exact);
             userwise(funnelJson.options.userwise);
             newUsers(funnelJson.options.newUsers);
+            longestFunnel(funnelJson.options.longestFunnel);
 
             for (var i = 0; i < funnelJson.steps.length; i++) {
                 steps.push(stepVM(funnelJson.steps[i]));
@@ -423,7 +427,8 @@ $(document).ready(function() {
                 options: {
                     exact: exact(),
                     userwise: userwise(),
-                    newUsers: newUsers()
+                    newUsers: newUsers(),
+                    longestFunnel: longestFunnel()
                 }
             };
             for (var i = 0; i < steps().length; i++) {
@@ -472,6 +477,7 @@ $(document).ready(function() {
             exact: exact,
             userwise: userwise,
             newUsers: newUsers,
+            longestFunnel: longestFunnel,
 
             addStep: addStep,
             removeStep: removeStep,

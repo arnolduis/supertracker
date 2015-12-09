@@ -44,8 +44,8 @@
     </div>
     <div>
         <div> 
-            <span class="label">From date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:null, max: dateToDate, value: dateFromDate} " readonly="true">
-            <span class="label">Till date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:dateFromDate, max: null, value: dateToDate} " readonly="true">
+            <span class="label">From date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:null, max: dateToDate, value: dateFromDate}">
+            <span class="label">Till date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:dateFromDate, max: null, value: dateToDate}">
         </div>
         <div >
             <span class="label">Full date from (UTC)</span> <input class="fullDate" data-bind="value: dateFrom().toISOString().split('.')[0]"></input>
@@ -63,12 +63,16 @@
         <input type="checkbox" data-bind="checked: exact" />            
     </div>
     <div>
-        <spab>Userwise:</span>
+        <span>Userwise:</span>
         <input type="checkbox" data-bind="checked: userwise" />            
     </div>
     <div>
-        <spab>New users:</span>
+        <span>First session:</span>
         <input type="checkbox" data-bind="checked: newUsers" />            
+    </div>
+    <div>
+        <span>Longest funnel:</span>
+        <input type="checkbox" data-bind="checked: longestFunnel" />            
     </div>
 </script>
 

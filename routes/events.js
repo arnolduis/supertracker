@@ -5,10 +5,7 @@ module.exports = function(app, options) {
 var Event = options.db.model("Event", require("../models/event"));
 var User = options.db.model("User");
 // var Event = options.db.model("Event");
-app.use(function (req, res, next) {
-	console.log("HelloBello!!!!!!!");
-	next();
-});
+
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;
 	var bufferTimeLimit = options.bufferTimeLimit;
@@ -31,37 +28,36 @@ app.use(function (req, res, next) {
 	}
 
 	function postExternalEvent(req, res) {
-			if(req.body.properties && req.body.properties.externalEvent) {
-				User.findOne({ external_user_id: req.body.extUserId}, function(err, result) {
+		if(req.body.properties && req.body.properties.externalEvent) {
+			User.findOne({ external_user_id: req.body.extUserId}, function(err, result) {
+				if (err) {
+					console.log(err);
+					return res.send(err);
+				}
+				if (!result || (result && result.length <= 0) ) {
+					console.log("No matching alias for the gieven user id.");
+					return res.send({ err: "No matching alias for the gieven user id."});
+				}
+
+				// Add the obtained track_id to external event
+				req.body.track_id = result.track_id;
+
+				Event.create(req.body, function(err, doc) {
 					if (err) {
 						console.log(err);
-						return res.send(err);
+						res.send('Server error, couldn\'t save events to server!');
+						return;
 					}
-					if (!result || (result && result.length <= 0) ) {
-						console.log("No matching alias for the gieven user id.");
-						return res.send({ err: "No matching alias for the gieven user id."});
-					}
+					console.log("INSERTED EXTERNAL EVENT:");
+					console.log(doc);//xxx
 
-					// Add the obtained track_id to external event
-					req.body.track_id = result.track_id;
+					// Creating server response
 
-					Event.create(req.body, function(err, doc) {
-						if (err) {
-							console.log(err);
-							res.send('Server error, couldn\'t save events to server!');
-							return;
-						}
-						console.log("INSERTED EXTERNAL EVENT:");
-						console.log(doc);//xxx
-
-						// Creating server response
-
-						res.send( JSON.stringify({response: "Events saved"}) );
-					});
-
+					res.send( JSON.stringify({response: "Events saved"}) );
 				});
-			}
-		
+
+			});
+		}
 	}
 
 	function postEvents(req, res){
