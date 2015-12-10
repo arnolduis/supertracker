@@ -26,7 +26,7 @@ var User = options.db.model("User");
     			return;
     		}
 
-    		var dict = {};
+    		var dict = {}; // track_id => external_user_id
     		var userTrackIds = [];
     		var l = users.length;
     		var i;
@@ -64,31 +64,74 @@ var User = options.db.model("User");
 					return;
 				}
 
-				var shrink = {};
-				var l = aggregation.length;
-				for(i = 0; i < l; i++) {
-					var tmp = shrink[dict[aggregation[i]._id.track_id]];
-					if (!tmp) {
-						tmp = [];
+
+				for (var i = 0; i < aggregation.length; i++) {
+					aggregation[i]._id.track_id = dict[aggregation[i]._id.track_id];
+					// console.log(aggregation[i]._id.track_id, dict[aggregation[i]._id.track_id]);
+				}
+
+				Event.find({external_user_id: { $exists: true}}, function (err, extEvents) {
+					if (err) {
+						console.log(err);
+						res.send(err);
+						return;
 					}
-					tmp.push({
-						name: aggregation[i]._id.session_id, 
-						events: aggregation[i].events,
-						dates: aggregation[i].dates
-					});
-					shrink[dict[aggregation[i]._id.track_id]] = tmp;
-				}
 
-				var output = [];
-				l = aggregation.length;
-				for (i in shrink) {
-					output.push({
-						name: i,
-						sessions: shrink[i]
-					});	
-				}
+					for (var i = 0; i < extEvents.length; i++) {
+						aggregation.push({
+							_id: {
+								track_id: extEvents[i].external_user_id,
+								session_id: "external"
+							},
+							events: [extEvents[i].name],
+							dates: [extEvents[i].date]
+						});
+					}
 
-				res.send(output);
+					var shrink = {};
+					var l = aggregation.length;
+					for(i = 0; i < l; i++) {
+						var tmp = shrink[aggregation[i]._id.track_id];
+						if (!tmp) {
+							tmp = [];
+						}
+						tmp.push({
+							name: aggregation[i]._id.session_id, 
+							events: aggregation[i].events,
+							dates: aggregation[i].dates
+						});
+						shrink[aggregation[i]._id.track_id] = tmp;
+					}
+
+					var output = [];
+					l = aggregation.length;
+					for (i in shrink) {
+						output.push({
+							name: i,
+							sessions: shrink[i]
+						});	
+					}
+
+					for (i = 0; i < 1; i++) {
+						output[i].sessions.sort(function (a,b) {
+							if (a.dates[0] === b.dates[0]) {
+								return 0;
+							}
+							if (a.dates[0] < b.dates[0]) {
+								return -1;
+							}
+							if (a.dates[0] > b.dates[0]) {
+								return 1;
+							}
+						});
+					}
+
+
+					res.send(output);
+					
+				});
+
+
 				
 
 				// res.writeHead(200, {'Content-Type': 'application/json'});
