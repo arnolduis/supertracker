@@ -49,7 +49,7 @@ var Session = options.db.model("Session");
 	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
 
-		console.log(req.body.funnel);
+		// console.log(req.body.funnel);
 		var sessionProperties = JSON.parse(req.body.funnel.sessionProperties);
 
 		var dateFrom = new Date(req.body.funnel.dateFrom);
@@ -170,11 +170,14 @@ var Session = options.db.model("Session");
 			options.reduce = linearReduce;
 		} 
 
+		console.log("ST: FUNNEL");
+		console.log("events", events);
 		process.stdout.write("Map function:    ");
 		console.log(options.map);
 		process.stdout.write("Reduce function: ");
 		console.log(options.reduce);
-
+		console.log("from:", dateFrom.toISOString());
+		console.log("to:  ", dateTo.toISOString());
 		// Search for the needed sessions
 		sessionProperties.date = { $gte: dateFrom, $lt: dateTo };
 		Session.find(sessionProperties,{session_id: 1, track_id: 1},{}, function (err, goodPropSessions) {
