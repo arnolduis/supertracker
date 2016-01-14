@@ -327,10 +327,10 @@ $(document).ready(function() {
         var sessionProperties = ko.observable("{}");
         var dateFromDate = ko.observable(new Date());
         var dateToDate = ko.observable(new Date());
-        var timeFrom = ko.observable(now.toISOString().split("T")[1].split(".")[0]);
-        var timeTo   = ko.observable(now.toISOString().split("T")[1].split(".")[0]);
+        var dateFromTime = ko.observable(now.toISOString().split("T")[1].split(".")[0]);
+        var dateToTime   = ko.observable(now.toISOString().split("T")[1].split(".")[0]);
         var dateFrom = ko.computed(function () {
-            var _timeFrom = timeFrom();
+            var _timeFrom = dateFromTime();
             var _dateFromDate = dateFromDate();
 
             if (!validateTime(_timeFrom)) {
@@ -339,46 +339,13 @@ $(document).ready(function() {
             return new Date(_dateFromDate.toISOString().split("T")[0]+"T"+_timeFrom);
         });
         var dateTo = ko.computed(function () {
-            var _timeTo = timeTo();
+            var _dateToTime = dateToTime();
             var _dateToDate = dateToDate();
-            if (!validateTime(_timeTo)) {
+            if (!validateTime(_dateToTime)) {
                 return console.log("Time is not valid. Provide it in a HH:MM:ss, or H:M:s  format");
             } 
-            return new Date(_dateToDate.toISOString().split("T")[0]+"T"+_timeTo);
+            return new Date(_dateToDate.toISOString().split("T")[0]+"T"+_dateToTime);
         });
-
-
-        (function() {
-            var customName = "funnel";
-            var calendars = {};
-            var calendarsId = 0;
-
-            ko.bindingHandlers.dhtmlXCalendar = {
-                init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var value = valueAccessor();
-                    console.log(value);
-                    element.setAttribute("data-calendarsId", calendarsId);
-                    element.id = customName + "Calendar_" + calendarsId;
-                    calendars[calendarsId] =  new dhtmlXCalendarObject(element.id);
-                    calendars[calendarsId].hideTime();
-                    element.value = calendars[calendarsId].getDate().toISOString().split("T")[0]; // ttt redundant
-                    calendars[calendarsId].attachEvent("onClick", function(date, state){
-                        console.log("xxx", date, state);
-                        value.value(calendars[element.dataset.calendarsid].getDate());
-                    });
-
-                    calendarsId++;
-                },
-                update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-                    var value = valueAccessor();
-
-                    var calendarsId = element.dataset.calendarsid;
-
-                    calendars[calendarsId].setSensitiveRange(value.min && value.min().toISOString().split("T")[0], value.max && value.max().toISOString().split("T")[0]);
-                    calendars[calendarsId].setDate(value.value().toISOString().split("T")[0]);
-                }
-            };
-        }());
 
         // Init
         var tmpDateFrom;
@@ -401,14 +368,48 @@ $(document).ready(function() {
             dateFromDate(new Date(ko.unwrap(funnelJson.dateFrom)));
             dateToDate(new Date(ko.unwrap(funnelJson.dateTo)));
 
-            timeFrom(new Date(funnelJson.dateFrom).toISOString().split("T")[1].split(".")[0]);
-            timeTo(new Date(funnelJson.dateTo).toISOString().split("T")[1].split(".")[0]);
+            dateFromTime(new Date(funnelJson.dateFrom).toISOString().split("T")[1].split(".")[0]);
+            dateToTime(new Date(funnelJson.dateTo).toISOString().split("T")[1].split(".")[0]);
 
         } else {
 
             name = "";
             steps.push(stepVM());
         }
+
+        (function() {
+            var customName = "funnel";
+            var calendars = {};
+            var calendarsId = 0;
+
+            ko.bindingHandlers.dhtmlXCalendar = {
+                init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var value = valueAccessor();
+                    console.log(value);
+                    element.setAttribute("data-calendarsId", calendarsId);
+                    element.id = customName + "Calendar_" + calendarsId;
+                    calendars[calendarsId] =  new dhtmlXCalendarObject(element.id);
+                    calendars[calendarsId].hideTime();
+                    calendars[calendarsId].setDate(value.value());
+                    element.value = calendars[calendarsId].getDate().toISOString().split("T")[0]; // ttt redundant
+                    calendars[calendarsId].attachEvent("onClick", function(date, state){
+                        console.log("xxx", date, state);
+                        value.value(calendars[element.dataset.calendarsid].getDate());
+                    });
+
+                    calendarsId++;
+                },
+                update: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    var value = valueAccessor();
+
+                    var calendarsId = element.dataset.calendarsid;
+
+                    calendars[calendarsId].setSensitiveRange(value.min && value.min().toISOString().split("T")[0], value.max && value.max().toISOString().split("T")[0]);
+                    calendars[calendarsId].setDate(value.value().toISOString().split("T")[0]);
+                }
+            };
+        }());
+
 
         function addStep() {
             steps.push(stepVM());
@@ -476,8 +477,8 @@ $(document).ready(function() {
             dateTo: dateTo,
             dateFromDate: dateFromDate,
             dateToDate: dateToDate,
-            timeFrom: timeFrom,
-            timeTo: timeTo,
+            dateFromTime: dateFromTime,
+            dateToTime: dateToTime,
             sessionProperties: sessionProperties,
             exact: exact,
             userwise: userwise,

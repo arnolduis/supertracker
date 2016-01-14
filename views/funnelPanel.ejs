@@ -45,14 +45,14 @@
     <div>
         <div> 
             <span class="label">From date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:null, max: dateToDate, value: dateFromDate}">
-            <span class="label">Till date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:dateFromDate, max: null, value: dateToDate}">
+            <span class="label">From time (UTC)</span> <input type="text" data-bind="value: dateFromTime">
         </div>
         <div >
             <span class="label">Full date from (UTC)</span> <input class="fullDate" data-bind="value: dateFrom().toISOString().split('.')[0]"></input>
         </div>
         <div>
-            <span class="label">From time (UTC)</span> <input type="text" data-bind="value: timeFrom">
-            <span class="label">Till time (UTC)</span> <input type="text" data-bind="value: timeTo">
+            <span class="label">Till date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:dateFromDate, max: null, value: dateToDate}">
+            <span class="label">Till time (UTC)</span> <input type="text" data-bind="value: dateToTime">
         </div>
         <div >
             <span class="label">Full date To   (UTC)</span> <input class="fullDate" data-bind="value: dateTo().toISOString().split('.')[0]"></input>
