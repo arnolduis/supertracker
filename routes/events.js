@@ -1,4 +1,4 @@
-var cors = require('cors');
+var cors = require("cors");
 var ObjectId = require("mongoose").Types.ObjectId;
 
 module.exports = function(app, options) {
@@ -11,16 +11,14 @@ var User = options.db.model("User");
 	var bufferTimeLimit = options.bufferTimeLimit;
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
-	var corsOptions     = options.corsOptions;
 
-	console.log(corsOptions);//xxx
+	app.get(stpath+"/events"              , getEvents); // get list of all events
+	app.get(stpath+"/events/getNames"     , getNames); // get event names for picking
+	app.post(stpath+"/events"             , postEvents); // put event to db
 
-	app.get(stpath+"/events", cors(corsOptions), getEvents); // get list of all events
-	app.post(stpath+"/events", cors(corsOptions), postEvents); // put event to db
-	app.post(stpath+"/events/external", cors(corsOptions), postExternalEvent); // put event to db
-	app.options(stpath+"/events", cors(corsOptions));
-	app.options(stpath+"/events/external", cors(corsOptions));
-	app.get(stpath+"/events/getNames", getNames); // get event names for picking
+	app.options(stpath+"/events/external" , cors(options.corsOptions));
+	app.post(stpath+"/events/external"    , cors(options.corsOptions), postExternalEvent); // put event to db
+	
 
 	function getEvents(req, res) {
 		Event.find({}, function (err, events) {
@@ -30,38 +28,21 @@ var User = options.db.model("User");
 	}
 
 	function postExternalEvent(req, res) {
-		console.log(req.body);
-			if(req.body.properties && req.body.properties.externalEvent) {
-				User.findOne({ external_user_id: req.body.extUserId}, function(err, result) {
-					if (err) {
-						console.log(err);
-						return res.send(err);
-					}
-					if (!result || (result && result.length <= 0) ) {
-						console.log("No matching alias for the gieven user id.");
-						return res.send({ err: "No matching alias for the gieven user id."});
-					}
-
-					// Add the obtained track_id to external event
-					req.body.track_id = result.track_id;
-
-					Event.create(req.body, function(err, doc) {
-						if (err) {
-							console.log(err);
-							res.send('Server error, couldn\'t save events to server!');
-							return;
-						}
-						console.log("INSERTED EXTERNAL EVENT:");
-						console.log(doc);//xxx
-
-						// Creating server response
-
-						res.send( JSON.stringify({response: "Events saved"}) );
-					});
-
-				});
+		if(!req.body.external_user_id) {
+			console.log("ST: Missing external_user_id");
+			return res.send({err: "ST: Missing external_user_id"});
+		}
+		Event.create(req.body, function(err, doc) {
+			if (err) {
+				console.log(err);
+				res.send('Server error, couldn\'t save events to server!');
+				return;
 			}
-		
+			console.log("ST: INSERTED EXTERNAL EVENT:");
+			console.log(doc);
+
+			res.send( JSON.stringify({response: "Events saved"}) );
+		});
 	}
 
 	function postEvents(req, res){

@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 var sessionSchema = {
 	track_id: { type:String, required: true }, //ttt Mixed amig nem allitom be jol 
 	date: { type: Date, default: Date.now },
+	first_session: Boolean,
 	screen_windowX: Number,
 	screen_windowY: Number,
 	screen_screenX: Number,

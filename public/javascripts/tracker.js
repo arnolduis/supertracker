@@ -18,7 +18,7 @@ function supertracker() {
 	var evBuffer = eventBuffer();
 
 	// Init function
-	function init () {
+	function init (options) {
 		// userId  = '%userId%';
 		referrer = document.referrer;
 		date = new Date();
@@ -38,67 +38,83 @@ function supertracker() {
 			trackId = null;			
 		}
 
+		var first_session = false;
+		
 		if (trackId) {
-			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
+			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain		
 		} else {
+			first_session = true;
 			trackId = uuid();
 			if (storage) {
+				// If no trackId then this is the first session fo the trackid
 				setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
 			}
 		}
 
-			if (storage && sessionStorage.supertrackerSessionId) {
-				sessionId = sessionStorage.supertrackerSessionId;
-				// console.log('Sessionstorage on');
-				initiated = true;
-				onInit();
-			 } else {
-				// getScript("%path%/javascripts/geoip2.js", function(){
-					// geoip2.city(function (resCity) {
-						
-						// console.log('Sessionstorage off');
-						var session = {};
-						session.track_id = trackId;
-						if (!storage) session.properties = { cookiesDisabled: true };
-						session.date = date;
-						session.screen_windowX = window.innerWidth;   // returns width of browser viewport
-						session.screen_windowY = window.innerHeight;   // returns height of browser viewport
-						session.screen_screenX = screen.width;
-						session.screen_screenY = screen.height;
+		if (storage && sessionStorage.supertrackerSessionId) {
+			sessionId = sessionStorage.supertrackerSessionId;
+			// console.log('Sessionstorage on');
+			initiated = true;
+			onInit();
+		} else {
+			// getScript("%path%/javascripts/geoip2.js", function(){
+				// geoip2.city(function (resCity) {
+					
+					// console.log('Sessionstorage off');
+					var session = {};
+					if (options.properties) {
+						session.properties = options.properties;
+					}
+					if (!storage) {
+						if (session.properties) {
+							session.properties.cookiesDisabled = true;
+						} else {
+							session.properties = {cookiesDisabled: true};
+						}
+					}
+					if (first_session) {
+						session.first_session = true;
+					}
+					session.track_id = trackId;
+					session.date = date;
+					session.screen_windowX = window.innerWidth;   // returns width of browser viewport
+					session.screen_windowY = window.innerHeight;   // returns height of browser viewport
+					session.screen_screenX = screen.width;
+					session.screen_screenY = screen.height;
 
-						
-							// ttt errorkezeles
+					
+						// ttt errorkezeles
 
-						// session.location_ip = resCity.traits.ip_address;
-						// session.location_country =  resCity.country.names.en;
-						// session.location_region =  resCity.subdivisions[0].names.en;
-						// session.location_city = resCity.city.names.en;
+					// session.location_ip = resCity.traits.ip_address;
+					// session.location_country =  resCity.country.names.en;
+					// session.location_region =  resCity.subdivisions[0].names.en;
+					// session.location_city = resCity.city.names.en;
 
 
-						var xhr = new XMLHttpRequest();
-						xhr.open('POST', '%path%/sessions');
-						xhr.setRequestHeader('Content-Type', 'application/json');
-						xhr.onload = function() {
-						    if (xhr.status === 200) {
-						        var res = JSON.parse(xhr.responseText);
-						        if (storage) {
-									sessionStorage.supertrackerSessionId = res.sessionId;
-						        }
-								sessionId = res.sessionId;
-						        if (res.errorMessage) {
-						        	alert(res.errorMessage);
-						        }
-						        initiated = true;
-								onInit();
-						    } else {
-						    	console.log("session_post_error");
-						    }
-						};
-						xhr.send(JSON.stringify(session));
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', '%path%/sessions');
+					xhr.setRequestHeader('Content-Type', 'application/json');
+					xhr.onload = function() {
+					    if (xhr.status === 200) {
+					        var res = JSON.parse(xhr.responseText);
+					        if (storage) {
+								sessionStorage.supertrackerSessionId = res.sessionId;
+					        }
+							sessionId = res.sessionId;
+					        if (res.errorMessage) {
+					        	alert(res.errorMessage);
+					        }
+					        initiated = true;
+							onInit();
+					    } else {
+					    	console.log("session_post_error");
+					    }
+					};
+					xhr.send(JSON.stringify(session));
 
-					// });
 				// });
-			}
+			// });
+		}
 
 
 			flushingLoop = setInterval(flush, bufferTimeLimit);
@@ -356,7 +372,7 @@ function supertracker() {
 			return (screen.height*screen.width).toString(16);
 		}
 
-		return (D()+"-"+R()+"-"+UA()+"-"+S());
+		return (D()+"-"+S()+"-"+UA()+"-"+R());
 	}
 
 	function setCookie(cname, cvalue, exdays, cdomain) {
