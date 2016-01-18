@@ -42,22 +42,55 @@
         </div>
         <button id="buttonAddStep" data-bind="click: $data.addStep">+</button>
     </div>
-    <div>
-        <div> 
-            <span class="label">From date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:null, max: dateToDate, value: dateFromDate}">
-            <span class="label">From time (UTC)</span> <input type="text" data-bind="value: dateFromTime">
-        </div>
-        <div >
-            <span class="label">Full date from (UTC)</span> <input class="fullDate" data-bind="value: dateFrom().toISOString().split('.')[0]"></input>
-        </div>
-        <div>
-            <span class="label">Till date (UTC)</span> <input type="text" data-bind="dhtmlXCalendar: { min:dateFromDate, max: null, value: dateToDate}">
-            <span class="label">Till time (UTC)</span> <input type="text" data-bind="value: dateToTime">
-        </div>
-        <div >
-            <span class="label">Full date To   (UTC)</span> <input class="fullDate" data-bind="value: dateTo().toISOString().split('.')[0]"></input>
-        </div>
-    </div>
+    <table class="dateSelection">
+        <tbody>
+            <tr>
+                <td>
+                    <span class="label">From date (UTC)</span> 
+                </td>
+                <td>
+                    <input type="text" data-bind="dhtmlXCalendar: { min:null, max: dateToDate, value: dateFromDate}">
+                </td>
+                <td>
+                    <span class="label">From time (UTC)</span> 
+                </td>
+                <td>
+                    <input type="text" data-bind="value: dateFromTime">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label">Full date from (UTC)</span> 
+                </td>
+                <td>
+                    <input class="fullDate" data-bind="value: dateFrom().toISOString().split('.')[0]"></input>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label">Till date (UTC)</span> 
+                </td>
+                <td>
+                    <input type="text" data-bind="dhtmlXCalendar: { min:dateFromDate, max: null, value: dateToDate}">
+                </td>
+                <td>
+                    <span class="label">Till time (UTC)</span> 
+                </td>
+                <td>
+                    <input type="text" data-bind="value: dateToTime">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label">Full date To   (UTC)</span> 
+                </td>
+                <td>
+                    <input class="fullDate" data-bind="value: dateTo().toISOString().split('.')[0]"></input>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
     <div>
         <span>Exact match:</span>
         <input type="checkbox" data-bind="checked: exact" />            

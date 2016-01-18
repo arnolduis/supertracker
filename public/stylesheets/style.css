@@ -100,7 +100,7 @@ button, select, input {
 
 .fullDate {
     max-width: 400px;   
-    width: 400px;   
+    /*width: 400px;   */
 }
 
 button
@@ -124,6 +124,10 @@ button
        -moz-border-radius: 30px 30px 30px 30px;
             border-radius: 30px 30px 30px 30px;
     background-color: #a6b1b6;
+}
+
+table.dateSelection {
+    /*width: 100%;*/
 }
 
 table.cohortTable {

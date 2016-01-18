@@ -1,7 +1,7 @@
 {
   "name": "supertracker",
   
-  "version": "0.0.47",
+  "version": "0.0.48",
   "description": "A super package for tracking and visualising user activity",
   "main": "./lib/supertracker.js",
   "bin": {
