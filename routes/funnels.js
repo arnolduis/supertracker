@@ -1,13 +1,14 @@
 var mongoose = require("mongoose");
-ObjectId = mongoose.Types.ObjectId;
-var MJ = require("mongo-fast-join"),
-    mongoJoin = new MJ();
 var async = require("async");
+var ObjectId = mongoose.Types.ObjectId;
+var MJ = require("mongo-fast-join");
+var mongoJoin = new MJ();
 
 module.exports = function(app, options) {
-var Funnel = options.db.model("Funnel");
-var Event = options.db.model("Event", require("../models/event"));
-var Session = options.db.model("Session");
+	var Funnel = options.db.model("Funnel");
+	var Event = options.db.model("Event", require("../models/event"));
+	var Session = options.db.model("Session");
+	var User = options.db.model("User");
 
 
 	var stpath          = options.stpath;
@@ -59,6 +60,7 @@ var Session = options.db.model("Session");
 		var events = [];
 		var funnel = {steps: []};
 		var debug = {steps:[]};
+		var track_id2external_user_id = {};
 
 		for (var i = 0; i < req.body.funnel.steps.length; i++) {
 			events.push(req.body.funnel.steps[i].event);
@@ -66,7 +68,7 @@ var Session = options.db.model("Session");
 		}
 
 		var options = {
-			scope    : { events: events, funnel:funnel, debug: debug},
+			scope    : { events: events, funnel:funnel, debug: debug, track_id2external_user_id: track_id2external_user_id},
 			query    : {
 				name: {$in: events}
 			}, 
@@ -80,7 +82,11 @@ var Session = options.db.model("Session");
 			emit( this.session_id, this.name );
 		}
 		function userwiseMap () {
-			emit( this.track_id, this.name );
+			if (this.external_user_id) {
+				emit( this.external_user_id, this.name );
+			} else {
+				emit( track_id2external_user_id[this.track_id], this.name);
+			}
 		}
 		// Reduce
 		function linearReduce (key, values) {
@@ -179,30 +185,32 @@ var Session = options.db.model("Session");
 		console.log("from:", dateFrom.toISOString());
 		console.log("to:  ", dateTo.toISOString());
 		// Search for the needed sessions
-		sessionProperties.date = { $gte: dateFrom, $lt: dateTo };
-		Session.find(sessionProperties,{session_id: 1, track_id: 1},{}, function (err, goodPropSessions) {
-			if (err) {
-				console.log(err); 
-				res.send(err); 
-				return;
-			}
+		if (req.body.funnel.options && req.body.funnel.options.userwise) {
+			User.find({}, function (err, users) {
+				for (var i = 0; i < users.length; i++) {
+					track_id2external_user_id[users[i].track_id] = users[i].external_user_id;
+				}
+				mapreduce(options);
+			});
+		} else {
+			sessionProperties.date = { $gte: dateFrom, $lt: dateTo };
+			Session.find(sessionProperties,{session_id: 1, track_id: 1},{}, function (err, goodPropSessions) {
+				if (err) {
+					console.log(err); 
+					res.send(err); 
+					return;
+				}
 
-			var goodPropSessionIds = [];
+				var goodPropSessionIds = [];
 
-			for (var i = 0; i < goodPropSessions.length; i++) {
-				goodPropSessionIds.push(goodPropSessions[i]._id);
-			}
-
-			// console.log(goodPropSessionIds);
-			// console.log("goodPropSessions count:", goodPropSessions.length);
-
-			options.query.session_id = { $in:  goodPropSessionIds };
-
-			// console.log(goodPropSessionIds);
-			mapreduce(options);
-		});
-
-
+				for (var i = 0; i < goodPropSessions.length; i++) {
+					goodPropSessionIds.push(goodPropSessions[i]._id);
+				}
+				options.query.session_id = { $in:  goodPropSessionIds };
+				mapreduce(options);
+			});
+		}
+		
 		function mapreduce (options) {
 			Event.mapReduce(options, function (err, model, stats) {
 				if (err) {
