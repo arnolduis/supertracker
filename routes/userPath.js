@@ -70,7 +70,7 @@ var User = options.db.model("User");
 					// console.log(aggregation[i]._id.track_id, dict[aggregation[i]._id.track_id]);
 				}
 
-				Event.find({external_user_id: { $exists: true}}, function (err, extEvents) {
+				Event.find({external_user_id: { $exists: true, $ne: null }}, function (err, extEvents) {
 					if (err) {
 						console.log(err);
 						res.send(err);
