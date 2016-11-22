@@ -4,6 +4,10 @@ var funnelSchema = {
 	userId: { type: String, required: true },
 	funnel: {
 		name: String,
+		dateFrom: Date,
+		dateTo: Date,
+		options: Object,
+		sessionProperties: String,
 		steps: [{
 			event: String,
 			operation_type: {
@@ -20,4 +24,4 @@ var funnelSchema = {
 	}
 };
 
-module.exports = mongoose.model('Funnel', funnelSchema);
+mongoose.model('Funnel', funnelSchema);

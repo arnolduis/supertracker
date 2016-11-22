@@ -1,4 +1,6 @@
-	// routes/dashboard.js
+// routes/dashboard.js
+var path = require("path")
+;
 module.exports = function(app, options) {
 
 	var stpath          = options.stpath;
@@ -6,10 +8,12 @@ module.exports = function(app, options) {
 	var bufferTimeLimit = options.bufferTimeLimit;
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
+	var cors			= options.cors;
 
+	// app.get(stpath, renderDashboard);
 	app.get(stpath, mwAuth, renderDashboard);
 
 	function renderDashboard(req,res) {
-	  	res.render('../node_modules/supertracker/views/dashboard.ejs',{title: 'Dashboard', stpath: stpath}); //ttt ez retek eossz igy, kezdj vele valamit...
+	  	res.render(path.join(__dirname, '../views/dashboard.ejs'),{title: 'Dashboard', stpath: stpath}); //ttt ez retek eossz igy, kezdj vele valamit...
 	}
 };

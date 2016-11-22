@@ -6,136 +6,511 @@
 
 function supertracker() {
 
-    var bufferSize = %bufferSize%; 
-    var bufferTimeLimit = %bufferTimeLimit%; 
-    // Session wide event data
-    var sessionId, userId;
-    var flushingLoop;
-    var referrer;
-    var date;
+	var bufferSize = %bufferSize%; 
+	var bufferTimeLimit = %bufferTimeLimit%; 
+	// Session wide event data
+	var sessionId, userId, trackId;
+	var flushingLoop;
+	var referrer;
+	var date;
+	var initiated = false;
+	var storage = checkStorage();
+	var evBuffer = eventBuffer();
 
+	// Init function
+	function init (options) {
+		// userId  = '%userId%';
+		referrer = document.referrer;
+		date = new Date();
 
-    function init () {
-        userId  = '%userId%';
-        referrer = document.referrer;
-        date = new Date();
-
-
-        if (sessionStorage.supertrackerSessionId) {
-            sessionId = sessionStorage.supertrackerSessionId;
-            console.log('Sessionstorage on');
-         } else {
-            console.log('Sessionstorage off');
-            var session = {userId: userId, date: date, screen: {}, location: {}};
-            // var windowX, windowY, screenX, screenY;
-            // var ipAddress, country, region, city;
-
-            session.screen.windowY = $(window).height();   // returns height of browser viewport
-            session.screen.windowX = $(window).width();   // returns width of browser viewport
-            session.screen.screenX = screen.width;
-            session.screen.screenY = screen.height;
-            
-            $.ajaxSetup({ cache: true });
-            $.getScript('http://js.maxmind.com/js/apis/geoip2/v2.1/geoip2.js', function () {
-                // ttt errorkezeles
-                geoip2.city(function (resCity) {
-
-                    session.location.ipAddress = resCity.traits.ip_address;
-                    session.location.country =  resCity.country.names.en;
-                    session.location.region =  resCity.subdivisions[0].names.en;
-                    session.location.city = resCity.city.names.en;
-
-                    $.ajax({
-                        url: '%path%/sessions',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(session)
-                    })
-                    .done(function(res) {
-                        console.log(res.sessionId);
-                        sessionStorage.supertrackerSessionId = res.sessionId;
-                        sessionId = res.sessionId;
-                    })
-                    .fail(function(err) {
-                        console.log("error");
-                        console.log(err);
-                    });
-                });
-            },
-            function(err) {
-                console.log(err);
-            });
-        }
-
-        flushingLoop = setInterval(flush, bufferTimeLimit);
-    }    
-
-    function track(eventName, eventData, comment) {
-
-        // Preparing data
-        var event = {
-            "userId": userId,
-            "sessionId": sessionId,
-            "referrer": referrer,
-            "name": eventName,
-            "data": eventData,
-            "date": new Date(),
-            "comments": comment
-        };
-
-        //Loading localstorage
-        if(typeof(Storage) !== "undefined") {
-            var eventBuffer;
-
-            if (localStorage.eventBuffer) {
-                eventBuffer = JSON.parse(localStorage.eventBuffer);
-                eventBuffer.push(event);
-            } else {
-                eventBuffer = [event];
-            }
-
-            localStorage.eventBuffer = JSON.stringify(eventBuffer);                
-
-            if (eventBuffer.length >= bufferSize) {
-                flush();
-            }
-
-
+        // Getting the current domain
+        var arrDomain = document.domain.split(".");
+        var domain = null;
+        if (arrDomain.length === 1){
+        	domain = null;
         } else {
-            console.log('Localstorage is not available...');
+        	domain = "." + arrDomain[arrDomain.length -2] + "." + arrDomain[arrDomain.length - 1];
         }
-    }
 
-    function flush () {
-        if(typeof(Storage) !== "undefined") {
-            if (localStorage.eventBuffer) {
-                $.ajax({
-                        url: '%path%/events',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(JSON.parse(localStorage.eventBuffer))                
-                    })
-                .done(function(data) {
-                    localStorage.removeItem('eventBuffer');
-                    clearInterval(flushingLoop);
-                    loop = setInterval(flush, bufferTimeLimit);
-                    $("#ajaxmessage").html(data);
-                })
-                .fail(function(data) {
-                    console.log("error");
-                    console.log(data);
-                    $("#ajaxmessage").html(data);
-                });
-            }
-        } else {
-            console.log('Localstorage is not available...');
-        }
-    }
+		if (storage) {
+	    	trackId = getCookie("supertrackerTrackId");
+		} else {
+			trackId = null;			
+		}
 
-    return {
-        track: track,
-        init: init
-    };
+		var first_session = false;
+		
+		if (trackId) {
+			setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain		
+		} else {
+			first_session = true;
+			trackId = uuid();
+			if (storage) {
+				// If no trackId then this is the first session fo the trackid
+				setCookie("supertrackerTrackId", trackId, 365, domain); //ttt actual domain
+			}
+		}
+
+		if (storage && sessionStorage.supertrackerSessionId) {
+			sessionId = sessionStorage.supertrackerSessionId;
+			// console.log('Sessionstorage on');
+			initiated = true;
+			onInit();
+		} else {
+			// getScript("%path%/javascripts/geoip2.js", function(){
+				// geoip2.city(function (resCity) {
+					
+					// console.log('Sessionstorage off');
+					var session = {};
+					if (options.properties) {
+						session.properties = options.properties;
+					}
+					if (!storage) {
+						if (session.properties) {
+							session.properties.cookiesDisabled = true;
+						} else {
+							session.properties = {cookiesDisabled: true};
+						}
+					}
+					if (first_session) {
+						session.first_session = true;
+					}
+					session.track_id = trackId;
+					session.date = date;
+					session.screen_windowX = window.innerWidth;   // returns width of browser viewport
+					session.screen_windowY = window.innerHeight;   // returns height of browser viewport
+					session.screen_screenX = screen.width;
+					session.screen_screenY = screen.height;
+
+					
+						// ttt errorkezeles
+
+					// session.location_ip = resCity.traits.ip_address;
+					// session.location_country =  resCity.country.names.en;
+					// session.location_region =  resCity.subdivisions[0].names.en;
+					// session.location_city = resCity.city.names.en;
+
+
+					var xhr = new XMLHttpRequest();
+					xhr.open('POST', '%path%/sessions');
+					xhr.setRequestHeader('Content-Type', 'application/json');
+					xhr.onload = function() {
+					    if (xhr.status === 200) {
+					        var res = JSON.parse(xhr.responseText);
+					        if (storage) {
+								sessionStorage.supertrackerSessionId = res.sessionId;
+					        }
+							sessionId = res.sessionId;
+					        if (res.errorMessage) {
+					        	alert(res.errorMessage);
+					        }
+					        initiated = true;
+							onInit();
+					    } else {
+					    	console.log("session_post_error");
+					    }
+					};
+					xhr.send(JSON.stringify(session));
+
+				// });
+			// });
+		}
+
+
+			flushingLoop = setInterval(flush, bufferTimeLimit);
+	}
+
+	function onInit () {
+		
+	}
+
+	function track(eventName, properties, comment, callback) {
+		// console.log("TRACK:");
+		// console.log(arguments);
+		// console.log("{");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
+
+		var args = [];
+		for (var i = 0; i < arguments.length; i++) {
+		    args.push(arguments[i]);
+		} 
+
+		eventName = args.shift();
+		if (args.length > 0)
+			if (typeof args[0] !== "function") {
+				properties = args.shift();
+			} else {
+				properties = null;
+				comment = null;
+				callback = args.shift();
+				args.length = 0;
+			}
+		if (args.length > 0)
+			if (typeof args[0] !== "function") {
+				comment = args.shift();
+			} else {
+				comment = null;
+				callback = args.shift();
+				args.length = 0;
+			}
+		if (args.length > 0) {
+			if (typeof args[0] !== "function") {
+				// comment = args.shift();
+			} else {
+				callback = args.shift();
+			}
+		}
+		// console.log("XXXX");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
+		// console.log("}");
+
+
+		if (initiated) {
+			// Preparing data
+			var event = {
+				"track_id": trackId,
+				"session_id": sessionId,
+				"name": eventName,
+				"referrer": referrer,
+				"current_url": window.location.href,
+				"properties": properties,
+				"date": new Date(),
+				"comments": comment
+			};
+
+			//Loading localstorage
+			evBuffer.push(event);
+
+			// Check if it is called as async
+			if ( typeof arguments[arguments.length - 1] == "function") {
+				flush(callback);
+			} else {
+				if (evBuffer.getLength() >= bufferSize) {
+					flush();
+				}
+			}
+
+		} else {
+			var origOnInit = onInit;
+			onInit = function () {
+				origOnInit();
+				track(eventName, properties, comment, callback);
+			};
+		}
+	}
+
+	function flush (callback) {
+		if (evBuffer.getLength() > 0) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', '%path%/events');
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onload = function() {
+			    if (xhr.status === 200) {
+			        var res = JSON.parse(xhr.responseText);
+			        if (res.errorMessage) {
+			        	alert(res.errorMessage);
+					}
+					clearInterval(flushingLoop);
+					flushingLoop = setInterval(flush, bufferTimeLimit);
+					if (typeof callback == "function") {
+						callback();
+					}
+			    } else {
+			    	console.log("event_flush_error");
+			    }
+			};
+			xhr.send(JSON.stringify(evBuffer.pop()));
+		} 
+	}
+
+	function identify(extUserId, extFlag, callback) { //ttt flushing mechanism
+
+		// console.log("TRACK:");
+		// console.log(arguments);
+		// console.log("{");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
+
+		var args = [];
+		for (var i = 0; i < arguments.length; i++) {
+		    args.push(arguments[i]);
+		} 
+
+		extUserId = args.shift();
+		if (args.length > 0)
+			if (typeof args[0] !== "function") {
+				extFlag = args.shift();
+			} else {
+				extFlag = null;
+				callback = args.shift();
+				args.length = 0;
+			}
+		if (args.length > 0) {
+			if (typeof args[0] !== "function") {
+				// comment = args.shift();
+			} else {
+				callback = args.shift();
+			}
+		}
+		// console.log("XXXX");
+		// console.log("eventName: " + eventName);
+		// console.log("properties: " + properties);
+		// console.log("comment: " + comment);
+		// console.log("callback: " + callback);
+		// console.log("}");
+
+
+		var user = {
+			"track_id": trackId,
+			"external_user_id": extUserId,
+			"external_flag": extFlag
+		};
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '%path%/users');
+		xhr.setRequestHeader('Content-Type', 'application/json');
+		xhr.onload = function() {
+			if (xhr.status === 200) {
+				var userInfo = JSON.parse(xhr.responseText);
+
+				console.log(userInfo);
+
+				if (userInfo.userSaved) {
+					if (typeof callback == "function") {
+						callback();
+						return;
+					}
+				}
+				if (typeof callback == "function") {
+					callback({err: "user couldnt be saved: " + userInfo});
+					return;
+				}
+			}
+		};
+		xhr.send(JSON.stringify(user));
+	}
+
+	function track_links (query) {
+		var links = document.querySelectorAll(query);
+
+		function onclickReplace (link, origOnclick) {
+
+			var onclick = function(event) {
+				var trimmedQuery = query.substring(1, query.length-1); // trimming the enclosing "[" and "]"
+				var trackData = event.target.getAttribute(trimmedQuery);
+				track( trackData, {link: true});
+				flush();
+
+				setTimeout(function () {
+					if (event.target.getAttribute("href")) {
+						window.location = event.target.getAttribute("href");
+					}
+					if (origOnclick) {
+						origOnclick(event);
+					}
+				},100);
+				return false;	
+			};
+
+			link.onclick = onclick;
+		}
+
+		for (var i = 0; i < links.length; i++) {
+			var origOnclick = links[i].onclick;
+			onclickReplace(links[i], origOnclick);
+		}
+	}
+
+	function uuid() {
+
+		// Random entropy
+		function R() {
+			return Math.floor((1 + Math.random()) * 0x10000)
+			.toString(16);
+			// .substring(1);
+		}
+
+		// Date entropy
+		function D() {
+			return (1*new Date()).toString(16);
+		}
+
+		// User agent entropy
+		function UA() {
+		    var ua = navigator.userAgent, i, ch, buffer = [], ret = 0;
+
+		    function xor(result, byte_array) {
+		        var j, tmp = 0;
+		        for (j = 0; j < byte_array.length; j++) {
+		            tmp |= (buffer[j] << j*8);
+		        }
+		        return result ^ tmp;
+		    }
+
+		    for (i = 0; i < ua.length; i++) {
+		        ch = ua.charCodeAt(i);
+		        buffer.unshift(ch & 0xFF);
+		        if (buffer.length >= 4) {
+		            ret = xor(ret, buffer);
+		            buffer = [];
+		        }
+		    }
+
+		    if (buffer.length > 0) { ret = xor(ret, buffer); }
+
+		    return ret.toString(16);
+		}
+
+		function S() {
+			return (screen.height*screen.width).toString(16);
+		}
+
+		return (D()+"-"+S()+"-"+UA()+"-"+R());
+	}
+
+	function setCookie(cname, cvalue, exdays, cdomain) {
+	    var d = new Date();
+	    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+	    var expires = "expires="+d.toUTCString();
+	    var domain = "domain=" + cdomain;
+	    var strCookie = cname + "=" + cvalue + "; " + expires + "; ";
+	    if (cdomain) {
+	    	strCookie = strCookie + domain;
+	    }
+	    document.cookie = strCookie;
+	}
+
+	function getCookie(cname) {
+	    var name = cname + "=";
+	    var ca = document.cookie.split(';');
+	    for(var i=0; i<ca.length; i++) {
+	        var c = ca[i];
+	        while (c.charAt(0)==' ') c = c.substring(1);
+	        if (c.indexOf(name) === 0) return c.substring(name.length, c.length);
+	    }
+	    return "";
+	}
+
+	// function getScript(source, callback) {
+	//     var script = document.createElement('script');
+	//     var prior = document.getElementsByTagName('script')[0];
+	//     script.async = 1;
+	//     prior.parentNode.insertBefore(script, prior);
+
+	//     script.onload = script.onreadystatechange = function( _, isAbort ) {
+	//         if(isAbort || !script.readyState || /loaded|complete/.test(script.readyState) ) {
+	//             script.onload = script.onreadystatechange = null;
+	//             script = undefined;
+
+	//             if(!isAbort) { if(callback) callback(); }
+	//         }
+	//     };
+
+	//     script.src = source;
+	// }
+
+	return {
+		init: init,
+		track: track,
+		identify: identify,
+		track_links: track_links
+	};
+}
+
+function checkStorage() {
+	var uid = new Date();
+	var cookie, ls, ss;
+	var lsResult, ssResult, cookieResult;
+	try {
+		// local
+		(ls = window.localStorage).setItem(uid, uid);
+		lsResult = ls.getItem(uid) == uid;
+		ls.removeItem(uid);
+		// session
+		(ss = window.sessionStorage).setItem(uid, uid);
+		ssResult = ss.getItem(uid) == uid;
+		ss.removeItem(uid);
+		// cookie
+		cookie = (navigator.cookieEnabled)? true : false;
+		if (typeof navigator.cookieEnabled=="undefined" && !cookieEnabled){ 
+			document.cookie="testcookie";
+			cookie = (document.cookie.indexOf("testcookie")!=-1)? true : false;
+		}
+		return ls && ss && lsResult && ssResult && cookie;
+	} catch (exception) {}
+}
+
+function eventBuffer (storage) {
+	var buffer = [];
+
+	function push (event){
+		if (storage) {
+			if (localStorage.eventBuffer) {
+				buffer = JSON.parse(localStorage.eventBuffer);
+				buffer.push(event);
+			} else {
+				buffer = [event];
+			}
+			localStorage.eventBuffer = JSON.stringify(buffer);   
+		} else {
+			buffer.push(event);
+		}
+	}
+
+	function pop () {
+		if (storage) {
+			if (localStorage.eventBuffer) {
+				buffer = JSON.parse(localStorage.eventBuffer);
+				localStorage.removeItem('eventBuffer');
+			} else {
+				buffer = [];
+			}
+		}
+
+		var buff = buffer;
+		buffer = [];
+		return buff;
+	}
+
+	function get () {
+		var buff;
+		if (storage) {
+			if (localStorage.eventBuffer) {
+				buff = JSON.parse(localStorage.eventBuffer);
+			} else {
+				buff = [];
+			}
+		} else {
+			buff = buffer;
+		}
+		return buff;
+	}
+
+	function getLength () {
+		var length;
+		if (storage) {
+			length = JSON.parse(localStorage.eventBuffer).length;
+		} else {
+			length = buffer.length;
+		}
+		return length;
+	}
+
+	return {
+		push: push,
+		pop: pop,
+		get: get,
+		getLength: getLength,
+
+		length: length
+	};
 }
 
 

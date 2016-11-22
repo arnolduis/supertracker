@@ -1,7 +1,15 @@
-var Funnel = require('../models/funnel');
-var Event = require('../models/event');
+var mongoose = require("mongoose");
+var async = require("async");
+var ObjectId = mongoose.Types.ObjectId;
+var MJ = require("mongo-fast-join");
+var mongoJoin = new MJ();
 
 module.exports = function(app, options) {
+	var Funnel = options.db.model("Funnel");
+	var Event = options.db.model("Event", require("../models/event"));
+	var Session = options.db.model("Session");
+	var User = options.db.model("User");
+
 
 	var stpath          = options.stpath;
 	var bufferSize      = options.bufferSize;
@@ -9,14 +17,18 @@ module.exports = function(app, options) {
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
 
-	// upsert funnel
+	// Upsert funnel
 	app.post(stpath+"/funnels", function(req, res) {
 
 		console.log('routes/funnels.post');
-		console.log(req.body.funnel.name);
+		console.log(req.body);
 
 		Funnel.findOneAndUpdate({'funnel.name': req.body.funnel.name}, req.body, {upsert: true}, function(err) { //qqq Ez Restful? Mert update es create kulon van
-			if (err) return res.send(err);
+			if (err) {
+				console.log(err);
+				res.send(err);	
+				return;
+			}
 			res.send( { response:"One funnel saved to ttt"} );
 		});	
 	});
@@ -37,18 +49,68 @@ module.exports = function(app, options) {
 	 * Applyfunnel
 	 */
 	app.post(stpath+"/funnels/apply", function (req, res) {
-		/// ddd reszletezd a gondolatmenetet
+
+		// console.log(req.body.funnel);
+		var sessionProperties = JSON.parse(req.body.funnel.sessionProperties);
+
+		var dateFrom = new Date(req.body.funnel.dateFrom);
+		var dateTo = new Date(req.body.funnel.dateTo);
+
+
 		var events = [];
 		var funnel = {steps: []};
 		var debug = {steps:[]};
+		var track_id2external_user_id = {};
+
 		for (var i = 0; i < req.body.funnel.steps.length; i++) {
 			events.push(req.body.funnel.steps[i].event);
 		    funnel.steps[i] = 0;
 		}
-		var map = function(){
-		    emit(this.sessionId,this.name);
+
+		var options = {
+			scope    : { events: events, funnel:funnel, debug: debug, track_id2external_user_id: track_id2external_user_id},
+			query    : {
+				name: {$in: events}
+			}, 
+			sort     : { date: 1 },
+			out      : { inline: 1},
 		};
-		var reduce = function(key, values) {
+
+		// Function choices
+		// Map
+		function sessionwiseMap () {
+			emit( this.session_id, this.name );
+		}
+		function userwiseMap () {
+			if (this.external_user_id) {
+				emit( this.external_user_id, this.name );
+			} else {
+				emit( track_id2external_user_id[this.track_id], this.name);
+			}
+		}
+		// Reduce
+		function linearReduce (key, values) {
+			print("linear reduce");
+			var funnelLength = 0;
+			var i;
+			for (i = 0; i < values.length; i++) {
+				if(events[funnelLength] === values[i]) {
+					funnelLength++;
+				}
+				if (events.length === funnelLength) {
+					break;
+				}
+			}
+			for (i = 0; i < funnelLength; i++) {
+				funnel.steps[i]++;	
+			}
+			return funnel;
+		}
+		function allfunnelReduce (key, values) {
+			print("allfunnel reduce");
+			// print(values);
+			// print(JSON.stringify(values));
+			// print("reduce  ", JSON.stringify(values));
 		    for (var j = 0; j < values.length; j++) {
 		        var k = 0;
 		        while( (j+k) < values.length && values[j+k] == events[k]) {
@@ -56,40 +118,111 @@ module.exports = function(app, options) {
 		            k++;
 		        }
 		    }
-
 		    return funnel;
-		};
-		var finalize = function(key, redValues) {
-		    if(typeof redValues === 'string'){
+		}
+		function longestFunnelReduce (key, values) {
+			print("Longest reduce");
+			// print(values);
+			// print(JSON.stringify(values));
+			// print("reduce  ", JSON.stringify(values));
+			funnelLength = 0;
+		    for (var j = 0; j < values.length; j++) {
+		        var k = 0;
+		        while( (j+k) < values.length && values[j+k] == events[k]) {
+		            k++;
+		        }
+		        if (k > funnelLength) {
+		        	funnelLength = k;
+		        }
+		    }
+		    for (var i = 0; i < funnelLength; i++) {
+		    	funnel.steps[i]++;	
+		    }
+		    return funnel;
+		}
+
+
+
+		// map
+		options.map = sessionwiseMap;
+		// reduce
+		options.reduce = allfunnelReduce;
+		// finalize
+		options.finalize = function(key, redValues) {
+			// print("finalize", events[0] == redValues);
+		    if(redValues == events[0]){
 		        funnel.steps[0]++;
 		    }
 		    return funnel;
 		};
-		var options = {
-		        scope: {events: events, funnel:funnel, debug: debug},
-		        query: { name: {$in: events}},
-		        sort: {sessionId:1, date:1 },
-		        finalize: finalize,
-		        out: "funnelResult",
-		            
-		};
+		//Userwise matching
+		if (req.body.funnel.options && req.body.funnel.options.userwise) {
+			options.map = userwiseMap;
+		} 
+		// Exact funnel matching
+		if (req.body.funnel.options && req.body.funnel.options.exact) {
+			delete options.query.name;
+		}
+		// First users
+		if (req.body.funnel.options && req.body.funnel.options.newUsers) {
+			sessionProperties.first_session = true;
+		} 
+		// Longest funnel
+		if (req.body.funnel.options && req.body.funnel.options.longestFunnel) {
+			options.reduce = longestFunnelReduce;
+		} 
+		// Linear funnel
+		if (req.body.funnel.options && req.body.funnel.options.linearFunnel) {
+			options.reduce = linearReduce;
+		} 
+
+		console.log("ST: FUNNEL");
+		console.log("events", events);
+		process.stdout.write("Map function:    ");
+		console.log(options.map);
+		process.stdout.write("Reduce function: ");
+		console.log(options.reduce);
+		console.log("from:", dateFrom.toISOString());
+		console.log("to:  ", dateTo.toISOString());
+		// Search for the needed sessions
+		if (req.body.funnel.options && req.body.funnel.options.userwise) {
+			User.find({}, function (err, users) {
+				for (var i = 0; i < users.length; i++) {
+					track_id2external_user_id[users[i].track_id] = users[i].external_user_id;
+				}
+				mapreduce(options);
+			});
+		} else {
+			sessionProperties.date = { $gte: dateFrom, $lt: dateTo };
+			Session.find(sessionProperties,{session_id: 1, track_id: 1},{}, function (err, goodPropSessions) {
+				if (err) {
+					console.log(err); 
+					res.send(err); 
+					return;
+				}
+
+				var goodPropSessionIds = [];
+
+				for (var i = 0; i < goodPropSessions.length; i++) {
+					goodPropSessionIds.push(goodPropSessions[i]._id);
+				}
+				options.query.session_id = { $in:  goodPropSessionIds };
+				mapreduce(options);
+			});
+		}
 		
-
-		Event.mapReduce({
-			map      : map,
-			reduce   : reduce,
-			scope    : options.scope,
-			query    : options.query,
-			sort     : options.sort,
-			finalize : options.finalize,	
-			out      : options.out
-		}, function (err, model, stats) {
-		  model.find().exec(function (err, docs) {
-		  	if (err) return console.log(err);
-// console.log(JSON.stringify(docs));	
-		    res.send(docs[docs.length-1].value.steps);
-		  });
-		});
-
+		function mapreduce (options) {
+			Event.mapReduce(options, function (err, model, stats) {
+				if (err) {
+					console.log(err);
+					return res.send({err: err});
+				}
+				if (model.length > 0) {
+					res.send(model[model.length-1].value.steps);
+				} else {
+					res.send({});
+				}
+			});
+		}
 	});
 };

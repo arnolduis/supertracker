@@ -3,7 +3,7 @@
 
 var express = require('express');
 var app     = express();
-var port    =   process.env.PORT || 3000;
+var port    =   process.env.PORT || 3005;
 var path = require('path');
 var bodyParser = require('body-parser');
 var nconf = require('nconf');
@@ -37,17 +37,11 @@ var secondPage = require('./routes/secondPage');
 app.get('/', index);
 app.get('/secondPage', secondPage);
 
-// LOGIC
+// SUPERTRACKER CONFIG
 // ==============================================
-
-
 var stpath = nconf.get('stpath');
 var mwAuth = function (req, res, next) {
-	if (req.supertracker.userId === 'arni') {
-		next();
-	}else {
-		res.send("Sorry, you can't acces the Supertrackers dashboard with this account. ");			
-	}
+	next();
 };
 
 var st = require('supertracker')(app, stpath, mwAuth);

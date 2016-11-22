@@ -1,6 +1,7 @@
 {
   "name": "supertracker",
-  "version": "0.0.14",
+  
+  "version": "0.0.50",
   "description": "A super package for tracking and visualising user activity",
   "main": "./lib/supertracker.js",
   "bin": {
@@ -14,15 +15,16 @@
     "url": "https://github.com/arnolduis/supertracker.git"
   },
   "dependencies": {
-    "mongoose": ">3.0.0",
-    "express": ">3.0.0",
-    "body-parser": "*",
-    "nconf": "*",
-    "ua-parser": "*",
     "async": "*",
-    "referer-parser": "*",
+    "body-parser": "*",
+    "cors": "~2.7.1",
+    "express": ">3.0.0",
     "mongo-fast-join": "*",
-    "strftime": "*" 
+    "mongoose": ">3.0.0",
+    "nconf": "*",
+    "referer-parser": "*",
+    "strftime": "*",
+    "ua-parser": "*"
   },
   "keywords": [
     "event",

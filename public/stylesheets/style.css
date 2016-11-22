@@ -41,11 +41,11 @@ body
     margin-bottom: 20px;
 
     border: 2px solid #a6b1b6;
-    background-color: #fff;
+/*    background-color: #fff;
     -webkit-box-shadow: 3px 3px 5px -1px rgba(0,0,0,.75);
        -moz-box-shadow: 3px 3px 5px -1px rgba(0,0,0,.75);
             box-shadow: 3px 3px 5px -1px rgba(0,0,0,.75);
-}
+*/}
 
 .widget h2
 {
@@ -98,6 +98,11 @@ button, select, input {
     max-width: 170px; 
 }
 
+.fullDate {
+    max-width: 400px;   
+    /*width: 400px;   */
+}
+
 button
 {
     color: #627b86;
@@ -119,6 +124,10 @@ button
        -moz-border-radius: 30px 30px 30px 30px;
             border-radius: 30px 30px 30px 30px;
     background-color: #a6b1b6;
+}
+
+table.dateSelection {
+    /*width: 100%;*/
 }
 
 table.cohortTable {
@@ -143,4 +152,26 @@ table.cohortTable td {
     border-style: solid;
     border-color: #666666;
     background-color: #ffffff;
+}
+
+td {
+    /*border: 1px solid red;*/
+    padding: 3px;
+    vertical-align: top;
+}
+
+table.userpath tbody:nth-child(odd) {
+    background: #f1f1f1;
+}
+
+table.userpath tbody:nth-child(even) {
+    background: pink;
+}
+
+table.userpath {
+    width: 100%;
+}
+
+table.userpath tr {
+    border-bottom: 1px solid black;
 }

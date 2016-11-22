@@ -5,158 +5,22 @@
 	<title><%= title %></title>
     <link rel='stylesheet' href='<%= stpath %>/stylesheets/normalize.css' />
 	<link rel='stylesheet' href='<%= stpath %>/stylesheets/style.css' />
-
-    <script src='<%= stpath %>/javascripts/jquery-1.11.1.min.js'></script>
-    <script src="<%= stpath %>/javascripts/dhtmlxcalendar.js"></script>
-    <script src="<%= stpath %>/javascripts/dateFormat.js"></script>
     <link rel="stylesheet" type="text/css" href="<%= stpath %>/stylesheets/dhtmlxcalendar.css"/>
-
-    <script src="<%= stpath %>/viewmodels/dashboardVM"></script>
-    <script src="<%= stpath %>/javascripts/knockout-3.1.0.js"></script>
-    <script src="<%= stpath %>/javascripts/Chart.min.js"></script>
-
-    <script type="text/html" id='step-template'>
-        <div class = 'step'>
-            <h2 data-bind="text:'Step ' + $index()"></h2>
-            <select data-bind="options: events, value: event"></select>
-            <select data-bind="options: properties, value: property", width="8"></select>
-            <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
-            <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
-            <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
-            <button data-bind="click: $parents[1].removeStep" class="removeStep">x</button>
-        </div>
-    </script>
-
-    <script type="text/html" id='funnel-template'>
-        <div class="funnel">
-            <input  data-bind="value: $data.name, valueUpdate: 'afterkeydown'", placeholder='Funnel Name'>            
-            <div class="steps">
-                <!-- ko foreach: $data.steps -->
-                <div data-bind="template: { name: 'step-template', data: $data }"></div>
-                <!-- /ko -->
-            </div>
-            <button id="buttonAddStep" data-bind="click: $data.addStep">+</button>
-        </div>
-    </script>
-
-    <script type="text/html" id='conditionStepTemplate'>
-        <div class = 'step'>
-            <select data-bind="options: properties, value: property", width="8"></select>
-            <select data-bind="options: operation_type().operators, optionsText: 'name', optionsValue: 'value', value: operator"></select>
-            <input  data-bind="value: value, valueUpdate: 'afterkeydown'">
-            <select data-bind="options: operation_types, optionsText: 'name', value: operation_type"></select>
-            <button data-bind="click: $parents[1].removeStep" class="removeStep">x</button>
-        </div>
-    </script>
-
-    <script type="text/html" id='conditionTemplate'>
-        <div class="funnel">
-            <div class="steps">
-                <!-- ko foreach: $data.steps -->
-                <div data-bind="template: { name: 'conditionStepTemplate', data: $data }"></div>
-                <!-- /ko -->
-            </div>
-            <button id="buttonAddStep" data-bind="click: $data.addStep">+</button>
-        </div>
-    </script>
-
 </head>
 <body >
 <div class="steps">
 
-    <div><a href="/">Back</a></div><br>
-    <label for="userId">Observer Id:</label>
-    <span id="userId" data-bind="text: userId"></span><br><br>
-
-
+    <div>
+        <a href="/">Back</a>
+    </div>
+    <br>
+    <!-- USER PATH ANALYSIS PANEL -->    
+    <% include userPathPanel %> 
     <!-- FUNNEL ANALYSIS PANEL -->
-
-    <div class="content">
-        <p><h1>Funnel Analysis</h1></p>
-        
-        <div class="widget" id="funnelPicker">
-            <h2>Funnel List</h2>
-            <select data-bind="options: funnels, optionsText: 'name', value: funnelSelected"></select>
-            <button data-bind="click: addFunnel">New Funnel</button>
-        </div>
-
-        <div class="widget" id="funnelEditor">
-            <h2>Edit Funnel</h2>
-            <div data-bind="template: { name: 'funnel-template', data: funnelEdited }"></div>
-            <button data-bind="click: saveFunnel">Save</button>
-            <button data-bind="click: deleteFunnel">Delete</button>
-            <button data-bind="click: applyFunnel">Show</button>
-        </div>
-
-        <div class="widget" id="funnelChart">
-            <h2>Chart</h2>
-            <span class="label">From</span> <input type="text" id="funnel_date_from" data-bind="click: setSens('funnel_date_to', 'max');" readonly="true">
-            <span class="label">Till</span> <input type="text" id="funnel_date_to" data-bind="click: setSens('funnel_date_from', 'min');" readonly="true">
-
-            <div class="canvas-container">
-                <canvas id="funnelCanvas" width="680" height="300"></canvas>
-            </div>
-        </div>
-    </div>
-
-
+    <% include funnelPanel %> 
     <!-- RETENTION ANALYSIS PANEL -->
-
-    <div class="content">
-        <p><h1>Retention Analysis</h1></p>
-
-
-        <div class="widget" id="cohortChart">
-            <h2>Retention Chart</h2>
-            <span class="label">From</span> <input type="text" id="cohort_date_from" data-bind="click: setSensCohort('cohort_date_to', 'max');" readonly="true">
-            <span class="label">Till</span> <input type="text" id="cohort_date_to" data-bind="click: setSensCohort('cohort_date_from', 'min');" readonly="true">
-            <div></div>
-            <span class="label">Rows</span> <input type="text" id="cohRows" data-bind="value: cohRows">
-            <span class="label">Cols</span> <input type="text" id="cohCols" data-bind="value: cohCols">
-            <div></div>
-            <button data-bind="click: applyCohort">Show</button>
-
-
-            <table class="cohortTable">
-                <tbody data-bind="foreach: retentionMX">
-                    <tr data-bind="foreach: $data">
-                        <td data-bind="text: $data"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-
     <!-- COHORT ANALYSIS PANEL -->
 
-    <div class="content">
-        <p><h1>Segmentation Analysis</h1></p>
-
-
-        <div class="widget" id="segChart">
-            <h2>Segmentation Chart</h2>
-
-            <span class="label">From</span> <input type="text" id="segFrom">    
-            <select data-bind="options: intervals, value: segTimeInt"></select>
-            <div></div>
-            <span class="label">Event: </span> <select data-bind="options: events, value: segEvent"></select>
-            <div></div>
-            <span class="label">By: </span>    <select data-bind="options: properties, value: segGrpBy"></select>
-            <!-- <div>Where</div> -->
-
-                <!-- <div data-bind="template: { name: 'segCondTemplate', data: segCondition }"></div> -->
-
-            <button data-bind="click: applySegQuery">Show</button>
-
-
-            <div class="canvas-container">
-                <canvas id="segCanvas" width="680" height="300"></canvas>
-            </div>
-        </div>
-
-
-    </div>
-
+    <% include scripts %> 
 </body>
 </html>
