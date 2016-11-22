@@ -12,9 +12,10 @@ var User = options.db.model("User");
 	var db              = options.db;
 	var mwAuth			= options.mwAuth;
 
+	app.options(stpath+"/events" , cors(options.corsOptions));
 	app.get(stpath+"/events"              , getEvents); // get list of all events
 	app.get(stpath+"/events/getNames"     , getNames); // get event names for picking
-	app.post(stpath+"/events"             , postEvents); // put event to db
+	app.post(stpath+"/events"             , cors(options.corsOptions), postEvents); // put event to db
 
 	app.options(stpath+"/events/external" , cors(options.corsOptions));
 	app.post(stpath+"/events/external"    , cors(options.corsOptions), postExternalEvent); // put event to db
